@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:async';
 
 class HomePage extends StatefulWidget {
   @override
@@ -11,45 +12,60 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
+  List<Message> messages;
   final databaseReference = Firestore.instance;
 
   @override
+  void initState() {
+    super.initState();
+    CollectionReference reference =
+        Firestore.instance.collection('conversations');
+    reference.snapshots().listen((querySnapshot) {
+      querySnapshot.documentChanges.forEach((change) {
+        setState(() {});
+      });
+    });
+    
+  }
+
+  @override
   Widget build(BuildContext context) {
+    print(databaseReference.collection('users').document('df').);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('FireStore Demo'),
-      ),
-      body: Center(
-          child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          RaisedButton(
-            child: Text('Create Record'),
-            onPressed: () {
-              createRecord();
-            },
-          ),
-          RaisedButton(
-            child: Text('View Record'),
-            onPressed: () {
-              getData();
-            },
-          ),
-          RaisedButton(
-            child: Text('Update Record'),
-            onPressed: () {
-              updateData();
-            },
-          ),
-          RaisedButton(
-            child: Text('Delete Record'),
-            onPressed: () {
-              deleteData();
-            },
-          ),
-        ],
-      )), //center
-    );
+        appBar: AppBar(
+          title: Text('FireStore Demo'),
+        ),
+        body: Flex(
+          children: <Widget>[
+            Expanded(
+              child: FutureBuilder(
+                future: databaseReference
+                    .collection('conversations')
+                    .getDocuments(),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                      return new Text('loading...');
+                    default:
+                      if (snapshot.hasError)
+                        return new Text('Error: ${snapshot.error}');
+                      else
+                        return createListView(context, snapshot);
+                  }
+                },
+              ),
+            ),
+            Expanded(
+              child: Container(
+                child: TextField(),
+              ),
+            )
+          ],
+          direction: Axis.vertical,
+        )
+        //center
+        );
   }
 
   void createRecord() async {
@@ -65,13 +81,29 @@ class HomePageState extends State<HomePage> {
     print(ref.documentID);
   }
 
-  void getData() {
-    databaseReference
-        .collection("books")
-        .getDocuments()
-        .then((QuerySnapshot snapshot) {
-      snapshot.documents.forEach((f) => print('${f.data}}'));
-    });
+  Widget createListView(BuildContext context, AsyncSnapshot snapshot) {
+    QuerySnapshot values = snapshot.data;
+    print(values.documents.length);
+    List<DocumentSnapshot> texts = new List<DocumentSnapshot>();
+    for (DocumentSnapshot s in values.documents) {
+      print(s.data['content']);
+      texts.add(s);
+    }
+    return new ListView.builder(
+      itemCount: texts.length,
+      itemBuilder: (BuildContext context, int index) {
+        return new Column(
+          children: <Widget>[
+            new ListTile(
+              title: new Text(texts[index].data['content']),
+            ),
+            new Divider(
+              height: 2.0,
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void updateData() {
@@ -92,4 +124,9 @@ class HomePageState extends State<HomePage> {
       print(e.toString());
     }
   }
+}
+
+class Message {
+  String text, from, date;
+  Message(this.text, this.from, this.date);
 }
