@@ -2,8 +2,15 @@ import 'package:flutter/material.dart';
 import 'login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+class HomePage extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    // TODO: implement createState
+    return HomePageState();
+  }
+}
 
-class MyApp extends StatelessWidget {
+class HomePageState extends State<HomePage> {
   final databaseReference = Firestore.instance;
 
   @override
@@ -46,18 +53,15 @@ class MyApp extends StatelessWidget {
   }
 
   void createRecord() async {
-    await databaseReference.collection("books")
-        .document("1")
-        .setData({
-          'title': 'Mastering Flutter',
-          'description': 'Programming Guide for Dart'
-        });
+    await databaseReference.collection("books").document("1").setData({
+      'title': 'Mastering Flutter',
+      'description': 'Programming Guide for Dart'
+    });
 
-    DocumentReference ref = await databaseReference.collection("books")
-        .add({
-          'title': 'Flutter in Action',
-          'description': 'Complete Programming Guide to learn Flutter'
-        });
+    DocumentReference ref = await databaseReference.collection("books").add({
+      'title': 'Flutter in Action',
+      'description': 'Complete Programming Guide to learn Flutter'
+    });
     print(ref.documentID);
   }
 
@@ -83,10 +87,7 @@ class MyApp extends StatelessWidget {
 
   void deleteData() {
     try {
-      databaseReference
-          .collection('books')
-          .document('1')
-          .delete();
+      databaseReference.collection('books').document('1').delete();
     } catch (e) {
       print(e.toString());
     }

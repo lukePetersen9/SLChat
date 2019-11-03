@@ -1,11 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'homepage.dart';
 
 class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
+      floatingActionButton: FloatingActionButton(onPressed: (){Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );},),
       body: Container(
         child: Flex(
           direction: Axis.vertical,
