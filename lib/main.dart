@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+Rimport 'package:flutter/material.dart';
 import 'login.dart';
 
 void main() => runApp(new MediaQuery(
