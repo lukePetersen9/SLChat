@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() => runApp(new MediaQuery(
-    data: new MediaQueryData(), child: new MaterialApp(home: Login())));
 
 class MyApp extends StatelessWidget {
   final databaseReference = Firestore.instance;
