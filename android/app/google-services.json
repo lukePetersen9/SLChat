@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "95682760876",
+    "firebase_url": "https://slchat-20911.firebaseio.com",
+    "project_id": "slchat-20911",
+    "storage_bucket": "slchat-20911.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:95682760876:android:c37eda75af54dadc064f09",
+        "android_client_info": {
+          "package_name": "com.hackohio.slchatappandroid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "95682760876-3826catqfj2vnlh443fn6dv8m2lnhvs1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqMTy3jaeuqiMFOS9ijH0H-0qOIkGG3Qw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "95682760876-3826catqfj2vnlh443fn6dv8m2lnhvs1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "95682760876-ere6a1vn7piinv04toq97ri8qbog0plu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.maybe.test"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
