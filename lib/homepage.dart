@@ -13,6 +13,9 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   List<Message> messages;
+  TextEditingController msgController = new TextEditingController();
+
+
   final databaseReference = Firestore.instance;
 
   @override
@@ -25,15 +28,14 @@ class HomePageState extends State<HomePage> {
         setState(() {});
       });
     });
-    
   }
 
   @override
   Widget build(BuildContext context) {
-    print(databaseReference.collection('users').document('df').);
+    print(databaseReference.collection('users').document('df'));
     return Scaffold(
         appBar: AppBar(
-          title: Text('FireStore Demo'),
+          title: Text('SL Chat'),
         ),
         body: Flex(
           children: <Widget>[
@@ -58,7 +60,21 @@ class HomePageState extends State<HomePage> {
             ),
             Expanded(
               child: Container(
-                child: TextField(),
+                child: TextField(
+                  controller: msgController,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                child: FloatingActionButton(
+                  onPressed: () {
+                    addToMessages();
+                    //createRecord();
+                  },
+                  child: Icon(Icons.send),
+                  backgroundColor: const Color(0xff937acc),
+                ),
               ),
             )
           ],
@@ -124,9 +140,24 @@ class HomePageState extends State<HomePage> {
       print(e.toString());
     }
   }
+
+  void addToMessages() async {
+    if(msgController.text != null){
+    await databaseReference.collection("conversations").document("November0920191352").setData({
+      'content': msgController.text,
+      'sender': 'shubham24',
+      'sent' : "November0920191407" 
+    });
+    }
+
+    msgController.clear();
 }
+}
+
+
 
 class Message {
   String text, from, date;
   Message(this.text, this.from, this.date);
 }
+
