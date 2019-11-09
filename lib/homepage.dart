@@ -30,7 +30,7 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    print(databaseReference.collection('users').document('df').);
+    print(databaseReference.collection('users').document('df'));
     return Scaffold(
         appBar: AppBar(
           title: Text('FireStore Demo'),
