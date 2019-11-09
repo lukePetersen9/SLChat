@@ -143,7 +143,7 @@ class HomePageState extends State<HomePage> {
   }
 
   void addToMessages() async {
-    if (msgController.text != null) {
+    if (msgController.text != null && msgController.text != '') {
       var now = new DateTime.now();
       await databaseReference
           .collection("conversations")
