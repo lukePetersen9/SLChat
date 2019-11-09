@@ -48,19 +48,19 @@ class Login extends StatelessWidget {
           ),
         ),
         floatingActionButton: FloatingActionButton(onPressed: () {
-
           //dataBaseReference.collection('users').document(tE.text).get()
-          if ((uname == 'lukePetersen19' && pwd == '1234') ||
-              (uname == 'shubham24' && pwd == 'qwerty')) {
+          if (uname == 'lukePetersen29' && pwd == '1234') {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => HomePage()),
+              MaterialPageRoute(
+                  builder: (context) => HomePage('lukePetersen29')),
             );
-          }
-          else
-          {
-            
-          }
+          } else if (uname == 'shubham24' && pwd == 'qwerty') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage('shubham24')),
+            );
+          } else {}
         }));
   }
 

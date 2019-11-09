@@ -1,20 +1,23 @@
+
 import 'package:flutter/material.dart';
 import 'login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 
 class HomePage extends StatefulWidget {
+  final String userName;
+  HomePage(this.userName);
+
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return HomePageState();
   }
 }
 
 class HomePageState extends State<HomePage> {
-  List<Message> messages;
+  ScrollController scrollController = new ScrollController();
+  List<Message> messages = new List<Message>();
   TextEditingController msgController = new TextEditingController();
-
 
   final databaseReference = Firestore.instance;
 
@@ -25,13 +28,16 @@ class HomePageState extends State<HomePage> {
         Firestore.instance.collection('conversations');
     reference.snapshots().listen((querySnapshot) {
       querySnapshot.documentChanges.forEach((change) {
-        setState(() {});
+        if (!(change.document.data['sender'] == (widget.userName))) {
+          setState(() {});
+        }
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    print(messages.length);
     print(databaseReference.collection('users').document('df'));
     return Scaffold(
         appBar: AppBar(
@@ -42,7 +48,7 @@ class HomePageState extends State<HomePage> {
             Expanded(
               child: FutureBuilder(
                 future: databaseReference
-                    .collection('conversations')
+                    .collection('conversations').orderBy('sent',descending: true)
                     .getDocuments(),
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   switch (snapshot.connectionState) {
@@ -70,7 +76,7 @@ class HomePageState extends State<HomePage> {
                 child: FloatingActionButton(
                   onPressed: () {
                     addToMessages();
-                    //createRecord();
+                    setState(() {});
                   },
                   child: Icon(Icons.send),
                   backgroundColor: const Color(0xff937acc),
@@ -106,17 +112,12 @@ class HomePageState extends State<HomePage> {
       texts.add(s);
     }
     return new ListView.builder(
+      reverse: true,
+      // controller: scrollController,
       itemCount: texts.length,
       itemBuilder: (BuildContext context, int index) {
-        return new Column(
-          children: <Widget>[
-            new ListTile(
-              title: new Text(texts[index].data['content']),
-            ),
-            new Divider(
-              height: 2.0,
-            ),
-          ],
+        return ListTile(
+          title: new Text(texts[index].data['content']),
         );
       },
     );
@@ -142,22 +143,23 @@ class HomePageState extends State<HomePage> {
   }
 
   void addToMessages() async {
-    if(msgController.text != null){
-    await databaseReference.collection("conversations").document("November0920191352").setData({
-      'content': msgController.text,
-      'sender': 'shubham24',
-      'sent' : "November0920191407" 
-    });
+    if (msgController.text != null) {
+      var now = new DateTime.now();
+      await databaseReference
+          .collection("conversations")
+          .document(now.toString())
+          .setData({
+        'content': msgController.text,
+        'sender': widget.userName,
+        'sent': now.toString(),
+      });
     }
 
     msgController.clear();
+  }
 }
-}
-
-
 
 class Message {
   String text, from, date;
   Message(this.text, this.from, this.date);
 }
-
