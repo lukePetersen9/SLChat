@@ -94,9 +94,6 @@ class Login extends StatelessWidget {
                     ),
                     child: TextField(
                       controller: uNameController,
-                      onChanged: (text) {
-                        uname = uNameController.text;
-                      },
                       cursorColor: Colors.grey[50],
                       style: TextStyle(
                           fontSize: height / 31, color: Colors.black45),
@@ -123,9 +120,6 @@ class Login extends StatelessWidget {
                     ),
                     child: TextField(
                       controller: pwdController,
-                      onChanged: (text) {
-                        pwd = pwdController.text;
-                      },
                       cursorColor: Colors.grey[50],
                       style: TextStyle(
                           fontSize: height / 31, color: Colors.black45),
