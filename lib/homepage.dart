@@ -25,7 +25,44 @@ class HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text("SLChat"),
       ),
-      body: displayMessages(),
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            displayMessages(),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.amber),
+                    ),
+                    child: TextField(
+                      controller: msgController,
+                      keyboardType: TextInputType.multiline,
+                      decoration: InputDecoration.collapsed(
+                        hintText: 'your message...',
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.blur_circular),
+                    onPressed: () {
+                      if (msgController.text != null &&
+                          msgController.text != '') {
+                        addToMessages(msgController.text);
+                        msgController.clear();
+                      }
+                    },
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -82,31 +119,16 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  Future<List<String>> getSomeData() async {
-    List<String> list = new List<String>();
-    databaseReference
-        .collection("users")
-        .getDocuments()
-        .then((QuerySnapshot snapshot) {
-      snapshot.documents.forEach((f) => list.add(f.data['name']));
+  void addToMessages(String value) async {
+    var now = new DateTime.now();
+    await databaseReference
+        .collection("conversations")
+        .document(now.toString())
+        .setData({
+      'content': msgController.text,
+      'sender': widget.userName,
+      'sent': now.toString(),
     });
-    return list;
-  }
-
-  void addToMessages() async {
-    if (msgController.text != null && msgController.text != '') {
-      var now = new DateTime.now();
-      await databaseReference
-          .collection("conversations")
-          .document(now.toString())
-          .setData({
-        'content': msgController.text,
-        'sender': widget.userName,
-        'sent': now.toString(),
-      });
-    }
-
-    msgController.clear();
   }
 }
 
