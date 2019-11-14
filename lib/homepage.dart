@@ -23,8 +23,14 @@ class HomePageState extends State<HomePage> {
     print(widget.userName);
     return Scaffold(
       appBar: AppBar(
-        title: Text("SLChat"),
-      ),
+          title: Row(
+        children: <Widget>[
+          CircleAvatar(
+            backgroundColor: Colors.black,
+          ),
+          Text("  SL Chat")
+        ],
+      )),
       body: SingleChildScrollView(
         reverse: true,
         child: Container(
@@ -138,7 +144,7 @@ class HomePageState extends State<HomePage> {
             ? Alignment.centerRight
             : Alignment.centerLeft,
         child: Container(
-          constraints: BoxConstraints(minWidth: 35, maxWidth: width*6),
+          constraints: BoxConstraints(minWidth: 35, maxWidth: width * 6),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
             color: currentUser == sender ? Colors.blue[300] : Colors.amber[200],
@@ -183,7 +189,15 @@ class HomePageState extends State<HomePage> {
       'sent': now.toString(),
     });
   }
+
+  String getUserProfileImage()
+  {
+    
+  }
+
 }
+
+
 
 class Message {
   String text, from, date;
