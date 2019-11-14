@@ -9,12 +9,10 @@ class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    TextEditingController uNameController = new TextEditingController();
-    TextEditingController pwdController = new TextEditingController();
+    //TextEditingController uNameController = new TextEditingController();
+    //TextEditingController pwdController = new TextEditingController();
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    String uname = uNameController.text;
-    String pwd = pwdController.text;
     return Scaffold(
       body: SingleChildScrollView(
         // physics: ClampingScrollPhysics(),
@@ -74,9 +72,9 @@ class Login extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    '  Login to start using this exclusive service',
+                    'Login to start using this exclusive service',
                     style:
-                        TextStyle(fontSize: height / 40, color: Colors.black45),
+                        TextStyle(fontSize: height / 45, color: Colors.black45),
                   ),
                 ),
               ),
@@ -93,7 +91,10 @@ class Login extends StatelessWidget {
                       borderRadius: BorderRadius.circular(height / 40),
                     ),
                     child: TextField(
-                      controller: uNameController,
+                      //controller: uNameController,
+                      onChanged: (text){
+                        uname = text;
+                      },
                       cursorColor: Colors.grey[50],
                       style: TextStyle(
                           fontSize: height / 31, color: Colors.black45),
@@ -119,7 +120,10 @@ class Login extends StatelessWidget {
                       borderRadius: BorderRadius.circular(height / 40),
                     ),
                     child: TextField(
-                      controller: pwdController,
+                      //controller: pwdController,
+                      onChanged: (text){
+                        pwd = text;
+                      },
                       cursorColor: Colors.grey[50],
                       style: TextStyle(
                           fontSize: height / 31, color: Colors.black45),
@@ -149,7 +153,7 @@ class Login extends StatelessWidget {
                     ),
                     onPressed: () {
                       
-                      signIn(context, uNameController.text, pwdController.text);
+                      signIn(context, uname, pwd);
                     },
                   ),
                 ),
@@ -160,7 +164,7 @@ class Login extends StatelessWidget {
               )
             ],
           ),
-        ),
+        )
       ), // This trailing comma makes auto-formatting nicer for build methods.
 
       //dataBaseReference.collection('users').document(tE.text).get()
