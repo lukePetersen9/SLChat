@@ -38,66 +38,75 @@ class HomePageState extends State<HomePage> {
           Text("SL Chat")
         ],
       )),
-      body: SingleChildScrollView(
-        reverse: true,
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: Flex(
-            direction: Axis.vertical,
-            children: <Widget>[
-              Expanded(
-                flex: 7,
-                child: displayMessages(),
-              ),
-              Expanded(
-                child: Flex(
-                  direction: Axis.horizontal,
-                  children: <Widget>[
-                    Expanded(
-                      flex: 4,
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: Flex(
+          direction: Axis.vertical,
+          children: <Widget>[
+            Expanded(
+              flex: MediaQuery.of(context).viewInsets.bottom == 0 ? 8 : 5,
+              child: displayMessages(),
+            ),
+            Expanded(
+              child: Flex(
+                direction: Axis.horizontal,
+                children: <Widget>[
+                  Expanded(
+                    flex: 5,
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                       child: Container(
-                        padding: EdgeInsets.all(5),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 3, horizontal: 10),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.amber),
+                          border: Border.all(color: Colors.blue[200]),
                         ),
                         child: TextField(
+                          cursorColor: Colors.blue[200],
+                          style:
+                              TextStyle(fontSize: 22, fontFamily: 'Garamond'),
                           controller: msgController,
                           keyboardType: TextInputType.multiline,
                           decoration: InputDecoration.collapsed(
+                            hintStyle:
+                                TextStyle(fontSize: 22, fontFamily: 'Garamond'),
                             hintText: 'your message...',
                           ),
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: Container(
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.blur_circular,
-                            color: Colors.blue,
-                            size: 40,
-                          ),
-                          onPressed: () {
-                            if (msgController.text != null &&
-                                msgController.text != "") {
-                              addToMessages(msgController.text,firstUser,secondUser);
-                              setState(() {
-                                scrollController.jumpTo(
-                                    scrollController.position.maxScrollExtent);
-                                msgController.clear();
-                              });
-                            }
-                          },
+                  ),
+                  Expanded(
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.blur_circular,
+                          color: Colors.blue,
+                          size: 40,
                         ),
+                        onPressed: () {
+                          if (msgController.text != null &&
+                              msgController.text != "") {
+                            addToMessages(msgController.text, firstUser,
+                                secondUser, widget.userName);
+                            setState(() {
+                              scrollController.jumpTo(
+                                  scrollController.position.maxScrollExtent);
+                              msgController.clear();
+                            });
+                          }
+                        },
                       ),
-                    )
-                  ],
-                ),
+                    ),
+                  )
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -122,7 +131,7 @@ class HomePageState extends State<HomePage> {
               return Center(child: Text('Error: ${snapshot.error}'));
             if (!snapshot.hasData) return Text('No data found!');
             bool isNew = true;
-            
+
             for (DocumentSnapshot d in snapshot.data.documents) {
               if (d.documentID.contains(widget.userName) &&
                   d.documentID.contains(widget.otherUser) &&
@@ -153,7 +162,7 @@ class HomePageState extends State<HomePage> {
                 child: getTextMessages(i),
               );
             } else {
-              makeNewConversation(firstUser, secondUser);
+              makeNewConversation(firstUser, secondUser, widget.userName);
             }
             return Text('empty');
           default:
@@ -170,7 +179,9 @@ class HomePageState extends State<HomePage> {
           widget.userName, MediaQuery.of(context).size.width));
     }
     if (list.length == 0) {
-      return Column(children: <Widget>[Text('sag')],) ;
+      return Column(
+        children: <Widget>[Text('sag')],
+      );
     }
     return new Column(children: list);
   }
@@ -192,7 +203,7 @@ class HomePageState extends State<HomePage> {
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           child: Text(
             text,
-            style: TextStyle(fontSize: 20, fontFamily: 'Garamond'),
+            style: TextStyle(fontSize: 22, fontFamily: 'Garamond'),
           ),
         ),
       ),
@@ -218,29 +229,36 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  void addToMessages(String value,String first, String second) async {
+  void addToMessages(
+      String value, String first, String second, String user) async {
     var now = new DateTime.now();
-    await databaseReference
-        .collection("conversations")
-        .document(first + ' ' +second)
-        .updateData({
-      'allTexts': FieldValue.arrayUnion([
+    try {
+      databaseReference
+          .collection("conversations")
+          .document(first + ' ' + second)
+          .updateData(
         {
-          'content': msgController.text,
-          'sender': widget.userName,
-          'sent': now.toString(),
-        }
-      ]),
-    });
+          'lastOpen' + user: now.toString(),
+          'allTexts': FieldValue.arrayUnion([
+            {
+              'content': msgController.text,
+              'sender': widget.userName,
+              'sent': now.toString(),
+            }
+          ]),
+        },
+      );
+    } catch (e) {}
   }
 
-  void makeNewConversation(String first, String second) async {
+  void makeNewConversation(String first, String second, String user) async {
     var now = new DateTime.now();
     await databaseReference
         .collection("conversations")
         .document(first + ' ' + second)
         .setData(
       {
+        'lastOpen' + user: now.toString(),
         'allTexts': [
           {'hiya': 'buddy'}
         ],
