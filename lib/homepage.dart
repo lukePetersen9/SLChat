@@ -16,8 +16,13 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   ScrollController scrollController = new ScrollController();
   TextEditingController msgController = new TextEditingController();
-
   final databaseReference = Firestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     print(widget.userName);
@@ -98,7 +103,10 @@ class HomePageState extends State<HomePage> {
 
   Widget displayMessages() {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection("conversations").snapshots(),
+      stream: Firestore.instance
+          .collection('conversations')
+          .where(widget.userName, isEqualTo: widget.userName)
+          .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return new Text('${snapshot.error}');
@@ -113,26 +121,33 @@ class HomePageState extends State<HomePage> {
           case ConnectionState.done:
             if (snapshot.hasError)
               return Center(child: Text('Error: ${snapshot.error}'));
-            if (!snapshot.hasData) return Text('No data finded!');
+            if (!snapshot.hasData) return Text('No data found!');
+            DocumentSnapshot s = snapshot.data.documents.where(
+              (DocumentSnapshot d) {
+                return d.documentID == widget.userName;
+              },
+            ).first;
+            List<dynamic> i = s.data['shubham24'];
             return SingleChildScrollView(
-              reverse: true,
               controller: scrollController,
-              child: Column(
-                  children:
-                      snapshot.data.documents.map((DocumentSnapshot document) {
-                return singleMessage(
-                    document['content'],
-                    document['sender'],
-                    document['sent'],
-                    widget.userName,
-                    MediaQuery.of(context).size.width);
-              }).toList()),
+              reverse: true,
+              child: getTextMessages(i),
             );
+
           default:
             return Text('error');
         }
       },
     );
+  }
+
+  Widget getTextMessages(List<dynamic> d) {
+    List<Widget> list = new List<Widget>();
+    for (var i = 0; i < d.length; i++) {
+      list.add(singleMessage(d[i]['content'], d[i]['sender'], d[i]['time'],
+          widget.userName, MediaQuery.of(context).size.width));
+    }
+    return new Column(children: list);
   }
 
   Widget singleMessage(String text, String sender, String time,
@@ -182,24 +197,38 @@ class HomePageState extends State<HomePage> {
     var now = new DateTime.now();
     await databaseReference
         .collection("conversations")
-        .document(now.toString())
-        .setData({
-      'content': msgController.text,
-      'sender': widget.userName,
-      'sent': now.toString(),
+        .document(widget.userName)
+        .updateData({
+      'shubham24': FieldValue.arrayUnion([
+        {
+          'content': msgController.text,
+          'sender': widget.userName,
+          'sent': now.toString(),
+        }
+      ]),
     });
   }
-
-  String getUserProfileImage()
-  {
-    
-  }
-
 }
-
-
 
 class Message {
   String text, from, date;
   Message(this.text, this.from, this.date);
 }
+
+/************************************Here is how to do it with a listView.builder 
+ * 
+ListView.builder(
+            reverse: true,
+            controller: scrollController,
+            itemCount: length,
+            itemBuilder: (BuildContext context, int index) {
+              return singleMessage(
+                  i[length - index - 1]['content'],
+                  i[length - index - 1]['sender'],
+                  i[length - index - 1]['time'],
+                  widget.userName,
+                  MediaQuery.of(context).size.width);
+            },
+          );
+ * 
+*/
