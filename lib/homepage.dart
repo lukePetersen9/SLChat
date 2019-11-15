@@ -5,7 +5,8 @@ import 'dart:async';
 
 class HomePage extends StatefulWidget {
   final String userName;
-  HomePage(this.userName);
+  final String otherUser;
+  HomePage(this.userName, this.otherUser);
 
   @override
   State<StatefulWidget> createState() {
@@ -17,6 +18,7 @@ class HomePageState extends State<HomePage> {
   ScrollController scrollController = new ScrollController();
   TextEditingController msgController = new TextEditingController();
   final databaseReference = Firestore.instance;
+  String firstUser = '', secondUser = '';
 
   @override
   void initState() {
@@ -33,7 +35,7 @@ class HomePageState extends State<HomePage> {
           CircleAvatar(
             backgroundColor: Colors.black,
           ),
-          Text("  SL Chat")
+          Text("SL Chat")
         ],
       )),
       body: SingleChildScrollView(
@@ -80,7 +82,7 @@ class HomePageState extends State<HomePage> {
                           onPressed: () {
                             if (msgController.text != null &&
                                 msgController.text != "") {
-                              addToMessages(msgController.text);
+                              addToMessages(msgController.text,firstUser,secondUser);
                               setState(() {
                                 scrollController.jumpTo(
                                     scrollController.position.maxScrollExtent);
@@ -103,10 +105,7 @@ class HomePageState extends State<HomePage> {
 
   Widget displayMessages() {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance
-          .collection('conversations')
-          .where(widget.userName, isEqualTo: widget.userName)
-          .snapshots(),
+      stream: Firestore.instance.collection('conversations').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return new Text('${snapshot.error}');
@@ -122,18 +121,41 @@ class HomePageState extends State<HomePage> {
             if (snapshot.hasError)
               return Center(child: Text('Error: ${snapshot.error}'));
             if (!snapshot.hasData) return Text('No data found!');
-            DocumentSnapshot s = snapshot.data.documents.where(
-              (DocumentSnapshot d) {
-                return d.documentID == widget.userName;
-              },
-            ).first;
-            List<dynamic> i = s.data['shubham24'];
-            return SingleChildScrollView(
-              controller: scrollController,
-              reverse: true,
-              child: getTextMessages(i),
-            );
+            bool isNew = true;
+            
+            for (DocumentSnapshot d in snapshot.data.documents) {
+              if (d.documentID.contains(widget.userName) &&
+                  d.documentID.contains(widget.otherUser) &&
+                  d.documentID.length ==
+                      widget.otherUser.length + widget.userName.length + 1) {
+                firstUser =
+                    d.documentID.substring(0, d.documentID.indexOf(' '));
+                secondUser =
+                    d.documentID.substring(d.documentID.indexOf(' ') + 1);
+                isNew = false;
+              }
+            }
+            // print(isNew);
+            if (!isNew) {
+              DocumentSnapshot s = snapshot.data.documents.where(
+                (DocumentSnapshot d) {
+                  print(d.documentID);
+                  print(firstUser + ' ' + secondUser);
+                  return d.documentID == firstUser + ' ' + secondUser;
+                },
+              ).first;
 
+              List<dynamic> i = s.data['allTexts'];
+              print(i);
+              return SingleChildScrollView(
+                controller: scrollController,
+                reverse: true,
+                child: getTextMessages(i),
+              );
+            } else {
+              makeNewConversation(firstUser, secondUser);
+            }
+            return Text('empty');
           default:
             return Text('error');
         }
@@ -147,6 +169,9 @@ class HomePageState extends State<HomePage> {
       list.add(singleMessage(d[i]['content'], d[i]['sender'], d[i]['time'],
           widget.userName, MediaQuery.of(context).size.width));
     }
+    if (list.length == 0) {
+      return Column(children: <Widget>[Text('sag')],) ;
+    }
     return new Column(children: list);
   }
 
@@ -159,15 +184,15 @@ class HomePageState extends State<HomePage> {
             ? Alignment.centerRight
             : Alignment.centerLeft,
         child: Container(
-          constraints: BoxConstraints(minWidth: 35, maxWidth: width * 6),
+          constraints: BoxConstraints(minWidth: 20, maxWidth: width * .7),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            color: currentUser == sender ? Colors.blue[300] : Colors.amber[200],
+            borderRadius: BorderRadius.circular(10),
+            color: currentUser == sender ? Colors.blue[100] : Colors.amber[100],
           ),
-          padding: EdgeInsets.symmetric(horizontal: 3, vertical: 2),
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           child: Text(
             text,
-            style: TextStyle(fontSize: 30, fontFamily: 'Garamond'),
+            style: TextStyle(fontSize: 20, fontFamily: 'Garamond'),
           ),
         ),
       ),
@@ -177,9 +202,9 @@ class HomePageState extends State<HomePage> {
   void updateData() {
     try {
       databaseReference
-          .collection('books')
-          .document('1')
-          .updateData({'description': 'Head First Flutter'});
+          .collection('conversations')
+          .document(widget.userName + ' ' + widget.otherUser)
+          .setData({'shubham24': 'data'});
     } catch (e) {
       print(e.toString());
     }
@@ -193,13 +218,13 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  void addToMessages(String value) async {
+  void addToMessages(String value,String first, String second) async {
     var now = new DateTime.now();
     await databaseReference
         .collection("conversations")
-        .document(widget.userName)
+        .document(first + ' ' +second)
         .updateData({
-      'shubham24': FieldValue.arrayUnion([
+      'allTexts': FieldValue.arrayUnion([
         {
           'content': msgController.text,
           'sender': widget.userName,
@@ -207,6 +232,20 @@ class HomePageState extends State<HomePage> {
         }
       ]),
     });
+  }
+
+  void makeNewConversation(String first, String second) async {
+    var now = new DateTime.now();
+    await databaseReference
+        .collection("conversations")
+        .document(first + ' ' + second)
+        .setData(
+      {
+        'allTexts': [
+          {'hiya': 'buddy'}
+        ],
+      },
+    );
   }
 }
 

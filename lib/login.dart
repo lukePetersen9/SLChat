@@ -6,11 +6,10 @@ import 'dart:async';
 
 class Login extends StatelessWidget {
   final databaseReference = Firestore.instance;
-
+  String uname = "";
+  String pwd = "";
   @override
   Widget build(BuildContext context) {
-    String uname = "";
-    String pwd = "";
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -120,7 +119,6 @@ class Login extends StatelessWidget {
                         borderRadius: BorderRadius.circular(height / 40),
                       ),
                       child: TextField(
-                        //controller: pwdController,
                         onChanged: (text) {
                           pwd = text;
                         },
@@ -164,8 +162,6 @@ class Login extends StatelessWidget {
               ],
             ),
           )), // This trailing comma makes auto-formatting nicer for build methods.
-
-      //dataBaseReference.collection('users').document(tE.text).get()
     );
   }
 
@@ -189,7 +185,9 @@ class Login extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => HomePage(username),
+            builder: (context) {
+              return HomePage(username, username=='lukepetersen29'?'shubham24':'lukepetersen29');
+            },
           ),
         );
       }
