@@ -29,7 +29,7 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
+//updateLastActiveTime(true, firstUser, secondUser, widget.userName);
     getUserImageData(widget.userName);
     getUserImageData(widget.otherUser);
   }
@@ -42,6 +42,7 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print(DateTime.now().toString());
     return Scaffold(
       appBar: AppBar(
           elevation: 0,
@@ -114,8 +115,7 @@ class HomePageState extends State<HomePage> {
                           if (msgController.text != null &&
                               msgController.text != "") {
                             addToMessages(msgController.text, firstUser,
-                                secondUser, widget.userName);
-                                
+                                secondUser, widget.userName);          
                             setState(() {
                               scrollController.jumpTo(
                                   scrollController.position.maxScrollExtent);
