@@ -25,6 +25,7 @@ class HomePageState extends State<HomePage> {
   String otherUserProfilePicture = '';
   String currentUserProfilePicture = '';
 
+
   @override
   void initState() {
     super.initState();
@@ -32,8 +33,10 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     print(widget.userName);
+    getUserImageData(widget.userName);
+    getUserImageData(widget.otherUser);
     return Scaffold(
-      appBar: AppBar(title: Text(widget.otherUser)),
+      appBar: AppBar(title: Row(children: <Widget>[CircleAvatar(backgroundImage: NetworkImage(otherUserProfilePicture)), Text("\t\t\t" + widget.otherUser),],)),
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
@@ -184,7 +187,6 @@ class HomePageState extends State<HomePage> {
 
   Widget singleMessage(String text, String sender, String time,
       String currentUser, double width) {
-    getUserImageData(sender);
     if (sender == widget.otherUser) {
       return Padding(
         padding: EdgeInsets.all(3),
