@@ -181,7 +181,7 @@ class Login extends StatelessWidget {
       FirebaseUser user = result.user;
 
       if (user != null && await user.getIdToken() != null) {
-        createRecord(username, password);
+       // createRecord(username, password);
         Navigator.push(
           context,
           MaterialPageRoute(

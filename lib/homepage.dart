@@ -19,6 +19,7 @@ class HomePageState extends State<HomePage> {
   TextEditingController msgController = new TextEditingController();
   final databaseReference = Firestore.instance;
   String firstUser = '', secondUser = '';
+  Map<String, dynamic> otherUserData = {};
 
   @override
   void initState() {
@@ -28,14 +29,15 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     print(widget.userName);
+    getOtherUserData();
     return Scaffold(
       appBar: AppBar(
           title: Row(
         children: <Widget>[
           CircleAvatar(
-            backgroundColor: Colors.black,
+            backgroundImage: NetworkImage(getUserProfileImage()),
           ),
-          Text("SL Chat")
+          Text("\t\t\t" + widget.otherUser)
         ],
       )),
       body: Container(
@@ -264,6 +266,28 @@ class HomePageState extends State<HomePage> {
         ],
       },
     );
+  }
+
+  Future getOtherUserData() async {
+    otherUserData = await Firestore.instance
+        .collection('users')
+        .document(widget.otherUser)
+        .get()
+        .then((DocumentSnapshot snap) => snap.data);
+  }
+
+  String getUserProfileImage() {
+    getOtherUserData();
+    // Second method call is there to temporarily fix the null issue, with profile images... Need a better fix soon
+    getOtherUserData();
+    String imageValue = otherUserData['profile_image'];
+    if (imageValue == null) {
+      print('This is null');
+      imageValue =
+          'https://inspirationfeeeed.files.wordpress.com/2015/01/low-poly-lion-by-lisa-dutra.jpg';
+    }
+
+    return imageValue;
   }
 }
 
