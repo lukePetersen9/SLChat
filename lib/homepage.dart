@@ -23,14 +23,21 @@ class HomePageState extends State<HomePage> {
   String firstUser = '', secondUser = '';
   var a;
   var b;
-  String otherUserProfilePicture = '';
-  String currentUserProfilePicture = '';
+  String otherUserProfilePicture = 'https://icon-library.net/images/no-profile-picture-icon-female/no-profile-picture-icon-female-0.jpg';
+  String currentUserProfilePicture = 'https://icon-library.net/images/no-profile-picture-icon-female/no-profile-picture-icon-female-0.jpg';
 
   @override
   void initState() {
     super.initState();
+
     getUserImageData(widget.userName);
     getUserImageData(widget.otherUser);
+  }
+
+  @override
+  void dispose() {
+    updateLastActiveTime(false, firstUser, secondUser, widget.userName);
+    super.dispose();
   }
 
   @override
@@ -108,6 +115,7 @@ class HomePageState extends State<HomePage> {
                               msgController.text != "") {
                             addToMessages(msgController.text, firstUser,
                                 secondUser, widget.userName);
+                                
                             setState(() {
                               scrollController.jumpTo(
                                   scrollController.position.maxScrollExtent);
@@ -128,6 +136,7 @@ class HomePageState extends State<HomePage> {
   }
 
   Widget displayMessages() {
+    //updateLastActiveTime(true, firstUser, secondUser, widget.userName);
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance.collection('conversations').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -146,7 +155,6 @@ class HomePageState extends State<HomePage> {
               return Center(child: Text('Error: ${snapshot.error}'));
             if (!snapshot.hasData) return Text('No data found!');
             bool isNew = true;
-
             for (DocumentSnapshot d in snapshot.data.documents) {
               if (d.documentID.contains(widget.userName) &&
                   d.documentID.contains(widget.otherUser) &&
@@ -159,7 +167,7 @@ class HomePageState extends State<HomePage> {
                 isNew = false;
               }
             }
-
+            print(isNew);
             if (!isNew) {
               DocumentSnapshot s = snapshot.data.documents.where(
                 (DocumentSnapshot d) {
@@ -168,16 +176,20 @@ class HomePageState extends State<HomePage> {
               ).first;
 
               List<dynamic> i = s.data['allTexts'];
-
               return SingleChildScrollView(
                 controller: scrollController,
                 reverse: true,
                 child: getTextMessages(i),
               );
             } else {
-              makeNewConversation(firstUser, secondUser, widget.userName);
+              makeNewConversation(
+                  widget.userName, widget.otherUser, widget.userName);
             }
-            return Text('empty');
+            return SingleChildScrollView(
+              controller: scrollController,
+              reverse: true,
+              child: Text('Start a new conversation with ' + widget.otherUser),
+            );
           default:
             return Text('error');
         }
@@ -187,13 +199,15 @@ class HomePageState extends State<HomePage> {
 
   Widget getTextMessages(List<dynamic> d) {
     List<Widget> list = new List<Widget>();
-    for (var i = 0; i < d.length; i++) {
+    for (var i = 1; i < d.length; i++) {
       list.add(singleMessage(d[i]['content'], d[i]['sender'], d[i]['sent'],
           widget.userName, MediaQuery.of(context).size.width));
     }
     if (list.length == 0) {
       return Column(
-        children: <Widget>[Text('Start a conversation')],
+        children: <Widget>[
+          Text('Start a conversation with ' + widget.otherUser)
+        ],
       );
     }
     return Column(children: list);
@@ -204,7 +218,6 @@ class HomePageState extends State<HomePage> {
     var dateTime = DateTime.parse(time);
     var now = DateTime.now();
     String displayDate = getDisplayDateText(dateTime, now);
-
     if (sender == widget.otherUser) {
       return Slidable(
         actionPane: SlidableDrawerActionPane(),
@@ -355,6 +368,22 @@ class HomePageState extends State<HomePage> {
     }
   }
 
+  void updateLastActiveTime(
+      bool isActive, String first, String second, String user) async {
+    var now = new DateTime.now();
+    try {
+      databaseReference
+          .collection("conversations")
+          .document(first + ' ' + second)
+          .updateData(
+        {
+          'lastOpen' + user: now.toString(),
+          user + 'IsActive': isActive.toString(),
+        },
+      );
+    } catch (e) {}
+  }
+
   void deleteData() {
     try {
       databaseReference.collection('books').document('1').delete();
@@ -372,7 +401,6 @@ class HomePageState extends State<HomePage> {
           .document(first + ' ' + second)
           .updateData(
         {
-          'lastOpen' + user: now.toString(),
           'allTexts': FieldValue.arrayUnion([
             {
               'content': msgController.text,
@@ -386,6 +414,7 @@ class HomePageState extends State<HomePage> {
   }
 
   void makeNewConversation(String first, String second, String user) async {
+    print('making new convo');
     var now = new DateTime.now();
     await databaseReference
         .collection("conversations")
@@ -393,8 +422,15 @@ class HomePageState extends State<HomePage> {
         .setData(
       {
         'lastOpen' + user: now.toString(),
+        'lastOpen' + widget.otherUser: 'never',
+        user + 'IsActive': 'true',
+        widget.otherUser + 'IsActive': 'false',
         'allTexts': [
-          {'first': 'message'}
+          {
+            'content': 'initialization',
+            'sender': widget.userName,
+            'sent': now.toString(),
+          }
         ],
       },
     );
