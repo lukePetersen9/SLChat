@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,27 +20,20 @@ class HomePageState extends State<HomePage> {
   TextEditingController msgController = new TextEditingController();
   final databaseReference = Firestore.instance;
   String firstUser = '', secondUser = '';
-  Map<String, dynamic> otherUserData = {};
+  var a;
+  var b;
+  String otherUserProfilePicture = '';
+  String currentUserProfilePicture = '';
 
   @override
   void initState() {
     super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
     print(widget.userName);
-    getOtherUserData();
     return Scaffold(
-      appBar: AppBar(
-          title: Row(
-        children: <Widget>[
-          CircleAvatar(
-            backgroundImage: NetworkImage(getUserProfileImage()),
-          ),
-          Text("\t\t\t" + widget.otherUser)
-        ],
-      )),
+      appBar: AppBar(title: Text(widget.otherUser)),
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
@@ -190,26 +184,80 @@ class HomePageState extends State<HomePage> {
 
   Widget singleMessage(String text, String sender, String time,
       String currentUser, double width) {
-    return Padding(
+    getUserImageData(sender);
+    if (sender == widget.otherUser) {
+      return Padding(
+        padding: EdgeInsets.all(3),
+        child: Align(
+            alignment: currentUser == sender
+                ? Alignment.centerRight
+                : Alignment.centerLeft,
+            child: Row(
+              mainAxisAlignment: widget.otherUser == sender
+                  ? MainAxisAlignment.start
+                  : MainAxisAlignment.end,
+              children: <Widget>[
+                profileImage(sender),
+                Container(
+                  constraints:
+                      BoxConstraints(minWidth: 20, maxWidth: width * .7),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: currentUser == sender
+                        ? Colors.blue[100]
+                        : Colors.amber[100],
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  child: Text(
+                    text,
+                    style: TextStyle(fontSize: 22, fontFamily: 'Garamond'),
+                  ),
+                )
+              ],
+            )),
+      );
+    }
+    else
+    {
+      return Padding(
       padding: EdgeInsets.all(3),
       child: Align(
         alignment: currentUser == sender
             ? Alignment.centerRight
             : Alignment.centerLeft,
-        child: Container(
-          constraints: BoxConstraints(minWidth: 20, maxWidth: width * .7),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: currentUser == sender ? Colors.blue[100] : Colors.amber[100],
-          ),
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          child: Text(
-            text,
-            style: TextStyle(fontSize: 22, fontFamily: 'Garamond'),
-          ),
-        ),
-      ),
+        child: Row(
+          mainAxisAlignment: widget.otherUser == sender? MainAxisAlignment.start : MainAxisAlignment.end,
+          children: <Widget>[
+            Container(
+            constraints: BoxConstraints(minWidth: 20, maxWidth: width * .7),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color:
+                  currentUser == sender ? Colors.blue[100] : Colors.amber[100],
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            child: Text(
+                  text,
+                  style: TextStyle(fontSize: 22, fontFamily: 'Garamond'),
+                ),
+            ),
+            profileImage(sender),
+          ],
+        )),
     );
+    }
+  }
+
+  Widget profileImage(String sender) {
+    if(sender == widget.otherUser)
+    {
+      return CircleAvatar(backgroundImage: NetworkImage(otherUserProfilePicture));
+    }
+    else
+    {
+      return CircleAvatar(backgroundImage: NetworkImage(currentUserProfilePicture));
+    }
+    
   }
 
   void updateData() {
@@ -268,26 +316,23 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  Future getOtherUserData() async {
-    otherUserData = await Firestore.instance
+  String getUserImageData(String username) {
+    if(username == widget.otherUser)
+    {
+    a = Firestore.instance
         .collection('users')
         .document(widget.otherUser)
         .get()
-        .then((DocumentSnapshot snap) => snap.data);
-  }
-
-  String getUserProfileImage() {
-    getOtherUserData();
-    // Second method call is there to temporarily fix the null issue, with profile images... Need a better fix soon
-    getOtherUserData();
-    String imageValue = otherUserData['profile_image'];
-    if (imageValue == null) {
-      print('This is null');
-      imageValue =
-          'https://inspirationfeeeed.files.wordpress.com/2015/01/low-poly-lion-by-lisa-dutra.jpg';
+        .then((DocumentSnapshot snap) => otherUserProfilePicture = snap.data['profile_image']);
     }
-
-    return imageValue;
+    else
+    {
+    b = Firestore.instance
+        .collection('users')
+        .document(widget.userName)
+        .get()
+        .then((DocumentSnapshot snap) => currentUserProfilePicture = snap.data['profile_image']);
+    }
   }
 }
 
