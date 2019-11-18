@@ -18,10 +18,12 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   ScrollController scrollController = new ScrollController();
+  //SlidableController slidableController = new SlidableController();
   TextEditingController msgController = new TextEditingController();
   final databaseReference = Firestore.instance;
   String firstUser = '', secondUser = '';
   String otherUserActive = 'false';
+  bool showTime = false, interactWithMessage = false;
   var a;
   var b;
   String otherUserProfilePicture =
@@ -46,7 +48,47 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: interactWithMessage
+          ? null
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                FloatingActionButton(
+                  backgroundColor: Colors.amber[300],
+                  child: Icon(Icons.favorite),
+                  onPressed: () {},
+                ),
+                FloatingActionButton(
+                  backgroundColor: Colors.amber[300],
+                  child: Icon(Icons.thumb_down),
+                  onPressed: () {},
+                ),
+                FloatingActionButton(
+                  backgroundColor: Colors.amber[300],
+                  child: Icon(Icons.ac_unit),
+                  onPressed: () {},
+                ),
+                FloatingActionButton(
+                  backgroundColor: Colors.amber[300],
+                  child: Icon(Icons.delete),
+                  onPressed: () {},
+                ),
+                IconButton(
+                  icon: Icon(Icons.close),
+                  onPressed: () {
+                    interactWithMessage = !interactWithMessage;
+                    setState(() {});
+                  },
+                )
+              ],
+            ),
       appBar: AppBar(
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.access_time),
+              onPressed: () {},
+            )
+          ],
           elevation: 0,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -175,7 +217,6 @@ class HomePageState extends State<HomePage> {
                   return d.documentID == firstUser + ' ' + secondUser;
                 },
               ).first;
-
               List<dynamic> i = s.data['allTexts'];
               otherUserActive = s.data['readAt'];
               return SingleChildScrollView(
@@ -293,7 +334,9 @@ class HomePageState extends State<HomePage> {
                   padding: EdgeInsets.symmetric(vertical: 1),
                   iconSize: 35,
                   onPressed: () {
-                    print('do more');
+                    setState(() {
+                      interactWithMessage = !interactWithMessage;
+                    });
                   },
                   icon: Icon(Icons.more_horiz),
                 ),
@@ -351,7 +394,9 @@ class HomePageState extends State<HomePage> {
                   padding: EdgeInsets.symmetric(vertical: 1),
                   iconSize: 35,
                   onPressed: () {
-                    print('do more');
+                    setState(() {
+                      interactWithMessage = !interactWithMessage;
+                    });
                   },
                   icon: Icon(Icons.more_horiz),
                 ),
@@ -417,7 +462,9 @@ class HomePageState extends State<HomePage> {
                 padding: EdgeInsets.symmetric(vertical: 1),
                 iconSize: 35,
                 onPressed: () {
-                  print('do more');
+                  setState(() {
+                      interactWithMessage = !interactWithMessage;
+                    });
                 },
                 icon: Icon(Icons.more_horiz),
               ),
