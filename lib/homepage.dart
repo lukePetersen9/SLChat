@@ -21,10 +21,13 @@ class HomePageState extends State<HomePage> {
   TextEditingController msgController = new TextEditingController();
   final databaseReference = Firestore.instance;
   String firstUser = '', secondUser = '';
+  String otherUserActive = 'false';
   var a;
   var b;
-  String otherUserProfilePicture = 'https://icon-library.net/images/no-profile-picture-icon-female/no-profile-picture-icon-female-0.jpg';
-  String currentUserProfilePicture = 'https://icon-library.net/images/no-profile-picture-icon-female/no-profile-picture-icon-female-0.jpg';
+  String otherUserProfilePicture =
+      'https://icon-library.net/images/no-profile-picture-icon-female/no-profile-picture-icon-female-0.jpg';
+  String currentUserProfilePicture =
+      'https://icon-library.net/images/no-profile-picture-icon-female/no-profile-picture-icon-female-0.jpg';
 
   @override
   void initState() {
@@ -42,7 +45,6 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    print(DateTime.now().toString());
     return Scaffold(
       appBar: AppBar(
           elevation: 0,
@@ -115,7 +117,7 @@ class HomePageState extends State<HomePage> {
                           if (msgController.text != null &&
                               msgController.text != "") {
                             addToMessages(msgController.text, firstUser,
-                                secondUser, widget.userName);          
+                                secondUser, widget.userName);
                             setState(() {
                               scrollController.jumpTo(
                                   scrollController.position.maxScrollExtent);
@@ -136,7 +138,6 @@ class HomePageState extends State<HomePage> {
   }
 
   Widget displayMessages() {
-    //updateLastActiveTime(true, firstUser, secondUser, widget.userName);
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance.collection('conversations').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -167,7 +168,7 @@ class HomePageState extends State<HomePage> {
                 isNew = false;
               }
             }
-            print(isNew);
+            updateLastActiveTime(true, firstUser, secondUser, widget.userName);
             if (!isNew) {
               DocumentSnapshot s = snapshot.data.documents.where(
                 (DocumentSnapshot d) {
@@ -176,6 +177,7 @@ class HomePageState extends State<HomePage> {
               ).first;
 
               List<dynamic> i = s.data['allTexts'];
+              otherUserActive = s.data['readAt'];
               return SingleChildScrollView(
                 controller: scrollController,
                 reverse: true,
@@ -199,9 +201,47 @@ class HomePageState extends State<HomePage> {
 
   Widget getTextMessages(List<dynamic> d) {
     List<Widget> list = new List<Widget>();
-    for (var i = 1; i < d.length; i++) {
+    for (var i = 1; i < d.length - 1; i++) {
       list.add(singleMessage(d[i]['content'], d[i]['sender'], d[i]['sent'],
           widget.userName, MediaQuery.of(context).size.width));
+    }
+    if (d[d.length - 1]['sender'] != widget.userName &&
+        otherUserActive == 'false') {
+      sendReadRecipt(d);
+      list.add(
+        singleMessage(
+            d[d.length - 1]['content'],
+            d[d.length - 1]['sender'],
+            d[d.length - 1]['sent'],
+            widget.userName,
+            MediaQuery.of(context).size.width),
+      );
+    } else if (d[d.length - 1]['sender'] == widget.userName) {
+      list.add(
+        specialMessage(
+          d[d.length - 1]['content'],
+          d[d.length - 1]['sender'],
+          d[d.length - 1]['sent'],
+          widget.userName,
+          MediaQuery.of(context).size.width,
+          otherUserActive == 'false'
+              ? 'delivered'
+              : 'Read ' +
+                  (getDisplayDateText(
+                    DateTime.parse(otherUserActive),
+                    DateTime.now(),
+                  ).replaceAll('Today', '')),
+        ),
+      );
+    } else {
+      list.add(
+        singleMessage(
+            d[d.length - 1]['content'],
+            d[d.length - 1]['sender'],
+            d[d.length - 1]['sent'],
+            widget.userName,
+            MediaQuery.of(context).size.width),
+      );
     }
     if (list.length == 0) {
       return Column(
@@ -211,6 +251,22 @@ class HomePageState extends State<HomePage> {
       );
     }
     return Column(children: list);
+  }
+
+  void sendReadRecipt(List<dynamic> d) {
+    DateTime now = DateTime.now();
+    try {
+      databaseReference
+          .collection('conversations')
+          .document(firstUser + ' ' + secondUser)
+          .updateData(
+        {
+          'readAt': now.toString(),
+        },
+      );
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   Widget singleMessage(String text, String sender, String time,
@@ -337,6 +393,86 @@ class HomePageState extends State<HomePage> {
     }
   }
 
+  Widget specialMessage(String text, String sender, String time,
+      String currentUser, double width, String readOrNot) {
+    var dateTime = DateTime.parse(time);
+    var now = DateTime.now();
+    String displayDate = getDisplayDateText(dateTime, now);
+
+    return Slidable(
+      actionPane: SlidableDrawerActionPane(),
+      secondaryActions: <Widget>[
+        Stack(
+          children: <Widget>[
+            Align(
+              alignment: Alignment.topCenter,
+              child: Text(
+                displayDate,
+                style: TextStyle(fontSize: 12, fontFamily: 'Garamond'),
+              ),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: IconButton(
+                padding: EdgeInsets.symmetric(vertical: 1),
+                iconSize: 35,
+                onPressed: () {
+                  print('do more');
+                },
+                icon: Icon(Icons.more_horiz),
+              ),
+            ),
+          ],
+        )
+      ],
+      child: Padding(
+        padding: EdgeInsets.all(3),
+        child: Align(
+          alignment: currentUser == sender
+              ? Alignment.centerRight
+              : Alignment.centerLeft,
+          child: Column(
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: widget.otherUser == sender
+                    ? MainAxisAlignment.start
+                    : MainAxisAlignment.end,
+                children: <Widget>[
+                  Container(
+                    constraints:
+                        BoxConstraints(minWidth: 20, maxWidth: width * .7),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: currentUser == sender
+                          ? Colors.blue[100]
+                          : Colors.amber[100],
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    child: Text(
+                      text,
+                      style: TextStyle(fontSize: 22, fontFamily: 'Garamond'),
+                    ),
+                  ),
+                  profileImage(sender),
+                ],
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Container(
+                  padding: EdgeInsets.only(right: 20, top: 1),
+                  child: Text(
+                    readOrNot,
+                    style: TextStyle(fontSize: 12, fontFamily: 'Garamond'),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget profileImage(String sender) {
     if (sender == widget.otherUser) {
       return Container(
@@ -377,7 +513,6 @@ class HomePageState extends State<HomePage> {
           .document(first + ' ' + second)
           .updateData(
         {
-          'lastOpen' + user: now.toString(),
           user + 'IsActive': isActive.toString(),
         },
       );
@@ -401,6 +536,7 @@ class HomePageState extends State<HomePage> {
           .document(first + ' ' + second)
           .updateData(
         {
+          'readAt': 'false',
           'allTexts': FieldValue.arrayUnion([
             {
               'content': msgController.text,
@@ -430,6 +566,7 @@ class HomePageState extends State<HomePage> {
             'content': 'initialization',
             'sender': widget.userName,
             'sent': now.toString(),
+            'readBy' + widget.otherUser: 'false',
           }
         ],
       },
