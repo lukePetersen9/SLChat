@@ -41,34 +41,38 @@ class HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    updateLastActiveTime(false, firstUser, secondUser, widget.userName);
+    //  updateLastActiveTime(false, firstUser, secondUser, widget.userName);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: interactWithMessage
+      floatingActionButton: !interactWithMessage
           ? null
           : Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 FloatingActionButton(
+                  heroTag: '1',
                   backgroundColor: Colors.amber[300],
                   child: Icon(Icons.favorite),
                   onPressed: () {},
                 ),
                 FloatingActionButton(
+                  heroTag: '2',
                   backgroundColor: Colors.amber[300],
                   child: Icon(Icons.thumb_down),
                   onPressed: () {},
                 ),
                 FloatingActionButton(
+                  heroTag: '3',
                   backgroundColor: Colors.amber[300],
                   child: Icon(Icons.ac_unit),
                   onPressed: () {},
                 ),
                 FloatingActionButton(
+                  heroTag: '4',
                   backgroundColor: Colors.amber[300],
                   child: Icon(Icons.delete),
                   onPressed: () {},
@@ -136,6 +140,7 @@ class HomePageState extends State<HomePage> {
                           style:
                               TextStyle(fontSize: 22, fontFamily: 'Garamond'),
                           controller: msgController,
+                          maxLines: null,
                           keyboardType: TextInputType.multiline,
                           decoration: InputDecoration.collapsed(
                             hintStyle:
@@ -210,7 +215,7 @@ class HomePageState extends State<HomePage> {
                 isNew = false;
               }
             }
-            updateLastActiveTime(true, firstUser, secondUser, widget.userName);
+           // updateLastActiveTime(true, firstUser, secondUser, widget.userName);
             if (!isNew) {
               DocumentSnapshot s = snapshot.data.documents.where(
                 (DocumentSnapshot d) {
@@ -463,8 +468,8 @@ class HomePageState extends State<HomePage> {
                 iconSize: 35,
                 onPressed: () {
                   setState(() {
-                      interactWithMessage = !interactWithMessage;
-                    });
+                    interactWithMessage = !interactWithMessage;
+                  });
                 },
                 icon: Icon(Icons.more_horiz),
               ),
@@ -604,16 +609,12 @@ class HomePageState extends State<HomePage> {
         .document(first + ' ' + second)
         .setData(
       {
-        'lastOpen' + user: now.toString(),
-        'lastOpen' + widget.otherUser: 'never',
-        user + 'IsActive': 'true',
-        widget.otherUser + 'IsActive': 'false',
+        'readAt': 'false',
         'allTexts': [
           {
             'content': 'initialization',
             'sender': widget.userName,
             'sent': now.toString(),
-            'readBy' + widget.otherUser: 'false',
           }
         ],
       },
