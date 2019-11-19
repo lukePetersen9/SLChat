@@ -104,7 +104,7 @@ class HomePageState extends State<HomePage> {
                 padding: EdgeInsets.only(left: 10),
                 child: Text(
                   widget.otherUser,
-                  style: TextStyle(fontSize: 30, fontFamily: 'Garamond'),
+                  style: TextStyle(fontSize: 25, fontFamily: 'Garamond'),
                 ),
               ),
             ],
@@ -649,8 +649,7 @@ class HomePageState extends State<HomePage> {
 
   String getDisplayDateText(DateTime sent, DateTime now) {
     if (now.difference(sent).inHours < 24) {
-      return 'Today ' +
-          (sent.hour % 12 == 0 ? '12' : (sent.hour % 12).toString()) +
+      return (sent.hour % 12 == 0 ? '12' : (sent.hour % 12).toString()) +
           ':' +
           (sent.minute < 10
               ? '0' + sent.minute.toString()
