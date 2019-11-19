@@ -48,6 +48,7 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       floatingActionButton: !interactWithMessage
           ? null
           : Row(
@@ -87,6 +88,7 @@ class HomePageState extends State<HomePage> {
               ],
             ),
       appBar: AppBar(
+        backgroundColor: Colors.black,
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.access_time),
@@ -138,13 +140,13 @@ class HomePageState extends State<HomePage> {
                         child: TextField(
                           cursorColor: Colors.blue[200],
                           style:
-                              TextStyle(fontSize: 22, fontFamily: 'Garamond'),
+                              TextStyle(fontSize: 22, fontFamily: 'Garamond', color: Colors.white),
                           controller: msgController,
                           maxLines: null,
                           keyboardType: TextInputType.multiline,
                           decoration: InputDecoration.collapsed(
                             hintStyle:
-                                TextStyle(fontSize: 22, fontFamily: 'Garamond'),
+                                TextStyle(fontSize: 22, fontFamily: 'Garamond', color: Colors.white),
                             hintText: 'your message...',
                           ),
                         ),
@@ -157,7 +159,7 @@ class HomePageState extends State<HomePage> {
                       child: IconButton(
                         icon: Icon(
                           Icons.blur_circular,
-                          color: Colors.blue,
+                          color: Colors.green,
                           size: 40,
                         ),
                         onPressed: () {
@@ -330,7 +332,7 @@ class HomePageState extends State<HomePage> {
                 alignment: Alignment.topCenter,
                 child: Text(
                   displayDate,
-                  style: TextStyle(fontSize: 12, fontFamily: 'Garamond'),
+                  style: TextStyle(fontSize: 12, fontFamily: 'Garamond', color: Colors.white),
                 ),
               ),
               Align(
@@ -367,13 +369,13 @@ class HomePageState extends State<HomePage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       color: currentUser == sender
-                          ? Colors.blue[100]
-                          : Colors.amber[100],
+                          ? Colors.blue
+                          : Colors.green
                     ),
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     child: Text(
                       text,
-                      style: TextStyle(fontSize: 22, fontFamily: 'Garamond'),
+                      style: TextStyle(fontSize: 22, fontFamily: 'Garamond', color:Colors.white),
                     ),
                   )
                 ],
@@ -390,7 +392,7 @@ class HomePageState extends State<HomePage> {
                 alignment: Alignment.topCenter,
                 child: Text(
                   displayDate,
-                  style: TextStyle(fontSize: 12, fontFamily: 'Garamond'),
+                  style: TextStyle(fontSize: 12, fontFamily: 'Garamond', color:Colors.white),
                 ),
               ),
               Align(
@@ -426,13 +428,13 @@ class HomePageState extends State<HomePage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       color: currentUser == sender
-                          ? Colors.blue[100]
-                          : Colors.amber[100],
+                          ? Colors.blue
+                          : Colors.green,
                     ),
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     child: Text(
                       text,
-                      style: TextStyle(fontSize: 22, fontFamily: 'Garamond'),
+                      style: TextStyle(fontSize: 22, fontFamily: 'Garamond', color:Colors.white),
                     ),
                   ),
                   profileImage(sender),
@@ -496,13 +498,13 @@ class HomePageState extends State<HomePage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       color: currentUser == sender
-                          ? Colors.blue[100]
-                          : Colors.amber[100],
+                          ? Colors.blue
+                          : Colors.green,
                     ),
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     child: Text(
                       text,
-                      style: TextStyle(fontSize: 22, fontFamily: 'Garamond'),
+                      style: TextStyle(fontSize: 22, fontFamily: 'Garamond', color:Colors.white),
                     ),
                   ),
                   profileImage(sender),
