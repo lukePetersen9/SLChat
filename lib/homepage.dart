@@ -4,6 +4,7 @@ import 'login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'messageWithOverlay.dart';
 
 class HomePage extends StatefulWidget {
   final String userName;
@@ -34,21 +35,14 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-//updateLastActiveTime(true, firstUser, secondUser, widget.userName);
     getUserImageData(widget.userName);
     getUserImageData(widget.otherUser);
   }
 
   @override
-  void dispose() {
-    //  updateLastActiveTime(false, firstUser, secondUser, widget.userName);
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.grey[850],
       floatingActionButton: !interactWithMessage
           ? null
           : Row(
@@ -89,28 +83,29 @@ class HomePageState extends State<HomePage> {
             ),
       appBar: AppBar(
         backgroundColor: Colors.black,
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.access_time),
-              onPressed: () {},
-            )
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.access_time),
+            onPressed: () {},
+          )
+        ],
+        elevation: 0,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            CircleAvatar(
+              backgroundImage: NetworkImage(otherUserProfilePicture),
+            ),
+            Container(
+              padding: EdgeInsets.only(left: 10),
+              child: Text(
+                widget.otherUser,
+                style: TextStyle(fontSize: 25, fontFamily: 'Garamond'),
+              ),
+            ),
           ],
-          elevation: 0,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              CircleAvatar(
-                backgroundImage: NetworkImage(otherUserProfilePicture),
-              ),
-              Container(
-                padding: EdgeInsets.only(left: 10),
-                child: Text(
-                  widget.otherUser,
-                  style: TextStyle(fontSize: 25, fontFamily: 'Garamond'),
-                ),
-              ),
-            ],
-          )),
+        ),
+      ),
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
@@ -120,6 +115,9 @@ class HomePageState extends State<HomePage> {
             Expanded(
               flex: MediaQuery.of(context).viewInsets.bottom == 0 ? 8 : 5,
               child: displayMessages(),
+            ),
+            Expanded(
+              child: MessagesWithOverlay(),
             ),
             Expanded(
               child: Flex(
@@ -139,14 +137,18 @@ class HomePageState extends State<HomePage> {
                         ),
                         child: TextField(
                           cursorColor: Colors.blue[200],
-                          style:
-                              TextStyle(fontSize: 22, fontFamily: 'Garamond', color: Colors.white),
+                          style: TextStyle(
+                              fontSize: 22,
+                              fontFamily: 'Garamond',
+                              color: Colors.white),
                           controller: msgController,
                           maxLines: null,
                           keyboardType: TextInputType.multiline,
                           decoration: InputDecoration.collapsed(
-                            hintStyle:
-                                TextStyle(fontSize: 22, fontFamily: 'Garamond', color: Colors.white),
+                            hintStyle: TextStyle(
+                                fontSize: 22,
+                                fontFamily: 'Garamond',
+                                color: Colors.white),
                             hintText: 'your message...',
                           ),
                         ),
@@ -217,7 +219,7 @@ class HomePageState extends State<HomePage> {
                 isNew = false;
               }
             }
-           // updateLastActiveTime(true, firstUser, secondUser, widget.userName);
+            // updateLastActiveTime(true, firstUser, secondUser, widget.userName);
             if (!isNew) {
               DocumentSnapshot s = snapshot.data.documents.where(
                 (DocumentSnapshot d) {
@@ -332,7 +334,10 @@ class HomePageState extends State<HomePage> {
                 alignment: Alignment.topCenter,
                 child: Text(
                   displayDate,
-                  style: TextStyle(fontSize: 12, fontFamily: 'Garamond', color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontFamily: 'Garamond',
+                      color: Colors.white),
                 ),
               ),
               Align(
@@ -367,15 +372,17 @@ class HomePageState extends State<HomePage> {
                     constraints:
                         BoxConstraints(minWidth: 20, maxWidth: width * .7),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: currentUser == sender
-                          ? Colors.blue
-                          : Colors.green
-                    ),
+                        borderRadius: BorderRadius.circular(10),
+                        color: currentUser == sender
+                            ? Colors.blue[300]
+                            : Colors.green[300]),
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     child: Text(
                       text,
-                      style: TextStyle(fontSize: 22, fontFamily: 'Garamond', color:Colors.white),
+                      style: TextStyle(
+                          fontSize: 22,
+                          fontFamily: 'Garamond',
+                          color: Colors.grey[850]),
                     ),
                   )
                 ],
@@ -392,7 +399,10 @@ class HomePageState extends State<HomePage> {
                 alignment: Alignment.topCenter,
                 child: Text(
                   displayDate,
-                  style: TextStyle(fontSize: 12, fontFamily: 'Garamond', color:Colors.white),
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontFamily: 'Garamond',
+                      color: Colors.white),
                 ),
               ),
               Align(
@@ -428,13 +438,16 @@ class HomePageState extends State<HomePage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       color: currentUser == sender
-                          ? Colors.blue
-                          : Colors.green,
+                          ? Colors.blue[300]
+                          : Colors.green[400],
                     ),
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     child: Text(
                       text,
-                      style: TextStyle(fontSize: 22, fontFamily: 'Garamond', color:Colors.white),
+                      style: TextStyle(
+                          fontSize: 22,
+                          fontFamily: 'Garamond',
+                          color: Colors.grey[850]),
                     ),
                   ),
                   profileImage(sender),
@@ -497,14 +510,15 @@ class HomePageState extends State<HomePage> {
                         BoxConstraints(minWidth: 20, maxWidth: width * .7),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      color: currentUser == sender
-                          ? Colors.blue
-                          : Colors.green,
+                      color: currentUser == sender ? Colors.blue : Colors.green,
                     ),
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     child: Text(
                       text,
-                      style: TextStyle(fontSize: 22, fontFamily: 'Garamond', color:Colors.white),
+                      style: TextStyle(
+                          fontSize: 22,
+                          fontFamily: 'Garamond',
+                          color: Colors.white),
                     ),
                   ),
                   profileImage(sender),
