@@ -1,10 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:async';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'messageWithOverlay.dart';
+import 'GeneralMessageWithInteractionsForCurrentUser.dart';
+import 'GeneralMessageWithInteractionsForOtherUser.dart';
 
 class HomePage extends StatefulWidget {
   final String userName;
@@ -19,12 +16,12 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   ScrollController scrollController = new ScrollController();
-  //SlidableController slidableController = new SlidableController();
   TextEditingController msgController = new TextEditingController();
   final databaseReference = Firestore.instance;
   String firstUser = '', secondUser = '';
   String otherUserActive = 'false';
   bool showTime = false, interactWithMessage = false;
+  Map<String, String> interactions = new Map<String, String>();
   var a;
   var b;
   String otherUserProfilePicture =
@@ -37,50 +34,22 @@ class HomePageState extends State<HomePage> {
     super.initState();
     getUserImageData(widget.userName);
     getUserImageData(widget.otherUser);
+    
+  }
+
+  @override
+  void dispose(){
+    updateLastActiveTime(false, firstUser, secondUser, widget.userName);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    interactions[currentUserProfilePicture] = 'like';
+    interactions[otherUserProfilePicture] = 'favorite';
+
     return Scaffold(
       backgroundColor: Colors.grey[850],
-      floatingActionButton: !interactWithMessage
-          ? null
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                FloatingActionButton(
-                  heroTag: '1',
-                  backgroundColor: Colors.amber[300],
-                  child: Icon(Icons.favorite),
-                  onPressed: () {},
-                ),
-                FloatingActionButton(
-                  heroTag: '2',
-                  backgroundColor: Colors.amber[300],
-                  child: Icon(Icons.thumb_down),
-                  onPressed: () {},
-                ),
-                FloatingActionButton(
-                  heroTag: '3',
-                  backgroundColor: Colors.amber[300],
-                  child: Icon(Icons.ac_unit),
-                  onPressed: () {},
-                ),
-                FloatingActionButton(
-                  heroTag: '4',
-                  backgroundColor: Colors.amber[300],
-                  child: Icon(Icons.delete),
-                  onPressed: () {},
-                ),
-                IconButton(
-                  icon: Icon(Icons.close),
-                  onPressed: () {
-                    interactWithMessage = !interactWithMessage;
-                    setState(() {});
-                  },
-                )
-              ],
-            ),
       appBar: AppBar(
         backgroundColor: Colors.black,
         actions: <Widget>[
@@ -115,9 +84,6 @@ class HomePageState extends State<HomePage> {
             Expanded(
               flex: MediaQuery.of(context).viewInsets.bottom == 0 ? 8 : 5,
               child: displayMessages(),
-            ),
-            Expanded(
-              child: MessagesWithOverlay(),
             ),
             Expanded(
               child: Flex(
@@ -189,6 +155,7 @@ class HomePageState extends State<HomePage> {
   }
 
   Widget displayMessages() {
+    updateLastActiveTime(true, firstUser, secondUser, widget.userName);
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance.collection('conversations').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -219,7 +186,6 @@ class HomePageState extends State<HomePage> {
                 isNew = false;
               }
             }
-            // updateLastActiveTime(true, firstUser, secondUser, widget.userName);
             if (!isNew) {
               DocumentSnapshot s = snapshot.data.documents.where(
                 (DocumentSnapshot d) {
@@ -240,7 +206,13 @@ class HomePageState extends State<HomePage> {
             return SingleChildScrollView(
               controller: scrollController,
               reverse: true,
-              child: Text('Start a new conversation with ' + widget.otherUser),
+              child: Text(
+                'Start a new conversation with ' + widget.otherUser,
+                style: TextStyle(
+                    fontSize: 22,
+                    fontFamily: 'Garamond',
+                    color: Colors.white60),
+              ),
             );
           default:
             return Text('error');
@@ -250,30 +222,63 @@ class HomePageState extends State<HomePage> {
   }
 
   Widget getTextMessages(List<dynamic> d) {
+    Map<String, String> m = new Map<String, String>();
     List<Widget> list = new List<Widget>();
-    for (var i = 1; i < d.length - 1; i++) {
-      list.add(singleMessage(d[i]['content'], d[i]['sender'], d[i]['sent'],
-          widget.userName, MediaQuery.of(context).size.width));
+    for (int i = 1; i < d.length - 1; i++) {
+      if (d[i]['sender'] == widget.userName) {
+        list.add(
+          GeneralMessageWithInteractionsForCurrentUser(
+            d[i]['content'],
+            widget.userName,
+            d[i]['sent'],
+            m,
+            currentUserProfilePicture,
+            false,
+            otherUserActive == 'false'
+                ? 'delivered'
+                : 'Read ' +
+                    (getDisplayDateText(
+                      DateTime.parse(otherUserActive),
+                      DateTime.now(),
+                    ).replaceAll('Today', '')),
+          ),
+        );
+      } else {
+        list.add(
+          GeneralMessageWithInteractionsForOtherUser(
+              d[i]['content'],
+              d[i]['sender'],
+              d[i]['sent'],
+              interactions,
+              otherUserProfilePicture,
+              false,
+              ''),
+        );
+      }
     }
     if (d[d.length - 1]['sender'] != widget.userName &&
-        otherUserActive == 'false') {
+        otherUserActive == 'false' &&
+        d.length > 1) {
       sendReadRecipt(d);
       list.add(
-        singleMessage(
+        GeneralMessageWithInteractionsForOtherUser(
             d[d.length - 1]['content'],
             d[d.length - 1]['sender'],
             d[d.length - 1]['sent'],
-            widget.userName,
-            MediaQuery.of(context).size.width),
+            interactions,
+            otherUserProfilePicture,
+            false,
+            ''),
       );
-    } else if (d[d.length - 1]['sender'] == widget.userName) {
+    } else if (d[d.length - 1]['sender'] == widget.userName && d.length > 1) {
       list.add(
-        specialMessage(
+        GeneralMessageWithInteractionsForCurrentUser(
           d[d.length - 1]['content'],
-          d[d.length - 1]['sender'],
-          d[d.length - 1]['sent'],
           widget.userName,
-          MediaQuery.of(context).size.width,
+          d[d.length - 1]['sent'],
+          interactions,
+          currentUserProfilePicture,
+          true,
           otherUserActive == 'false'
               ? 'delivered'
               : 'Read ' +
@@ -283,20 +288,26 @@ class HomePageState extends State<HomePage> {
                   ).replaceAll('Today', '')),
         ),
       );
-    } else {
+    } else if (d.length > 1) {
       list.add(
-        singleMessage(
+        GeneralMessageWithInteractionsForOtherUser(
             d[d.length - 1]['content'],
             d[d.length - 1]['sender'],
             d[d.length - 1]['sent'],
-            widget.userName,
-            MediaQuery.of(context).size.width),
+            interactions,
+            otherUserProfilePicture,
+            false,
+            ''),
       );
     }
     if (list.length == 0) {
       return Column(
         children: <Widget>[
-          Text('Start a conversation with ' + widget.otherUser)
+          Text(
+            'Start a conversation with ' + widget.otherUser,
+            style: TextStyle(
+                fontSize: 22, fontFamily: 'Garamond', color: Colors.white60),
+          ),
         ],
       );
     }
@@ -316,248 +327,6 @@ class HomePageState extends State<HomePage> {
       );
     } catch (e) {
       print(e.toString());
-    }
-  }
-
-  Widget singleMessage(String text, String sender, String time,
-      String currentUser, double width) {
-    var dateTime = DateTime.parse(time);
-    var now = DateTime.now();
-    String displayDate = getDisplayDateText(dateTime, now);
-    if (sender == widget.otherUser) {
-      return Slidable(
-        actionPane: SlidableDrawerActionPane(),
-        actions: <Widget>[
-          Stack(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.topCenter,
-                child: Text(
-                  displayDate,
-                  style: TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'Garamond',
-                      color: Colors.white),
-                ),
-              ),
-              Align(
-                alignment: Alignment.center,
-                child: IconButton(
-                  padding: EdgeInsets.symmetric(vertical: 1),
-                  iconSize: 35,
-                  onPressed: () {
-                    setState(() {
-                      interactWithMessage = !interactWithMessage;
-                    });
-                  },
-                  icon: Icon(Icons.more_horiz),
-                ),
-              ),
-            ],
-          )
-        ],
-        child: Padding(
-          padding: EdgeInsets.all(3),
-          child: Align(
-              alignment: currentUser == sender
-                  ? Alignment.centerRight
-                  : Alignment.centerLeft,
-              child: Row(
-                mainAxisAlignment: widget.otherUser == sender
-                    ? MainAxisAlignment.start
-                    : MainAxisAlignment.end,
-                children: <Widget>[
-                  profileImage(sender),
-                  Container(
-                    constraints:
-                        BoxConstraints(minWidth: 20, maxWidth: width * .7),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: currentUser == sender
-                            ? Colors.blue[300]
-                            : Colors.green[300]),
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    child: Text(
-                      text,
-                      style: TextStyle(
-                          fontSize: 22,
-                          fontFamily: 'Garamond',
-                          color: Colors.grey[850]),
-                    ),
-                  )
-                ],
-              )),
-        ),
-      );
-    } else {
-      return Slidable(
-        actionPane: SlidableDrawerActionPane(),
-        secondaryActions: <Widget>[
-          Stack(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.topCenter,
-                child: Text(
-                  displayDate,
-                  style: TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'Garamond',
-                      color: Colors.white),
-                ),
-              ),
-              Align(
-                alignment: Alignment.center,
-                child: IconButton(
-                  padding: EdgeInsets.symmetric(vertical: 1),
-                  iconSize: 35,
-                  onPressed: () {
-                    setState(() {
-                      interactWithMessage = !interactWithMessage;
-                    });
-                  },
-                  icon: Icon(Icons.more_horiz),
-                ),
-              ),
-            ],
-          )
-        ],
-        child: Padding(
-          padding: EdgeInsets.all(3),
-          child: Align(
-              alignment: currentUser == sender
-                  ? Alignment.centerRight
-                  : Alignment.centerLeft,
-              child: Row(
-                mainAxisAlignment: widget.otherUser == sender
-                    ? MainAxisAlignment.start
-                    : MainAxisAlignment.end,
-                children: <Widget>[
-                  Container(
-                    constraints:
-                        BoxConstraints(minWidth: 20, maxWidth: width * .7),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: currentUser == sender
-                          ? Colors.blue[300]
-                          : Colors.green[400],
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    child: Text(
-                      text,
-                      style: TextStyle(
-                          fontSize: 22,
-                          fontFamily: 'Garamond',
-                          color: Colors.grey[850]),
-                    ),
-                  ),
-                  profileImage(sender),
-                ],
-              )),
-        ),
-      );
-    }
-  }
-
-  Widget specialMessage(String text, String sender, String time,
-      String currentUser, double width, String readOrNot) {
-    var dateTime = DateTime.parse(time);
-    var now = DateTime.now();
-    String displayDate = getDisplayDateText(dateTime, now);
-
-    return Slidable(
-      actionPane: SlidableDrawerActionPane(),
-      secondaryActions: <Widget>[
-        Stack(
-          children: <Widget>[
-            Align(
-              alignment: Alignment.topCenter,
-              child: Text(
-                displayDate,
-                style: TextStyle(fontSize: 12, fontFamily: 'Garamond'),
-              ),
-            ),
-            Align(
-              alignment: Alignment.center,
-              child: IconButton(
-                padding: EdgeInsets.symmetric(vertical: 1),
-                iconSize: 35,
-                onPressed: () {
-                  setState(() {
-                    interactWithMessage = !interactWithMessage;
-                  });
-                },
-                icon: Icon(Icons.more_horiz),
-              ),
-            ),
-          ],
-        )
-      ],
-      child: Padding(
-        padding: EdgeInsets.all(3),
-        child: Align(
-          alignment: currentUser == sender
-              ? Alignment.centerRight
-              : Alignment.centerLeft,
-          child: Column(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: widget.otherUser == sender
-                    ? MainAxisAlignment.start
-                    : MainAxisAlignment.end,
-                children: <Widget>[
-                  Container(
-                    constraints:
-                        BoxConstraints(minWidth: 20, maxWidth: width * .7),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: currentUser == sender ? Colors.blue : Colors.green,
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    child: Text(
-                      text,
-                      style: TextStyle(
-                          fontSize: 22,
-                          fontFamily: 'Garamond',
-                          color: Colors.white),
-                    ),
-                  ),
-                  profileImage(sender),
-                ],
-              ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: Container(
-                  padding: EdgeInsets.only(right: 20, top: 1),
-                  child: Text(
-                    readOrNot,
-                    style: TextStyle(fontSize: 12, fontFamily: 'Garamond'),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget profileImage(String sender) {
-    if (sender == widget.otherUser) {
-      return Container(
-        padding: EdgeInsets.all(5),
-        child: CircleAvatar(
-          radius: 15,
-          backgroundImage: NetworkImage(otherUserProfilePicture),
-        ),
-      );
-    } else {
-      return Container(
-        padding: EdgeInsets.all(5),
-        child: CircleAvatar(
-          radius: 15,
-          backgroundImage: NetworkImage(currentUserProfilePicture),
-        ),
-      );
     }
   }
 
@@ -618,7 +387,6 @@ class HomePageState extends State<HomePage> {
   }
 
   void makeNewConversation(String first, String second, String user) async {
-    print('making new convo');
     var now = new DateTime.now();
     await databaseReference
         .collection("conversations")
