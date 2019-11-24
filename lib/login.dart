@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_with_firebase/signup.dart';
 import 'homepage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
@@ -126,7 +127,6 @@ class Login extends StatelessWidget {
                   SizedBox(height: 5),
                   FadeAnimation(2.5, Container(
                     child: FlatButton(
-                      color: Colors.white,
                       child: Text
                     (
                       'Create a new Account',
@@ -134,6 +134,16 @@ class Login extends StatelessWidget {
                         fontSize: 12,
                       ),
                       ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                                MaterialPageRoute(
+                                    builder: (context) {
+                                      return Signup();
+                      }
+          ),
+        );
+                      },
                     )
                   )
                     ),
