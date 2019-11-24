@@ -8,6 +8,7 @@ void main() {
     new MediaQuery(
       data: new MediaQueryData(),
       child: new MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: Login(),
       ),
     ),
