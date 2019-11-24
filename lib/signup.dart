@@ -28,7 +28,8 @@ class Signup extends StatelessWidget {
                   borderRadius:
                       BorderRadius.only(bottomLeft: Radius.circular(60)),
                   image: DecorationImage(
-                    image: AssetImage('images/th.png'),
+                    //image: AssetImage('images/th.png'),
+                    image: NetworkImage('https://wallpapercave.com/wp/wp1902577.jpg'),
                     fit: BoxFit.fill,
                   )),
             ),
@@ -47,7 +48,7 @@ class Signup extends StatelessWidget {
                               borderRadius: BorderRadius.circular(30),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Color.fromRGBO(205, 98, 64, .3),
+                                  color: Color.fromRGBO(68, 187, 0, .3),
                                   blurRadius: 5,
                                   offset: Offset(0, 5),
                                 )
@@ -153,7 +154,7 @@ class Signup extends StatelessWidget {
                             child: Align(
                               alignment: Alignment.center,
                               child: RaisedButton(
-                                color: Color.fromRGBO(205, 98, 64, 1),
+                                color: Color.fromRGBO(68, 187, 0, 1),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30),
                                 ),
@@ -162,7 +163,7 @@ class Signup extends StatelessWidget {
                                   child: Align(
                                       alignment: Alignment.center,
                                       child: Text(
-                                        'Login',
+                                        'Sign Up',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 25,
