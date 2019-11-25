@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:simple_animations/simple_animations.dart';
 import 'Animation/FadeAnimation.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
 class Login extends StatelessWidget {
   final databaseReference = Firestore.instance;
@@ -15,146 +16,162 @@ class Login extends StatelessWidget {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    return Scaffold(
-        body: SingleChildScrollView(
-      child: Column(
-        children: <Widget>[
-          FadeAnimation(1, Container(
-            height: 250,
-            decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius:
-                    BorderRadius.only(bottomLeft: Radius.circular(60)),
-                image: DecorationImage(
-                  image: AssetImage('images/low-poly-elephant.png'),
-                  fit: BoxFit.fill,
-                )),
-          ),),
-          SizedBox(height: 20),
-          FadeAnimation(1.5, Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                children: <Widget>[
-                  Container(
+    return StyledToast(
+        textStyle: TextStyle(fontSize: 16.0, color: Colors.black),
+        backgroundColor: Colors.white,
+        borderRadius: BorderRadius.circular(15.0),
+        textPadding: EdgeInsets.symmetric(horizontal: 17.0, vertical: 10.0),
+        toastAnimation: StyledToastAnimation.slideFromTopFade,
+        reverseAnimation: StyledToastAnimation.fade,
+        curve: Curves.fastOutSlowIn,
+        reverseCurve: Curves.fastLinearToSlowEaseIn,
+        dismissOtherOnShow: true,
+        movingOnWindowChange: true,
+        toastPositions: StyledToastPosition.top,
+        child: Scaffold(
+            body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              FadeAnimation(
+                1,
+                Container(
+                  height: 250,
+                  decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius:
+                          BorderRadius.only(bottomLeft: Radius.circular(60)),
+                      image: DecorationImage(
+                        image: AssetImage('images/low-poly-elephant.png'),
+                        fit: BoxFit.fill,
+                      )),
+                ),
+              ),
+              SizedBox(height: 20),
+              FadeAnimation(
+                  1.5,
+                  Padding(
                       padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color.fromRGBO(148, 104, 244, .3),
-                              blurRadius: 5,
-                              offset: Offset(0, 5),
-                            )
-                          ]),
                       child: Column(
                         children: <Widget>[
-                          Align(
-                            alignment: Alignment.topLeft,
-                            child: Container(
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(),
-                                child: Text(
-                                  'Welcome!',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 45,
+                          Container(
+                              padding: EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(30),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color.fromRGBO(148, 104, 244, .3),
+                                      blurRadius: 5,
+                                      offset: Offset(0, 5),
+                                    )
+                                  ]),
+                              child: Column(
+                                children: <Widget>[
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Container(
+                                        padding: EdgeInsets.all(10),
+                                        decoration: BoxDecoration(),
+                                        child: Text(
+                                          'Welcome!',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.normal,
+                                            fontSize: 45,
+                                          ),
+                                        )),
                                   ),
-                                )),
-                          ),
-                          Container(
-                            height: 50,
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                                border: Border(
-                                    bottom:
-                                        BorderSide(color: Colors.grey[200]))),
-                            child: TextField(
-                              decoration: InputDecoration.collapsed(
-                                  border: InputBorder.none,
-                                  hintText: "Username",
-                                  hintStyle: TextStyle(color: Colors.grey)),
-                              onChanged: (text) {
-                                uname = text;
-                              },
-                            ),
-                          ),
-                          Container(
-                            height: 50,
-                            padding: EdgeInsets.all(10),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: "Password",
-                                  hintStyle: TextStyle(color: Colors.grey)),
-                              onChanged: (text) {
-                                pwd = text;
-                              },
-                              obscureText: true,
-                            ),
-                          )
-                        ],
-                      )),
-                  SizedBox(height: 25),
-                  FadeAnimation(2.0,
-                  Container(
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: RaisedButton(
-                        color: Color.fromRGBO(148, 104, 244, 1),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Container(
-                          height: 50,
-                          child: Align(
-                            alignment: Alignment.center,
-                              child: Text(
-                            'Login',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 25,
-                            ),
-                          )),
-                        ),
-                        onPressed: () {
-                          signIn(context, uname, pwd);
-                        },
-                      ),
-                    ),
-                  )
-                  ),
-                  SizedBox(height: 5),
-                  FadeAnimation(2.5, Container(
-                    child: FlatButton(
-                      child: Text
-                    (
-                      'Create a new Account',
-                      style: TextStyle(
-                        fontSize: 12,
-                      ),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                                MaterialPageRoute(
-                                    builder: (context) {
+                                  Container(
+                                    height: 50,
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                        border: Border(
+                                            bottom: BorderSide(
+                                                color: Colors.grey[200]))),
+                                    child: TextField(
+                                      decoration: InputDecoration.collapsed(
+                                          border: InputBorder.none,
+                                          hintText: "Username",
+                                          hintStyle:
+                                              TextStyle(color: Colors.grey)),
+                                      onChanged: (text) {
+                                        uname = text;
+                                      },
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 50,
+                                    padding: EdgeInsets.all(10),
+                                    child: TextField(
+                                      decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          hintText: "Password",
+                                          hintStyle:
+                                              TextStyle(color: Colors.grey)),
+                                      onChanged: (text) {
+                                        pwd = text;
+                                      },
+                                      obscureText: true,
+                                    ),
+                                  )
+                                ],
+                              )),
+                          SizedBox(height: 25),
+                          FadeAnimation(
+                              2.0,
+                              Container(
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: RaisedButton(
+                                    color: Color.fromRGBO(148, 104, 244, 1),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                    child: Container(
+                                      height: 50,
+                                      child: Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            'Login',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 25,
+                                            ),
+                                          )),
+                                    ),
+                                    onPressed: () {
+                                      signIn(context, uname, pwd);
+                                    },
+                                  ),
+                                ),
+                              )),
+                          SizedBox(height: 5),
+                          FadeAnimation(
+                              2.5,
+                              Container(
+                                  child: FlatButton(
+                                child: Text(
+                                  'Create a new Account',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) {
                                       return Signup();
-                      }
+                                    }),
+                                  );
+                                },
+                              ))),
+                        ],
+                      )))
+            ],
           ),
-        );
-                      },
-                    )
-                  )
-                    ),
-                ],
-              )))
-        ],
-      ),
 
-      // physics: ClampingScrollPhysics(),
-      scrollDirection: Axis.vertical,
-    ));
+          // physics: ClampingScrollPhysics(),
+          scrollDirection: Axis.vertical,
+        )));
   }
 
   Future<void> signIn(
@@ -189,6 +206,7 @@ class Login extends StatelessWidget {
       }
     } catch (e) {
       print('Error: $e');
+      showToast("Wrong Username/Password =(");
     }
   }
 
