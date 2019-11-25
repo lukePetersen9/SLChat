@@ -28,8 +28,7 @@ class Signup extends StatelessWidget {
                   borderRadius:
                       BorderRadius.only(bottomLeft: Radius.circular(60)),
                   image: DecorationImage(
-                    //image: AssetImage('images/th.png'),
-                    image: NetworkImage('https://wallpapercave.com/wp/wp1902577.jpg'),
+                    image: AssetImage('images/wp1902577.png'),
                     fit: BoxFit.fill,
                   )),
             ),

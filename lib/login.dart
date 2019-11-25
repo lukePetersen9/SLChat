@@ -206,7 +206,31 @@ class Login extends StatelessWidget {
       }
     } catch (e) {
       print('Error: $e');
-      showToast("Wrong Username/Password =(");
+      print(e.toString());
+      if(username == '' && password == '')
+      {
+        showToast("Username and Password field are empty");
+      }
+      else if(password == '')
+      {
+        showToast("Please Input A Password");
+      }
+      else if(username == '')
+      {
+        showToast("Please Input A Username");
+      }
+      else if(e.toString() == 'PlatformException(ERROR_USER_NOT_FOUND, There is no user record corresponding to this identifier. The user may have been deleted., null)')
+      {
+        showToast("User not found");
+      }
+      else if(e.toString() == 'PlatformException(ERROR_WRONG_PASSWORD, The password is invalid or the user does not have a password., null)')
+      {
+        showToast("Incorrect Password");
+      }
+      else if(e.toString() == 'PlatformException(ERROR_TOO_MANY_REQUESTS, We have blocked all requests from this device due to unusual activity. Try again later. [ Too many unsuccessful login attempts.  Please include reCaptcha verification or try again later ], null)')
+      {
+        showToast("Too many incorrect attempts! Try again later");
+      }
     }
   }
 
