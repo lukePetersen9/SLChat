@@ -277,13 +277,7 @@ class SignupState extends State<Signup> {
         'username': username,
         'profile_image':
             'https://i.pinimg.com/236x/10/ae/df/10aedff18fca7367122784b4453c86bb--geometric-art-geometric-patterns.jpg',
-        'conversations': [
-          {
-            'first': 'null',
-            'second': 'null',
-            'started': 'null',
-          }
-        ],
+       
       },
     );
   }
