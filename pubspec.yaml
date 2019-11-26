@@ -51,6 +51,7 @@ flutter:
   - images/low-poly-elephant.png
   - images/th.png
   - images/wp1902577.png
+  - images/ruby.PNG
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
