@@ -34,11 +34,10 @@ class ConversationPageState extends State<ConversationPage> {
     super.initState();
     getUserImageData(widget.userEmail);
     getUserImageData(widget.otherUserEmail);
-    
   }
 
   @override
-  void dispose(){
+  void dispose() {
     updateLastActiveTime(false, firstUser, secondUser, widget.userEmail);
     super.dispose();
   }
@@ -62,14 +61,36 @@ class ConversationPageState extends State<ConversationPage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            CircleAvatar(
-              backgroundImage: NetworkImage(otherUserProfilePicture),
-            ),
+            getUserData(
+                widget.otherUserEmail, 'profile_image', 'userdata', null),
             Container(
               padding: EdgeInsets.only(left: 10),
-              child: Text(
-                widget.otherUserEmail,
-                style: TextStyle(fontSize: 25, fontFamily: 'Garamond'),
+              child: Row(
+                children: <Widget>[
+                  getUserData(
+                    widget.otherUserEmail,
+                    'firstName',
+                    'userdata',
+                    TextStyle(
+                      fontSize: 30,
+                      fontFamily: 'Garamond',
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 7,
+                  ),
+                  getUserData(
+                    widget.otherUserEmail,
+                    'lastName',
+                    'userdata',
+                    TextStyle(
+                      fontSize: 30,
+                      fontFamily: 'Garamond',
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -178,7 +199,9 @@ class ConversationPageState extends State<ConversationPage> {
               if (d.documentID.contains(widget.userEmail) &&
                   d.documentID.contains(widget.otherUserEmail) &&
                   d.documentID.length ==
-                      widget.otherUserEmail.length + widget.userEmail.length + 1) {
+                      widget.otherUserEmail.length +
+                          widget.userEmail.length +
+                          1) {
                 firstUser =
                     d.documentID.substring(0, d.documentID.indexOf(' '));
                 secondUser =
@@ -192,8 +215,7 @@ class ConversationPageState extends State<ConversationPage> {
                   return d.documentID == firstUser + ' ' + secondUser;
                 },
               ).first;
-              List<dynamic> 
-              i = s.data['allTexts'];
+              List<dynamic> i = s.data['allTexts'];
               otherUserActive = s.data['readAt'];
               return SingleChildScrollView(
                 controller: scrollController,
@@ -492,27 +514,90 @@ class ConversationPageState extends State<ConversationPage> {
         return 'idk';
     }
   }
+
+  Widget getUserData(String email, String type, String path, TextStyle style) {
+    String wantedData = "";
+    if (path == 'userdata') {
+      return StreamBuilder<QuerySnapshot>(
+        stream: Firestore.instance.collection('users').snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (!snapshot.hasData) return new Text('Loading...');
+          for (DocumentSnapshot d in snapshot.data.documents) {
+            if (d.documentID == email) {
+              wantedData = d.data[type];
+            }
+          }
+          switch (type) {
+            case 'firstName':
+              return Text(
+                wantedData,
+                style: style,
+              );
+            case 'lastName':
+              return Text(
+                wantedData,
+                style: style,
+              );
+            case 'profile_image':
+              return profileImage(wantedData);
+            case 'username':
+              return Text(
+                wantedData,
+                style: style,
+              );
+            default:
+              return Text('error');
+          }
+        },
+      );
+    } else {
+      return StreamBuilder<QuerySnapshot>(
+        stream: Firestore.instance.collection('conversations').snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (!snapshot.hasData) return new Text('Loading...');
+
+          for (DocumentSnapshot d in snapshot.data.documents) {
+            if (d.documentID.contains(widget.userEmail) &&
+                d.documentID.contains(widget.otherUserEmail) &&
+                d.documentID.length ==
+                    widget.otherUserEmail.length +
+                        widget.userEmail.length +
+                        1) {
+              firstUser = d.documentID.substring(0, d.documentID.indexOf(' '));
+              secondUser =
+                  d.documentID.substring(d.documentID.indexOf(' ') + 1);
+            }
+          }
+          DocumentSnapshot s = snapshot.data.documents.where(
+            (DocumentSnapshot d) {
+              return d.documentID == firstUser + ' ' + secondUser;
+            },
+          ).first;
+          List<dynamic> i = s.data['allTexts'];
+          wantedData = i[i.length - 1]['content'];
+          return Text(
+            wantedData,
+            style: style,
+          );
+        },
+      );
+    }
+  }
+}
+
+Widget profileImage(String url) {
+  return Padding(
+    padding: EdgeInsets.only(right: 7, left: 10),
+    child: Container(
+      child: CircleAvatar(
+        radius: 20,
+        backgroundImage: NetworkImage(url),
+      ),
+    ),
+  );
 }
 
 class Message {
   String text, from, date;
   Message(this.text, this.from, this.date);
 }
-
-/************************************Here is how to do it with a listView.builder 
- * 
-ListView.builder(
-            reverse: true,
-            controller: scrollController,
-            itemCount: length,
-            itemBuilder: (BuildContext context, int index) {
-              return singleMessage(
-                  i[length - index - 1]['content'],
-                  i[length - index - 1]['sender'],
-                  i[length - index - 1]['time'],
-                  widget.userName,
-                  MediaQuery.of(context).size.width);
-            },
-          );
- * 
-*/
