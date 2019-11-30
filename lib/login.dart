@@ -26,7 +26,7 @@ class LoginState extends State<Login> {
     super.initState();
     getUser().then((user) {
       if (user != null) {
-        print(user.email);
+      //  print(user.email);
         Navigator.push(
           context,
           MaterialPageRoute(

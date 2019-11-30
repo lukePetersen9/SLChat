@@ -5,8 +5,9 @@ import 'GeneralMessageWithInteractionsForOtherUser.dart';
 
 class ConversationPage extends StatefulWidget {
   final String userEmail;
-  final String otherUserEmail;
-  ConversationPage(this.userEmail, this.otherUserEmail);
+  final String docId;
+  final String otherUserEmail = 'sdf@yahoo.com';
+  ConversationPage(this.userEmail, this.docId);
 
   @override
   State<StatefulWidget> createState() {
@@ -104,7 +105,7 @@ class ConversationPageState extends State<ConversationPage> {
           children: <Widget>[
             Expanded(
               flex: MediaQuery.of(context).viewInsets.bottom == 0 ? 8 : 5,
-              child: displayMessages(),
+              child: displayMessages(widget.docId),
             ),
             Expanded(
               child: Flex(
@@ -175,10 +176,14 @@ class ConversationPageState extends State<ConversationPage> {
     );
   }
 
-  Widget displayMessages() {
-    updateLastActiveTime(true, firstUser, secondUser, widget.userEmail);
+  Widget displayMessages(String docID) {
+    // updateLastActiveTime(true, firstUser, secondUser, widget.userEmail);
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('conversations').snapshots(),
+      stream: Firestore.instance
+          .collection('conversations')
+          .document(docID)
+          .collection('messages')
+          .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return new Text('${snapshot.error}');
@@ -194,49 +199,13 @@ class ConversationPageState extends State<ConversationPage> {
             if (snapshot.hasError)
               return Center(child: Text('Error: ${snapshot.error}'));
             if (!snapshot.hasData) return Text('No data found!');
-            bool isNew = true;
-            for (DocumentSnapshot d in snapshot.data.documents) {
-              if (d.documentID.contains(widget.userEmail) &&
-                  d.documentID.contains(widget.otherUserEmail) &&
-                  d.documentID.length ==
-                      widget.otherUserEmail.length +
-                          widget.userEmail.length +
-                          1) {
-                firstUser =
-                    d.documentID.substring(0, d.documentID.indexOf(' '));
-                secondUser =
-                    d.documentID.substring(d.documentID.indexOf(' ') + 1);
-                isNew = false;
-              }
-            }
-            if (!isNew) {
-              DocumentSnapshot s = snapshot.data.documents.where(
-                (DocumentSnapshot d) {
-                  return d.documentID == firstUser + ' ' + secondUser;
-                },
-              ).first;
-              List<dynamic> i = s.data['allTexts'];
-              otherUserActive = s.data['readAt'];
-              return SingleChildScrollView(
-                controller: scrollController,
-                reverse: true,
-                child: getTextMessages(i),
-              );
-            } else {
-              makeNewConversation(
-                  widget.userEmail, widget.otherUserEmail, widget.userEmail);
-            }
+
             return SingleChildScrollView(
               controller: scrollController,
               reverse: true,
-              child: Text(
-                'Start a new conversation with ' + widget.otherUserEmail,
-                style: TextStyle(
-                    fontSize: 22,
-                    fontFamily: 'Garamond',
-                    color: Colors.white60),
-              ),
+              child: getTextMessages(snapshot.data.documents),
             );
+
           default:
             return Text('error');
         }
@@ -244,7 +213,7 @@ class ConversationPageState extends State<ConversationPage> {
     );
   }
 
-  Widget getTextMessages(List<dynamic> d) {
+  Widget getTextMessages(List<DocumentSnapshot> d) {
     Map<String, String> m = new Map<String, String>();
     List<Widget> list = new List<Widget>();
     for (int i = 1; i < d.length - 1; i++) {
@@ -407,25 +376,6 @@ class ConversationPageState extends State<ConversationPage> {
         },
       );
     } catch (e) {}
-  }
-
-  void makeNewConversation(String first, String second, String user) async {
-    var now = new DateTime.now();
-    await databaseReference
-        .collection("conversations")
-        .document(first + ' ' + second)
-        .setData(
-      {
-        'readAt': 'false',
-        'allTexts': [
-          {
-            'content': 'initialization',
-            'sender': widget.userEmail,
-            'sent': now.toString(),
-          }
-        ],
-      },
-    );
   }
 
   void getUserImageData(String username) {

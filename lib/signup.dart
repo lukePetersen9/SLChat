@@ -271,13 +271,13 @@ class SignupState extends State<Signup> {
   void createRecord(String email, String username, String f, String l) async {
     await databaseReference.collection('users').document(email).setData(
       {
+        'email': email,
         'username': username,
         'firstName': f,
         'lastName': l,
         'username': username,
         'profile_image':
             'https://i.pinimg.com/236x/10/ae/df/10aedff18fca7367122784b4453c86bb--geometric-art-geometric-patterns.jpg',
-       
       },
     );
   }

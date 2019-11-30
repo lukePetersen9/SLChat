@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'conversationPage.dart';
+import 'firestoreMain.dart';
 
 class SearchDialog extends StatefulWidget {
   final String userEmail;
@@ -12,6 +13,7 @@ class SearchDialog extends StatefulWidget {
 }
 
 class SearchDialogState extends State<SearchDialog> {
+  FirestoreMain fire = new FirestoreMain();
   final databaseReference = Firestore.instance;
   String searchText = "";
   @override
@@ -19,7 +21,7 @@ class SearchDialogState extends State<SearchDialog> {
     return AlertDialog(
       title: TextField(
         onChanged: (change) {
-          print(searchText);
+       //   print(searchText);
           setState(() {
             searchText = change;
           });
@@ -67,14 +69,9 @@ class SearchDialogState extends State<SearchDialog> {
               searchResultTextBox.add(
                 new FlatButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return ConversationPage(widget.userEmail, name);
-                        },
-                      ),
-                    );
+                    List<String> user = new List<String>();
+                    user.add(name);
+                    fire.makeNewConversation(widget.userEmail, user);
                   },
                   child: Text(name),
                 ),

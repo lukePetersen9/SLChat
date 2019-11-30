@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_with_firebase/conversationPage.dart';
 import 'searchDialog.dart';
 import 'login.dart';
+import 'firestoreMain.dart';
+import 'user.dart';
 
 class HomePage extends StatefulWidget {
   final String email;
@@ -21,6 +23,7 @@ class HomePageState extends State<HomePage> {
   String secondUser = "";
   TextEditingController search = new TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  
 
   Future<FirebaseUser> getUser() async {
     return await _auth.currentUser();
@@ -28,6 +31,7 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    FirestoreMain g = new FirestoreMain();
     return Scaffold(
       appBar: AppBar(
         title: Text('Your Conversations'),
@@ -53,7 +57,7 @@ class HomePageState extends State<HomePage> {
         },
       ),
       body: SingleChildScrollView(
-        child: showConversations(widget.email),
+        child: g.showConversations(widget.email),
       ),
     );
   }
@@ -88,107 +92,111 @@ class HomePageState extends State<HomePage> {
             if (snapshot.hasError)
               return Center(child: Text('Error: ${snapshot.error}'));
             if (!snapshot.hasData) return Text('No data found!');
-            List<String> convoEmails = new List<String>();
-            for (DocumentSnapshot d in snapshot.data.documents) {
-              if (d.documentID.contains(email)) {
-                convoEmails.add(d.documentID.replaceFirst(email, '').trim());
-              }
-            }
+          for(DocumentSnapshot s in snapshot.data.documents){
+            print(s.documentID);
+          }
+          //   List<String> convoEmails = new List<String>();
+          //   for (DocumentSnapshot d in snapshot.data.documents) {
+          //     if (d.documentID.contains(email)) {
+          //       convoEmails.add(d.documentID.replaceFirst(email, '').trim());
+          //     }
+          //   }
 
-            List<Widget> conversations = new List<Widget>();
-            for (String name in convoEmails) {
-              conversations.add(
-                new GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return ConversationPage(email, name);
-                        },
-                      ),
-                    );
-                  },
-                  child: Container(
-                    color: Colors.white,
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height / 10,
-                    padding: EdgeInsets.all(5),
-                    child: Row(
-                      children: <Widget>[
-                        getUserData(name, 'profile_image', 'userdata', null),
-                        Flex(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          direction: Axis.vertical,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 3,
-                              child: Container(
-                                child: Row(
-                                  children: <Widget>[
-                                    getUserData(
-                                      name,
-                                      'firstName',
-                                      'userdata',
-                                      TextStyle(
-                                        fontSize: 22,
-                                        fontFamily: 'Garamond',
-                                        color: Colors.grey[850],
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 7,
-                                    ),
-                                    getUserData(
-                                      name,
-                                      'lastName',
-                                      'userdata',
-                                      TextStyle(
-                                        fontSize: 22,
-                                        fontFamily: 'Garamond',
-                                        color: Colors.grey[850],
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    getUserData(
-                                      name,
-                                      'username',
-                                      'userdata',
-                                      TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: 'Garamond',
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: getUserData(
-                                name,
-                                widget.email,
-                                'conversations',
-                                TextStyle(
-                                  fontSize: 20,
-                                  fontFamily: 'Garamond',
-                                  color: Colors.grey[700],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }
+          //   List<Widget> conversations = new List<Widget>();
+          // //  conversations.add(g.getMessages('IDqbpgl5vylwfkt5HCxK'));
+          //   for (String name in convoEmails) {
+          //     conversations.add(
+          //       new GestureDetector(
+          //         onTap: () {
+          //           Navigator.push(
+          //             context,
+          //             MaterialPageRoute(
+          //               builder: (context) {
+          //                 return ConversationPage(email, name);
+          //               },
+          //             ),
+          //           );
+          //         },
+          //         child: Container(
+          //           color: Colors.white,
+          //           width: MediaQuery.of(context).size.width,
+          //           height: MediaQuery.of(context).size.height / 10,
+          //           padding: EdgeInsets.all(5),
+          //           child: Row(
+          //             children: <Widget>[
+          //               getUserData(name, 'profile_image', 'userdata', null),
+          //               Flex(
+          //                 crossAxisAlignment: CrossAxisAlignment.start,
+          //                 direction: Axis.vertical,
+          //                 children: <Widget>[
+          //                   Expanded(
+          //                     flex: 3,
+          //                     child: Container(
+          //                       child: Row(
+          //                         children: <Widget>[
+          //                           getUserData(
+          //                             name,
+          //                             'firstName',
+          //                             'userdata',
+          //                             TextStyle(
+          //                               fontSize: 22,
+          //                               fontFamily: 'Garamond',
+          //                               color: Colors.grey[850],
+          //                             ),
+          //                           ),
+          //                           SizedBox(
+          //                             width: 7,
+          //                           ),
+          //                           getUserData(
+          //                             name,
+          //                             'lastName',
+          //                             'userdata',
+          //                             TextStyle(
+          //                               fontSize: 22,
+          //                               fontFamily: 'Garamond',
+          //                               color: Colors.grey[850],
+          //                             ),
+          //                           ),
+          //                           SizedBox(
+          //                             width: 10,
+          //                           ),
+          //                           getUserData(
+          //                             name,
+          //                             'username',
+          //                             'userdata',
+          //                             TextStyle(
+          //                               fontSize: 15,
+          //                               fontFamily: 'Garamond',
+          //                               color: Colors.grey[600],
+          //                             ),
+          //                           ),
+          //                         ],
+          //                       ),
+          //                     ),
+          //                   ),
+          //                   Expanded(
+          //                     flex: 2,
+          //                     child: getUserData(
+          //                       name,
+          //                       widget.email,
+          //                       'conversations',
+          //                       TextStyle(
+          //                         fontSize: 20,
+          //                         fontFamily: 'Garamond',
+          //                         color: Colors.grey[700],
+          //                       ),
+          //                     ),
+          //                   )
+          //                 ],
+          //               ),
+          //             ],
+          //           ),
+          //         ),
+          //       ),
+          //     );
+          //   }
             return Column(
-              children: conversations,
+              // children: conversations,
             );
           default:
             return Text('error');
@@ -264,14 +272,4 @@ class HomePageState extends State<HomePage> {
   }
 }
 
-Widget profileImage(String url) {
-  return Padding(
-    padding: EdgeInsets.only(right: 7, left: 10),
-    child: Container(
-      child: CircleAvatar(
-        radius: 25,
-        backgroundImage: NetworkImage(url),
-      ),
-    ),
-  );
-}
+
