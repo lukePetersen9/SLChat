@@ -1,75 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_with_firebase/GeneralMessageWithInteractionsForCurrentUser.dart';
-import 'package:flutter_with_firebase/user.dart';
 import 'conversationPage.dart';
 
 class FirestoreMain {
-  final databaseReference = Firestore.instance;
-  Map<String, User> convoPeople = new Map<String, User>();
-  Map<String, Map<String, Widget>> convoTile =
-      new Map<String, Map<String, Widget>>();
-  Map<String, String> order = new Map<String, String>();
-
-  Widget getMessages(String id) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance
-          .collection('conversations/' + id + '/messages')
-          .snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) {
-          return new Text('${snapshot.error}');
-        }
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-          case ConnectionState.waiting:
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          case ConnectionState.active:
-          case ConnectionState.done:
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
-            if (!snapshot.hasData) {
-              return Text('No data found!');
-            }
-            List<Widget> messages = new List<Widget>();
-            final Map<String, String> interactions = new Map<String, String>();
-            for (DocumentSnapshot d in snapshot.data.documents) {
-              messages.add(
-                GeneralMessageWithInteractionsForCurrentUser(
-                    d.data['content'],
-                    'ljpete22@yahoo.com',
-                    d.documentID,
-                    interactions,
-                    'null',
-                    true,
-                    'read'),
-              );
-            }
-            return Column(
-              children: messages,
-            );
-          default:
-            return Text('error');
-        }
-      },
-    );
-  }
-
   void makeNewConversation(
       String userEmail, List<String> otherUserEmails) async {
     var now = new DateTime.now();
-    List<String> copy = otherUserEmails;
     String docID = userEmail + otherUserEmails.toString();
-    await databaseReference.collection("conversations").document(docID).setData(
+    await Firestore.instance
+        .collection("conversations")
+        .document(docID)
+        .setData(
       {
         'started': now,
         'members': [userEmail] + otherUserEmails,
         'lastOpened' + userEmail: now.toString(),
         'lastMessage': 'send a message!',
         'lastMessageTime': now.toString(),
+      },
+    );
+  }
+
+  void addInteraction(
+      String type, String email, String docID, String time) async {
+    await Firestore.instance
+        .collection("conversations")
+        .document(docID)
+        .collection('messages')
+        .document(time)
+        .updateData(
+      {
+        'interactions': FieldValue.arrayUnion([email + '@' + type])
       },
     );
   }
@@ -97,7 +58,6 @@ class FirestoreMain {
             if (!snapshot.hasData) return Text('No data found!');
             List<String> times = new List<String>();
             Map<String, Widget> tiles = new Map<String, Widget>();
-
             for (DocumentSnapshot s in snapshot.data.documents) {
               String time = s.data['lastMessageTime'];
               List<dynamic> members = new List<dynamic>();
@@ -110,7 +70,7 @@ class FirestoreMain {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return ConversationPage(email, s.documentID);
+                        return ConversationPage(email, s.documentID, members);
                       },
                     ),
                   );
@@ -149,7 +109,6 @@ class FirestoreMain {
             for (int i = 0; i < times.length; i++) {
               orderedTiles.add(tiles[times[i]]);
             }
-
             return Column(
               children: orderedTiles,
             );
@@ -178,24 +137,6 @@ class FirestoreMain {
               return d.documentID == user;
             },
           ).data['lastName'];
-          String username = snapshot.data.documents.singleWhere(
-            (DocumentSnapshot d) {
-              return d.documentID == user;
-            },
-          ).data['username'];
-          String profileImage = snapshot.data.documents.singleWhere(
-            (DocumentSnapshot d) {
-              return d.documentID == user;
-            },
-          ).data['profile_image'];
-          String email = snapshot.data.documents.singleWhere(
-            (DocumentSnapshot d) {
-              return d.documentID == user;
-            },
-          ).data['email'];
-          convoPeople[user] =
-              new User(first, last, email, profileImage, username);
-
           if (user != currentUserEmail) {
             names.add(first + ' ' + last);
           }
@@ -221,7 +162,6 @@ class FirestoreMain {
   }
 
   Widget displayProfileImages(List<dynamic> emails) {
-    print(emails);
     List<Widget> images = new List<Widget>();
     for (int i = 0; i < emails.length; i++) {
       images.add(
@@ -248,14 +188,13 @@ class FirestoreMain {
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) return new Text('Loading...');
-        print(snapshot.data.documents.first.data['profile_image']);
-        return profileImage(
+        return _profileImage(
             snapshot.data.documents.first.data['profile_image']);
       },
     );
   }
 
-  Widget profileImage(String url) {
+  Widget _profileImage(String url) {
     return Padding(
       padding: EdgeInsets.only(right: 7, left: 10),
       child: Container(

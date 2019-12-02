@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_with_firebase/dateTimeFormat.dart';
 import 'GeneralMessageWithInteractionsForCurrentUser.dart';
 import 'GeneralMessageWithInteractionsForOtherUser.dart';
+import 'firestoreMain.dart';
 
 class ConversationPage extends StatefulWidget {
-  final String userEmail;
-  final String docId;
-  final String otherUserEmail = 'sdf@yahoo.com';
-  ConversationPage(this.userEmail, this.docId);
+  final List<dynamic> members;
+  final String currentUserEmail;
+  final String docID;
+  ConversationPage(this.currentUserEmail, this.docID, this.members);
 
   @override
   State<StatefulWidget> createState() {
@@ -19,78 +21,40 @@ class ConversationPageState extends State<ConversationPage> {
   ScrollController scrollController = new ScrollController();
   TextEditingController msgController = new TextEditingController();
   final databaseReference = Firestore.instance;
-  String firstUser = '', secondUser = '';
-  String otherUserActive = 'false';
+  DateTimeFormat dateTimeFormat = new DateTimeFormat();
+  FirestoreMain fire = new FirestoreMain();
   bool showTime = false, interactWithMessage = false;
-  Map<String, String> interactions = new Map<String, String>();
-  var a;
-  var b;
-  String otherUserProfilePicture =
-      'https://icon-library.net/images/no-profile-picture-icon-female/no-profile-picture-icon-female-0.jpg';
-  String currentUserProfilePicture =
-      'https://icon-library.net/images/no-profile-picture-icon-female/no-profile-picture-icon-female-0.jpg';
 
   @override
   void initState() {
     super.initState();
-    getUserImageData(widget.userEmail);
-    getUserImageData(widget.otherUserEmail);
   }
 
   @override
   void dispose() {
-    updateLastActiveTime(false, firstUser, secondUser, widget.userEmail);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    interactions[currentUserProfilePicture] = 'like';
-    interactions[otherUserProfilePicture] = 'favorite';
-
     return Scaffold(
       backgroundColor: Colors.grey[850],
       appBar: AppBar(
         backgroundColor: Colors.black,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.access_time),
-            onPressed: () {},
-          )
-        ],
         elevation: 0,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            getUserData(
-                widget.otherUserEmail, 'profile_image', 'userdata', null),
             Container(
               padding: EdgeInsets.only(left: 10),
               child: Row(
                 children: <Widget>[
-                  getUserData(
-                    widget.otherUserEmail,
-                    'firstName',
-                    'userdata',
-                    TextStyle(
-                      fontSize: 30,
-                      fontFamily: 'Garamond',
-                      color: Colors.white,
-                    ),
-                  ),
+                  fire.displayProfileImages(widget.members),
                   SizedBox(
                     width: 7,
                   ),
-                  getUserData(
-                    widget.otherUserEmail,
-                    'lastName',
-                    'userdata',
-                    TextStyle(
-                      fontSize: 30,
-                      fontFamily: 'Garamond',
-                      color: Colors.white,
-                    ),
-                  ),
+                  fire.getUsersInGroup(
+                      widget.currentUserEmail, widget.members, TextStyle())
                 ],
               ),
             ),
@@ -105,7 +69,7 @@ class ConversationPageState extends State<ConversationPage> {
           children: <Widget>[
             Expanded(
               flex: MediaQuery.of(context).viewInsets.bottom == 0 ? 8 : 5,
-              child: displayMessages(widget.docId),
+              child: displayMessages(widget.docID),
             ),
             Expanded(
               child: Flex(
@@ -155,8 +119,7 @@ class ConversationPageState extends State<ConversationPage> {
                         onPressed: () {
                           if (msgController.text != null &&
                               msgController.text != "") {
-                            addToMessages(msgController.text, firstUser,
-                                secondUser, widget.userEmail);
+                            addToMessages(msgController.text);
                             setState(() {
                               scrollController.jumpTo(
                                   scrollController.position.maxScrollExtent);
@@ -177,7 +140,6 @@ class ConversationPageState extends State<ConversationPage> {
   }
 
   Widget displayMessages(String docID) {
-    // updateLastActiveTime(true, firstUser, secondUser, widget.userEmail);
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance
           .collection('conversations')
@@ -199,13 +161,18 @@ class ConversationPageState extends State<ConversationPage> {
             if (snapshot.hasError)
               return Center(child: Text('Error: ${snapshot.error}'));
             if (!snapshot.hasData) return Text('No data found!');
-
+            List<Widget> messages = new List<Widget>();
+            for (int i = 0; i < snapshot.data.documents.length; i++) {
+              messages.add(getTextMessage(snapshot.data.documents[i],
+                  i == snapshot.data.documents.length - 1));
+            }
             return SingleChildScrollView(
               controller: scrollController,
               reverse: true,
-              child: getTextMessages(snapshot.data.documents),
+              child: Column(
+                children: messages,
+              ),
             );
-
           default:
             return Text('error');
         }
@@ -213,341 +180,80 @@ class ConversationPageState extends State<ConversationPage> {
     );
   }
 
-  Widget getTextMessages(List<DocumentSnapshot> d) {
-    Map<String, String> m = new Map<String, String>();
-    List<Widget> list = new List<Widget>();
-    for (int i = 1; i < d.length - 1; i++) {
-      if (d[i]['sender'] == widget.userEmail) {
-        list.add(
-          GeneralMessageWithInteractionsForCurrentUser(
-            d[i]['content'],
-            widget.userEmail,
-            d[i]['sent'],
-            m,
-            currentUserProfilePicture,
-            false,
-            otherUserActive == 'false'
-                ? 'delivered'
-                : 'Read ' +
-                    (getDisplayDateText(
-                      DateTime.parse(otherUserActive),
-                      DateTime.now(),
-                    ).replaceAll('Today', '')),
-          ),
-        );
-      } else {
-        list.add(
-          GeneralMessageWithInteractionsForOtherUser(
-              d[i]['content'],
-              d[i]['sender'],
-              d[i]['sent'],
-              interactions,
-              otherUserProfilePicture,
-              false,
-              ''),
-        );
+  Widget getTextMessage(DocumentSnapshot d, bool isLast) {
+    List<dynamic> readList = d.data['readBy'];
+    bool alreadyRead = false;
+    for (String s in readList) {
+      if (s.contains(widget.currentUserEmail)) {
+        alreadyRead = true;
       }
     }
-    if (d[d.length - 1]['sender'] != widget.userEmail &&
-        otherUserActive == 'false' &&
-        d.length > 1) {
-      sendReadRecipt(d);
-      list.add(
-        GeneralMessageWithInteractionsForOtherUser(
-            d[d.length - 1]['content'],
-            d[d.length - 1]['sender'],
-            d[d.length - 1]['sent'],
-            interactions,
-            otherUserProfilePicture,
-            false,
-            ''),
-      );
-    } else if (d[d.length - 1]['sender'] == widget.userEmail && d.length > 1) {
-      list.add(
-        GeneralMessageWithInteractionsForCurrentUser(
-          d[d.length - 1]['content'],
-          widget.userEmail,
-          d[d.length - 1]['sent'],
-          interactions,
-          currentUserProfilePicture,
-          true,
-          otherUserActive == 'false'
-              ? 'delivered'
-              : 'Read ' +
-                  (getDisplayDateText(
-                    DateTime.parse(otherUserActive),
-                    DateTime.now(),
-                  ).replaceAll('Today', '')),
-        ),
-      );
-    } else if (d.length > 1) {
-      list.add(
-        GeneralMessageWithInteractionsForOtherUser(
-            d[d.length - 1]['content'],
-            d[d.length - 1]['sender'],
-            d[d.length - 1]['sent'],
-            interactions,
-            otherUserProfilePicture,
-            false,
-            ''),
-      );
+    if (!alreadyRead) {
+      try {
+        databaseReference
+            .collection("conversations")
+            .document(widget.docID)
+            .collection('messages')
+            .document(d.documentID)
+            .updateData(
+          {
+            'readBy': FieldValue.arrayUnion(
+              [widget.currentUserEmail + '@' + DateTime.now().toString()],
+            ),
+          },
+        );
+      } catch (e) {}
     }
-    if (list.length == 0) {
-      return Column(
-        children: <Widget>[
-          Text(
-            'Start a conversation with ' + widget.otherUserEmail,
-            style: TextStyle(
-                fontSize: 22, fontFamily: 'Garamond', color: Colors.white60),
-          ),
-        ],
-      );
-    }
-    return Column(children: list);
-  }
-
-  void sendReadRecipt(List<dynamic> d) {
-    DateTime now = DateTime.now();
-    try {
-      databaseReference
-          .collection('conversations')
-          .document(firstUser + ' ' + secondUser)
-          .updateData(
-        {
-          'readAt': now.toString(),
-        },
-      );
-    } catch (e) {
-      print(e.toString());
+    String readDelivered = readList.length > 1
+        ? 'read ' +
+            dateTimeFormat.getDisplayDateText(
+                DateTime.parse(readList[1]
+                    .toString()
+                    .substring(readList[1].toString().lastIndexOf('@') + 1)),
+                DateTime.now())
+        : 'delivered';
+    if (d.data['sentBy'] == widget.currentUserEmail) {
+      return GeneralMessageWithInteractionsForCurrentUser(
+          d.data['content'],
+          d.documentID,
+          d.data['interactions'],
+          widget.currentUserEmail,
+          isLast,
+          readDelivered,
+          widget.docID);
+    } else {
+      return GeneralMessageWithInteractionsForOtherUser(d.data['content'],
+          d.data['sentBy'], d.documentID, d.data['interactions'],widget.docID);
     }
   }
 
-  void updateData() {
-    try {
-      databaseReference
-          .collection('conversations')
-          .document(widget.userEmail + ' ' + widget.otherUserEmail)
-          .setData({'shubham24': 'data'});
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  void updateLastActiveTime(
-      bool isActive, String first, String second, String user) async {
+  void addToMessages(String value) async {
     var now = new DateTime.now();
     try {
       databaseReference
           .collection("conversations")
-          .document(first + ' ' + second)
-          .updateData(
+          .document(widget.docID)
+          .collection('messages')
+          .document(now.toString())
+          .setData(
         {
-          user + 'IsActive': isActive.toString(),
+          'content': value,
+          'sentBy': widget.currentUserEmail,
+          'readBy': [widget.currentUserEmail],
+          'interactions': ['init'],
         },
       );
     } catch (e) {}
-  }
-
-  void deleteData() {
-    try {
-      databaseReference.collection('books').document('1').delete();
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  void addToMessages(
-      String value, String first, String second, String user) async {
-    var now = new DateTime.now();
     try {
       databaseReference
           .collection("conversations")
-          .document(first + ' ' + second)
+          .document(widget.docID)
           .updateData(
         {
-          'readAt': 'false',
-          'allTexts': FieldValue.arrayUnion([
-            {
-              'content': msgController.text,
-              'sender': widget.userEmail,
-              'sent': now.toString(),
-            }
-          ]),
+          'lastMessage': value,
+          'lastMessageTime': now.toString(),
         },
       );
     } catch (e) {}
   }
-
-  void getUserImageData(String username) {
-    if (username == widget.otherUserEmail) {
-      a = Firestore.instance
-          .collection('users')
-          .document(widget.otherUserEmail)
-          .get()
-          .then(
-        (DocumentSnapshot snap) {
-          otherUserProfilePicture = snap.data['profile_image'];
-          setState(() {});
-        },
-      );
-    } else {
-      b = Firestore.instance
-          .collection('users')
-          .document(widget.userEmail)
-          .get()
-          .then(
-        (DocumentSnapshot snap) {
-          currentUserProfilePicture = snap.data['profile_image'];
-          setState(() {});
-        },
-      );
-    }
-  }
-
-  String getDisplayDateText(DateTime sent, DateTime now) {
-    if (now.difference(sent).inHours < 24) {
-      return (sent.hour % 12 == 0 ? '12' : (sent.hour % 12).toString()) +
-          ':' +
-          (sent.minute < 10
-              ? '0' + sent.minute.toString()
-              : sent.minute.toString()) +
-          (sent.hour > 11 && sent.hour < 23 ? ' pm' : ' am');
-    } else if (now.difference(sent).inDays < 7) {
-      return sent.weekday.toString() +
-          ' ' +
-          (sent.hour % 12 == 0 ? '12' : (sent.hour % 12).toString()) +
-          ':' +
-          (sent.minute < 10
-              ? '0' + sent.minute.toString()
-              : sent.minute.toString()) +
-          (sent.hour > 11 && sent.hour < 23 ? ' pm' : ' am');
-    } else {
-      return monthAbreviation(sent.month) +
-          ' ' +
-          sent.day.toString() +
-          ', ' +
-          (sent.hour % 12 == 0 ? '12' : (sent.hour % 12).toString()) +
-          ':' +
-          (sent.minute < 10
-              ? '0' + sent.minute.toString()
-              : sent.minute.toString());
-    }
-  }
-
-  String monthAbreviation(int month) {
-    switch (month) {
-      case 1:
-        return 'Jan';
-      case 2:
-        return 'Feb';
-      case 3:
-        return 'Mar';
-      case 4:
-        return 'Apr';
-      case 5:
-        return 'May';
-      case 6:
-        return 'Jun';
-      case 7:
-        return 'Jul';
-      case 8:
-        return 'Aug';
-      case 9:
-        return 'Sept';
-      case 10:
-        return 'Oct';
-      case 11:
-        return 'Nov';
-      case 12:
-        return 'Dec';
-      default:
-        return 'idk';
-    }
-  }
-
-  Widget getUserData(String email, String type, String path, TextStyle style) {
-    String wantedData = "";
-    if (path == 'userdata') {
-      return StreamBuilder<QuerySnapshot>(
-        stream: Firestore.instance.collection('users').snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (!snapshot.hasData) return new Text('Loading...');
-          for (DocumentSnapshot d in snapshot.data.documents) {
-            if (d.documentID == email) {
-              wantedData = d.data[type];
-            }
-          }
-          switch (type) {
-            case 'firstName':
-              return Text(
-                wantedData,
-                style: style,
-              );
-            case 'lastName':
-              return Text(
-                wantedData,
-                style: style,
-              );
-            case 'profile_image':
-              return profileImage(wantedData);
-            case 'username':
-              return Text(
-                wantedData,
-                style: style,
-              );
-            default:
-              return Text('error');
-          }
-        },
-      );
-    } else {
-      return StreamBuilder<QuerySnapshot>(
-        stream: Firestore.instance.collection('conversations').snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (!snapshot.hasData) return new Text('Loading...');
-
-          for (DocumentSnapshot d in snapshot.data.documents) {
-            if (d.documentID.contains(widget.userEmail) &&
-                d.documentID.contains(widget.otherUserEmail) &&
-                d.documentID.length ==
-                    widget.otherUserEmail.length +
-                        widget.userEmail.length +
-                        1) {
-              firstUser = d.documentID.substring(0, d.documentID.indexOf(' '));
-              secondUser =
-                  d.documentID.substring(d.documentID.indexOf(' ') + 1);
-            }
-          }
-          DocumentSnapshot s = snapshot.data.documents.where(
-            (DocumentSnapshot d) {
-              return d.documentID == firstUser + ' ' + secondUser;
-            },
-          ).first;
-          List<dynamic> i = s.data['allTexts'];
-          wantedData = i[i.length - 1]['content'];
-          return Text(
-            wantedData,
-            style: style,
-          );
-        },
-      );
-    }
-  }
-}
-
-Widget profileImage(String url) {
-  return Padding(
-    padding: EdgeInsets.only(right: 7, left: 10),
-    child: Container(
-      child: CircleAvatar(
-        radius: 20,
-        backgroundImage: NetworkImage(url),
-      ),
-    ),
-  );
-}
-
-class Message {
-  String text, from, date;
-  Message(this.text, this.from, this.date);
 }

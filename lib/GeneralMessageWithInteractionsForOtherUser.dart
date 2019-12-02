@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_with_firebase/dateTimeFormat.dart';
+import 'package:flutter_with_firebase/firestoreMain.dart';
 
 class GeneralMessageWithInteractionsForOtherUser extends StatefulWidget {
   final String text;
-  final String username;
+  final String email;
   final String time;
-  final String userProfileImage;
-  final bool isLast;
-  final String readDelivered;
-  final Map<String, String> interactions;
+  final List<dynamic> interactions;
+  final String docID;
 
   GeneralMessageWithInteractionsForOtherUser(
     this.text,
-    this.username,
+    this.email,
     this.time,
     this.interactions,
-    this.userProfileImage,
-    this.isLast,
-    this.readDelivered,
+    this.docID,
   );
   @override
   _GeneralMessageWithInteractionsForOtherUserState createState() =>
@@ -27,6 +25,8 @@ class GeneralMessageWithInteractionsForOtherUser extends StatefulWidget {
 class _GeneralMessageWithInteractionsForOtherUserState
     extends State<GeneralMessageWithInteractionsForOtherUser>
     with SingleTickerProviderStateMixin {
+  FirestoreMain fire = new FirestoreMain();
+  DateTimeFormat dateTimeFormat = new DateTimeFormat();
   bool showTime = false;
   Color textBackgroundColor = Colors.amber[300];
   GlobalKey<State> extentChange = new GlobalKey<State>();
@@ -39,13 +39,14 @@ class _GeneralMessageWithInteractionsForOtherUserState
     return Slidable(
       actionPane: SlidableDrawerActionPane(),
       actionExtentRatio: maxExtent,
-      actions: makeInteractionItemList(widget.interactions).length > 8
+      secondaryActions: makeInteractionItemList(widget.interactions).length > 8
           ? makeInteractionItemList(widget.interactions).sublist(0, 9)
           : makeInteractionItemList(widget.interactions),
-      secondaryActions: <Widget>[
+      actions: <Widget>[
         IconButton(
           padding: EdgeInsets.all(0),
-          onPressed: () {},
+          onPressed: () {fire.addInteraction(
+                'favorite', widget.email, widget.docID, widget.time);},
           icon: Icon(
             Icons.favorite,
             color: Colors.white70,
@@ -53,7 +54,8 @@ class _GeneralMessageWithInteractionsForOtherUserState
         ),
         IconButton(
           padding: EdgeInsets.all(0),
-          onPressed: () {},
+          onPressed: () {fire.addInteraction(
+                'like', widget.email, widget.docID, widget.time);},
           icon: Icon(
             Icons.thumb_up,
             color: Colors.white70,
@@ -61,7 +63,8 @@ class _GeneralMessageWithInteractionsForOtherUserState
         ),
         IconButton(
           padding: EdgeInsets.all(0),
-          onPressed: () {},
+          onPressed: () {fire.addInteraction(
+                'dislike', widget.email, widget.docID, widget.time);},
           icon: Icon(
             Icons.thumb_down,
             color: Colors.white70,
@@ -83,8 +86,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              messageCharacteristics(widget.text, widget.username, widget.time,
-                  widget.isLast, widget.readDelivered, showTime),
+              messageCharacteristics(widget.text, widget.time, showTime),
             ],
           ),
         ),
@@ -123,7 +125,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          profileImage(widget.userProfileImage),
+          fire.getUserProfileImage(widget.email),
           AnimatedContainer(
             duration: Duration(milliseconds: 400),
             constraints: BoxConstraints(
@@ -148,28 +150,27 @@ class _GeneralMessageWithInteractionsForOtherUserState
     );
   }
 
-  Widget messageCharacteristics(String text, String username, String time,
-      bool isLast, String readDelivered, bool shouldShow) {
+  Widget messageCharacteristics(String text, String time, bool shouldShow) {
     if (shouldShow) {
       return textMessageWithoutReadRecipt(
         Colors.transparent,
         Colors.amber[300],
         Colors.white70,
-        'Sent: ' + getDisplayDateText(DateTime.parse(time), DateTime.now()),
+        'Sent: ' +
+            dateTimeFormat.getDisplayDateText(
+                DateTime.parse(time), DateTime.now()),
       );
     } else {
       return textMessageWithoutReadRecipt(
           Colors.amber[300], Colors.amber[300], Colors.grey[850], text);
     }
   }
-}
 
-List<Widget> makeInteractionItemList(Map<String, String> inter) {
-  List<Widget> all = new List<Widget>();
-  Icon icon = Icon(Icons.favorite);
-  inter.forEach(
-    (String key, String value) {
-      switch (value) {
+  List<Widget> makeInteractionItemList(List<dynamic> inter) {
+    List<Widget> all = new List<Widget>();
+    Icon icon = Icon(Icons.favorite);
+    for (int i = 1; i < inter.length; i++) {
+      switch (inter[i]) {
         case 'favorite':
           icon = Icon(
             Icons.favorite,
@@ -200,12 +201,7 @@ List<Widget> makeInteractionItemList(Map<String, String> inter) {
             children: <Widget>[
               Align(
                 alignment: Alignment.bottomCenter,
-                child: Container(
-                  child: CircleAvatar(
-                    backgroundImage: NetworkImage(key),
-                    radius: 15,
-                  ),
-                ),
+                child: Container(child: fire.getUserProfileImage(widget.email)),
               ),
               Align(
                 alignment: Alignment.topLeft,
@@ -215,86 +211,14 @@ List<Widget> makeInteractionItemList(Map<String, String> inter) {
           ),
         ),
       );
-    },
-  );
-  if (all.length > 7) {
-    all.insert(
-      8,
-      Icon(Icons.more_horiz),
-    );
-  }
-  return all;
-}
+    }
 
-String getDisplayDateText(DateTime sent, DateTime now) {
-  if (now.difference(sent).inHours < 24) {
-    return (sent.hour % 12 == 0 ? '12' : (sent.hour % 12).toString()) +
-        ':' +
-        (sent.minute < 10
-            ? '0' + sent.minute.toString()
-            : sent.minute.toString()) +
-        (sent.hour > 11 && sent.hour < 23 ? ' pm' : ' am');
-  } else if (now.difference(sent).inDays < 7) {
-    return sent.weekday.toString() +
-        ' ' +
-        (sent.hour % 12 == 0 ? '12' : (sent.hour % 12).toString()) +
-        ':' +
-        (sent.minute < 10
-            ? '0' + sent.minute.toString()
-            : sent.minute.toString()) +
-        (sent.hour > 11 && sent.hour < 23 ? ' pm' : ' am');
-  } else {
-    return monthAbreviation(sent.month) +
-        ' ' +
-        sent.day.toString() +
-        ', ' +
-        (sent.hour % 12 == 0 ? '12' : (sent.hour % 12).toString()) +
-        ':' +
-        (sent.minute < 10
-            ? '0' + sent.minute.toString()
-            : sent.minute.toString());
+    if (all.length > 7) {
+      all.insert(
+        8,
+        Icon(Icons.more_horiz),
+      );
+    }
+    return all;
   }
-}
-
-String monthAbreviation(int month) {
-  switch (month) {
-    case 1:
-      return 'Jan';
-    case 2:
-      return 'Feb';
-    case 3:
-      return 'Mar';
-    case 4:
-      return 'Apr';
-    case 5:
-      return 'May';
-    case 6:
-      return 'Jun';
-    case 7:
-      return 'Jul';
-    case 8:
-      return 'Aug';
-    case 9:
-      return 'Sept';
-    case 10:
-      return 'Oct';
-    case 11:
-      return 'Nov';
-    case 12:
-      return 'Dec';
-    default:
-      return 'idk';
-  }
-}
-
-Widget profileImage(String url) {
-  return Padding(
-    padding: EdgeInsets.only(left: 7, right: 10),
-    child: Container(
-      child: CircleAvatar(
-        radius: 15,
-        backgroundImage: NetworkImage(url),
-      ),
-    ),
-  );
 }
