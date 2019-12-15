@@ -9,9 +9,7 @@ import 'login.dart';
 
 class Signup extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() {
-    return SignupState();
-  }
+  State<StatefulWidget> createState() => SignupState();
 }
 
 class SignupState extends State<Signup> {

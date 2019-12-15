@@ -10,9 +10,7 @@ import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
 class Login extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() {
-    return LoginState();
-  }
+  State<StatefulWidget> createState() => LoginState();
 }
 
 class LoginState extends State<Login> {
@@ -38,9 +36,7 @@ class LoginState extends State<Login> {
     });
   }
 
-  Future<FirebaseUser> getUser() async {
-    return await _auth.currentUser();
-  }
+  Future<FirebaseUser> getUser() async => await _auth.currentUser();
 
   @override
   Widget build(BuildContext context) {
