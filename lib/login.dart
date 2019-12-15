@@ -122,7 +122,7 @@ class LoginState extends State<Login> {
                                     child: TextField(
                                       decoration: InputDecoration.collapsed(
                                           border: InputBorder.none,
-                                          hintText: "Email",
+                                          hintText: 'Email',
                                           hintStyle:
                                               TextStyle(color: Colors.grey)),
                                       onChanged: (text) {
@@ -138,7 +138,7 @@ class LoginState extends State<Login> {
                                     child: TextField(
                                       decoration: InputDecoration(
                                           border: InputBorder.none,
-                                          hintText: "Password",
+                                          hintText: 'Password',
                                           hintStyle:
                                               TextStyle(color: Colors.grey)),
                                       onChanged: (text) {

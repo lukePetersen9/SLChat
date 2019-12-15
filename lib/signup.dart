@@ -16,11 +16,11 @@ class Signup extends StatefulWidget {
 
 class SignupState extends State<Signup> {
   final databaseReference = Firestore.instance;
-  String uname = "";
-  String pwd = "";
-  String first = "";
-  String last = "";
-  String email = "";
+  String uname = '';
+  String pwd = '';
+  String first = '';
+  String last = '';
+  String email = '';
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -87,7 +87,7 @@ class SignupState extends State<Signup> {
                                   child: TextField(
                                     decoration: InputDecoration.collapsed(
                                         border: InputBorder.none,
-                                        hintText: "First Name",
+                                        hintText: 'First Name',
                                         hintStyle:
                                             TextStyle(color: Colors.grey)),
                                     onChanged: (text) {
@@ -108,7 +108,7 @@ class SignupState extends State<Signup> {
                                   child: TextField(
                                     decoration: InputDecoration.collapsed(
                                         border: InputBorder.none,
-                                        hintText: "Last Name",
+                                        hintText: 'Last Name',
                                         hintStyle:
                                             TextStyle(color: Colors.grey)),
                                     onChanged: (text) {
@@ -129,7 +129,7 @@ class SignupState extends State<Signup> {
                                   child: TextField(
                                     decoration: InputDecoration.collapsed(
                                         border: InputBorder.none,
-                                        hintText: "Email",
+                                        hintText: 'Email',
                                         hintStyle:
                                             TextStyle(color: Colors.grey)),
                                     onChanged: (text) {
@@ -150,7 +150,7 @@ class SignupState extends State<Signup> {
                                   child: TextField(
                                     decoration: InputDecoration.collapsed(
                                         border: InputBorder.none,
-                                        hintText: "Username",
+                                        hintText: 'Username',
                                         hintStyle:
                                             TextStyle(color: Colors.grey)),
                                     onChanged: (text) {
@@ -171,7 +171,7 @@ class SignupState extends State<Signup> {
                                   child: TextField(
                                     decoration: InputDecoration(
                                         border: InputBorder.none,
-                                        hintText: "Password",
+                                        hintText: 'Password',
                                         hintStyle:
                                             TextStyle(color: Colors.grey)),
                                     onChanged: (text) {
@@ -186,7 +186,7 @@ class SignupState extends State<Signup> {
                                   child: TextField(
                                     decoration: InputDecoration(
                                         border: InputBorder.none,
-                                        hintText: "Confirm Password",
+                                        hintText: 'Confirm Password',
                                         hintStyle:
                                             TextStyle(color: Colors.grey)),
                                     onChanged: (text) {},
