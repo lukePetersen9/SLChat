@@ -10,7 +10,7 @@ import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
 class Login extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => LoginState();
+   State<StatefulWidget> createState() => LoginState();
 }
 
 class LoginState extends State<Login> {

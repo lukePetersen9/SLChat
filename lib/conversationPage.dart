@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_with_firebase/dateTimeFormat.dart';
+import 'package:flutter_with_firebase/homepage.dart';
 import 'GeneralMessageWithInteractionsForCurrentUser.dart';
 import 'GeneralMessageWithInteractionsForOtherUser.dart';
 import 'firestoreMain.dart';
@@ -38,10 +40,20 @@ class ConversationPageState extends State<ConversationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[850],
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: Colors.black,
         elevation: 0,
+        leading: FlatButton(
+          onPressed: ()
+          {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            CupertinoIcons.back,
+            color: Color.fromRGBO(43, 158, 179, 1),
+          ),
+        ),
+        backgroundColor: Colors.grey[100],
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
@@ -54,7 +66,7 @@ class ConversationPageState extends State<ConversationPage> {
                     width: 7,
                   ),
                   fire.getUsersInGroup(
-                      widget.currentUserEmail, widget.members, TextStyle())
+                      widget.currentUserEmail, widget.members, TextStyle(color: Colors.grey[850]))
                 ],
               ),
             ),
@@ -84,23 +96,23 @@ class ConversationPageState extends State<ConversationPage> {
                         padding:
                             EdgeInsets.symmetric(vertical: 3, horizontal: 10),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.blue[200]),
+                          borderRadius: BorderRadius.circular(25),
+                          border: Border.all(color: Color.fromRGBO(43, 158, 179, 1)),
                         ),
                         child: TextField(
-                          cursorColor: Colors.blue[200],
+                          cursorColor: Color.fromRGBO(43, 158, 179, 1),
                           style: TextStyle(
                               fontSize: 22,
                               fontFamily: 'Garamond',
-                              color: Colors.white),
+                              color: Colors.grey[850]),
                           controller: msgController,
                           maxLines: null,
                           keyboardType: TextInputType.multiline,
                           decoration: InputDecoration.collapsed(
                             hintStyle: TextStyle(
-                                fontSize: 22,
+                                fontSize: 15,
                                 fontFamily: 'Garamond',
-                                color: Colors.white),
+                                color: Colors.grey[400]),
                             hintText: 'your message...',
                           ),
                         ),
@@ -112,9 +124,9 @@ class ConversationPageState extends State<ConversationPage> {
                       alignment: Alignment.center,
                       child: IconButton(
                         icon: Icon(
-                          Icons.blur_circular,
-                          color: Colors.green,
-                          size: 40,
+                          Icons.send,
+                          color: Color.fromRGBO(43, 158, 179, 1),
+                          size: 35,
                         ),
                         onPressed: () {
                           if (msgController.text != null &&

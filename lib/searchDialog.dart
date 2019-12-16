@@ -19,6 +19,7 @@ class SearchDialogState extends State<SearchDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: Colors.grey[100],
       title: TextField(
         onChanged: (change) {
        //   print(searchText);
@@ -30,7 +31,7 @@ class SearchDialogState extends State<SearchDialog> {
       content: displaySearch(searchText),
       actions: <Widget>[
         new FlatButton(
-          child: new Text("Close"),
+          child: new Text("Close", style: TextStyle(color: Color.fromRGBO(43, 158, 179, 1))),
           onPressed: () {
             Navigator.of(context).pop();
           },

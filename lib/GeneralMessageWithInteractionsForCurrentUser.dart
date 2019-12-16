@@ -32,10 +32,10 @@ class _GeneralMessageWithInteractionsForCurrentUserState
   FirestoreMain fire = new FirestoreMain();
   DateTimeFormat dateTimeFormat = new DateTimeFormat();
   bool showTime = false;
-  Color textBackgroundColor = Colors.blue[300];
+  Color textBackgroundColor = Color.fromRGBO(43, 158, 179, 1);
   GlobalKey<State> extentChange = new GlobalKey<State>();
   Color notifBackColor = Colors.red[300];
-  Color notifTextColor = Colors.white60;
+  Color notifTextColor = Color.fromRGBO(43, 158, 179, 1);
 
   @override
   void dispose() {
@@ -150,8 +150,15 @@ class _GeneralMessageWithInteractionsForCurrentUserState
             constraints: BoxConstraints(
                 minWidth: 20, maxWidth: MediaQuery.of(context).size.width * .7),
             decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey[400],
+                  blurRadius: 5,
+                  offset: Offset(0, 5),
+                )
+              ],
               border: Border.all(color: messageBorder),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(25),
               color: messageColor,
             ),
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -194,8 +201,15 @@ class _GeneralMessageWithInteractionsForCurrentUserState
                     minWidth: 20,
                     maxWidth: MediaQuery.of(context).size.width * .7),
                 decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey[400],
+                      blurRadius: 5,
+                      offset: Offset(0, 5),
+                    )
+                  ],
                   border: Border.all(color: messageBorder),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(25),
                   color: messageColor,
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -214,7 +228,9 @@ class _GeneralMessageWithInteractionsForCurrentUserState
               readDelivered,
               textAlign: TextAlign.right,
               style: TextStyle(
-                  fontSize: 12, fontFamily: 'Garamond', color: Colors.white70),
+                  fontSize: 12,
+                  fontFamily: 'Garamond',
+                  color: Color.fromRGBO(43, 158, 179, 1)),
             ),
           ),
         ],
@@ -227,31 +243,35 @@ class _GeneralMessageWithInteractionsForCurrentUserState
     if (!isLast) {
       if (shouldShow) {
         return textMessageWithoutReadRecipt(
-          Colors.transparent,
-          Colors.blue[300],
-          Colors.white70,
+          Color.fromRGBO(43, 158, 179, 1),
+          Colors.teal[700],
+          Colors.grey[100],
           'Sent: ' +
               dateTimeFormat.getDisplayDateText(
                   DateTime.parse(time), DateTime.now()),
         );
       } else {
-        return textMessageWithoutReadRecipt(
-            Colors.blue[300], Colors.blue[300], Colors.grey[850], text);
+        return textMessageWithoutReadRecipt(Color.fromRGBO(43, 158, 179, 1),
+            Color.fromRGBO(43, 158, 179, 1), Colors.grey[100], text);
       }
     } else {
       if (shouldShow) {
         return textMessageAndReadRecipt(
-          Colors.transparent,
-          Colors.blue[300],
-          Colors.white70,
+          Color.fromRGBO(43, 158, 179, 1),
+          Colors.teal[700],
+          Colors.grey[100],
           'Sent: ' +
               dateTimeFormat.getDisplayDateText(
                   DateTime.parse(time), DateTime.now()),
           readDelivered,
         );
       } else {
-        return textMessageAndReadRecipt(Colors.blue[300], Colors.blue[300],
-            Colors.grey[850], text, readDelivered);
+        return textMessageAndReadRecipt(
+            Color.fromRGBO(43, 158, 179, 1),
+            Color.fromRGBO(43, 158, 179, 1),
+            Colors.grey[100],
+            text,
+            readDelivered);
       }
     }
   }

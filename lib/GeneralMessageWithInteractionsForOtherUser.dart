@@ -45,8 +45,10 @@ class _GeneralMessageWithInteractionsForOtherUserState
       actions: <Widget>[
         IconButton(
           padding: EdgeInsets.all(0),
-          onPressed: () {fire.addInteraction(
-                'favorite', widget.email, widget.docID, widget.time);},
+          onPressed: () {
+            fire.addInteraction(
+                'favorite', widget.email, widget.docID, widget.time);
+          },
           icon: Icon(
             Icons.favorite,
             color: Colors.white70,
@@ -54,8 +56,10 @@ class _GeneralMessageWithInteractionsForOtherUserState
         ),
         IconButton(
           padding: EdgeInsets.all(0),
-          onPressed: () {fire.addInteraction(
-                'like', widget.email, widget.docID, widget.time);},
+          onPressed: () {
+            fire.addInteraction(
+                'like', widget.email, widget.docID, widget.time);
+          },
           icon: Icon(
             Icons.thumb_up,
             color: Colors.white70,
@@ -63,8 +67,10 @@ class _GeneralMessageWithInteractionsForOtherUserState
         ),
         IconButton(
           padding: EdgeInsets.all(0),
-          onPressed: () {fire.addInteraction(
-                'dislike', widget.email, widget.docID, widget.time);},
+          onPressed: () {
+            fire.addInteraction(
+                'dislike', widget.email, widget.docID, widget.time);
+          },
           icon: Icon(
             Icons.thumb_down,
             color: Colors.white70,
@@ -131,8 +137,15 @@ class _GeneralMessageWithInteractionsForOtherUserState
             constraints: BoxConstraints(
                 minWidth: 20, maxWidth: MediaQuery.of(context).size.width * .7),
             decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey[350],
+                  blurRadius: 5,
+                  offset: Offset(0, 5),
+                )
+              ],
               border: Border.all(color: messageBorder),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(25),
               color: messageColor,
             ),
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -153,16 +166,16 @@ class _GeneralMessageWithInteractionsForOtherUserState
   Widget messageCharacteristics(String text, String time, bool shouldShow) {
     if (shouldShow) {
       return textMessageWithoutReadRecipt(
-        Colors.transparent,
-        Colors.amber[300],
-        Colors.white70,
+        Colors.blueGrey[50],
+        Colors.blueGrey[800],
+        Colors.grey[150],
         'Sent: ' +
             dateTimeFormat.getDisplayDateText(
                 DateTime.parse(time), DateTime.now()),
       );
     } else {
-      return textMessageWithoutReadRecipt(
-          Colors.amber[300], Colors.amber[300], Colors.grey[850], text);
+      return textMessageWithoutReadRecipt(Colors.blueGrey[50],
+          Colors.blueGrey[50], Colors.grey[850], text);
     }
   }
 

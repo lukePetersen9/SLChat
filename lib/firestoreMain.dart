@@ -76,7 +76,7 @@ class FirestoreMain {
                   );
                 },
                 child: Container(
-                  color: Colors.white,
+                  color: Colors.grey[100],
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height / 10,
                   padding: EdgeInsets.all(5),
@@ -88,14 +88,14 @@ class FirestoreMain {
                         direction: Axis.vertical,
                         children: <Widget>[
                           Expanded(
-                            flex: 3,
+                            
                             child: Container(
                                 child: getUsersInGroup(
-                                    email, members, TextStyle())),
+                                    email, members, TextStyle(fontSize: 18, color: Colors.black))),
                           ),
                           Expanded(
-                            flex: 2,
-                            child: Text(s.data['lastMessage']),
+                            
+                            child: Text(s.data['lastMessage'], style: TextStyle(fontSize: 14, color: Color.fromRGBO(43, 158, 179, 1))),
                           )
                         ],
                       ),

@@ -70,6 +70,11 @@ flutter:
           - asset: fonts/EBGaramond-Regular.ttf
           - asset: fonts/EBGaramond-Medium.ttf
           - asset: fonts/EBGaramond-Bold.ttf
+      - family: Roboto
+        fonts:
+          - asset: fonts/Roboto-Regular.ttf
+          - asset: fonts/Roboto-Medium.ttf
+          - asset: fonts/Roboto-Bold.ttf
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
