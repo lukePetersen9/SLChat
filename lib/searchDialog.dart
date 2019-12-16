@@ -22,7 +22,7 @@ class SearchDialogState extends State<SearchDialog> {
       backgroundColor: Colors.grey[100],
       title: TextField(
         onChanged: (change) {
-       //   print(searchText);
+          //   print(searchText);
           setState(() {
             searchText = change;
           });
@@ -31,7 +31,8 @@ class SearchDialogState extends State<SearchDialog> {
       content: displaySearch(searchText),
       actions: <Widget>[
         new FlatButton(
-          child: new Text("Close", style: TextStyle(color: Color.fromRGBO(43, 158, 179, 1))),
+          child: new Text("Close",
+              style: TextStyle(color: Color.fromRGBO(43, 158, 179, 1))),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -67,16 +68,22 @@ class SearchDialogState extends State<SearchDialog> {
             }
             List<Widget> searchResultTextBox = new List<Widget>();
             for (String name in searchResults) {
-              searchResultTextBox.add(
+              if(name != widget.userEmail)
+              {
+searchResultTextBox.add(
                 new FlatButton(
                   onPressed: () {
                     List<String> user = new List<String>();
+
                     user.add(name);
+
                     fire.makeNewConversation(widget.userEmail, user);
                   },
                   child: Text(name),
                 ),
               );
+              }
+              
             }
             return SingleChildScrollView(
               child: Column(
