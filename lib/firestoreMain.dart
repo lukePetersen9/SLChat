@@ -60,6 +60,7 @@ class FirestoreMain {
             Map<String, Widget> tiles = new Map<String, Widget>();
             for (DocumentSnapshot s in snapshot.data.documents) {
               String time = s.data['lastMessageTime'];
+              String lastMsg = s.data['lastMessage'];
               List<dynamic> members = new List<dynamic>();
               members.addAll(s.data['members']);
               members.remove(email);
@@ -94,8 +95,7 @@ class FirestoreMain {
                                     email, members, TextStyle(fontSize: 18, color: Colors.black))),
                           ),
                           Expanded(
-                            
-                            child: Text(s.data['lastMessage'], style: TextStyle(fontSize: 14, color: Color.fromRGBO(43, 158, 179, 1))),
+                            child: lastMsg.length <= 40 ? Text(lastMsg, style: TextStyle(fontSize: 14, color: Color.fromRGBO(43, 158, 179, 1))) : Text(lastMsg.substring(0,40) + "...", style: TextStyle(fontSize: 14, color: Color.fromRGBO(43, 158, 179, 1))),
                           )
                         ],
                       ),
@@ -106,7 +106,7 @@ class FirestoreMain {
             }
             List<Widget> orderedTiles = new List<Widget>();
             times.sort();
-            for (int i = 0; i < times.length; i++) {
+            for (int i = times.length - 1; i >= 0; i--) {
               orderedTiles.add(tiles[times[i]]);
             }
             return Column(
