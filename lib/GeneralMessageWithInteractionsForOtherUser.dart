@@ -35,6 +35,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
 
   @override
   Widget build(BuildContext context) {
+    print(widget.interactions);
     double maxExtent = .1;
     return Slidable(
       actionPane: SlidableDrawerActionPane(),
@@ -51,7 +52,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
           },
           icon: Icon(
             Icons.favorite,
-            color: Colors.white70,
+            color: Colors.black38,
           ),
         ),
         IconButton(
@@ -62,7 +63,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
           },
           icon: Icon(
             Icons.thumb_up,
-            color: Colors.white70,
+            color: Colors.black38,
           ),
         ),
         IconButton(
@@ -73,7 +74,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
           },
           icon: Icon(
             Icons.thumb_down,
-            color: Colors.white70,
+            color: Colors.black38,
           ),
         ),
         IconButton(
@@ -81,7 +82,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
           onPressed: () {},
           icon: Icon(
             Icons.delete,
-            color: Colors.white70,
+            color: Colors.black38,
           ),
         ),
       ],
@@ -174,8 +175,8 @@ class _GeneralMessageWithInteractionsForOtherUserState
                 DateTime.parse(time), DateTime.now()),
       );
     } else {
-      return textMessageWithoutReadRecipt(Colors.blueGrey[50],
-          Colors.blueGrey[50], Colors.grey[850], text);
+      return textMessageWithoutReadRecipt(
+          Colors.blueGrey[50], Colors.blueGrey[50], Colors.grey[850], text);
     }
   }
 
@@ -183,7 +184,14 @@ class _GeneralMessageWithInteractionsForOtherUserState
     List<Widget> all = new List<Widget>();
     Icon icon = Icon(Icons.favorite);
     for (int i = 1; i < inter.length; i++) {
-      switch (inter[i]) {
+      String e = inter[i]
+          .toString()
+          .substring(0, inter[i].toString().lastIndexOf('@') );
+          print(e);
+      String interaction = inter[i]
+          .toString()
+          .substring(inter[i].toString().lastIndexOf('@') + 1);
+      switch (interaction) {
         case 'favorite':
           icon = Icon(
             Icons.favorite,
@@ -197,7 +205,6 @@ class _GeneralMessageWithInteractionsForOtherUserState
             color: Colors.green[300],
             size: 20,
           );
-          ;
           break;
         case 'dislike':
           icon = Icon(
@@ -210,11 +217,16 @@ class _GeneralMessageWithInteractionsForOtherUserState
       all.add(
         Container(
           height: 40,
+          width: 40,
           child: Stack(
             children: <Widget>[
               Align(
                 alignment: Alignment.bottomCenter,
-                child: Container(child: fire.getUserProfileImage(widget.email)),
+                child: Container(
+                  padding: EdgeInsets.all(0),
+                  child: fire.getUserProfileImage(e),
+                  width: 40,
+                ),
               ),
               Align(
                 alignment: Alignment.topLeft,

@@ -31,18 +31,19 @@ class HomePageState extends State<HomePage> {
         elevation: 0,
         backgroundColor: Colors.grey[100],
         leading: Container(),
-        title: Text('Your Conversations', style: TextStyle(color: Colors.grey[850])),
+        title: Text('Your Conversations',
+            style: TextStyle(color: Colors.grey[850])),
         actions: <Widget>[
           FlatButton(
             onPressed: () {
               Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return UserSettings();
-            },
-          ),
-        );
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return UserSettings(widget.email);
+                  },
+                ),
+              );
             },
             child: Icon(
               Icons.settings,

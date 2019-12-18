@@ -3,6 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'conversationPage.dart';
 
 class FirestoreMain {
+  String profileImage =
+      'https://cdn150.picsart.com/upscale-245339439045212.png?r1024x1024';
+
   void makeNewConversation(
       String userEmail, List<String> otherUserEmails) async {
     var now = new DateTime.now();
@@ -31,6 +34,14 @@ class FirestoreMain {
         .updateData(
       {
         'interactions': FieldValue.arrayUnion([email + '@' + type])
+      },
+    );
+  }
+
+  void updateProfileImage(String email, String profileImage) async {
+    await Firestore.instance.collection('users').document(email).updateData(
+      {
+        'profile_image': profileImage,
       },
     );
   }
@@ -89,13 +100,24 @@ class FirestoreMain {
                         direction: Axis.vertical,
                         children: <Widget>[
                           Expanded(
-                            
                             child: Container(
                                 child: getUsersInGroup(
-                                    email, members, TextStyle(fontSize: 18, color: Colors.black))),
+                                    email,
+                                    members,
+                                    TextStyle(
+                                        fontSize: 18, color: Colors.black))),
                           ),
                           Expanded(
-                            child: lastMsg.length <= 40 ? Text(lastMsg, style: TextStyle(fontSize: 14, color: Color.fromRGBO(43, 158, 179, 1))) : Text(lastMsg.substring(0,40) + "...", style: TextStyle(fontSize: 14, color: Color.fromRGBO(43, 158, 179, 1))),
+                            child: lastMsg.length <= 40
+                                ? Text(lastMsg,
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: Color.fromRGBO(43, 158, 179, 1)))
+                                : Text(lastMsg.substring(0, 40) + "...",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color:
+                                            Color.fromRGBO(43, 158, 179, 1))),
                           )
                         ],
                       ),
@@ -182,26 +204,26 @@ class FirestoreMain {
 
   Widget getUserProfileImage(String email) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance
-          .collection('users')
-          .where('email', isEqualTo: email)
-          .snapshots(),
+      stream: Firestore.instance.collection('users').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (!snapshot.hasData) return new Text('Loading...');
-        return _profileImage(
-            snapshot.data.documents.first.data['profile_image']);
+        if (!snapshot.hasData) {
+          return _profileImage(profileImage);
+        }
+        String e = snapshot.data.documents
+            .firstWhere((test) => test.documentID == email)
+            .data['profile_image'];
+        profileImage = e;
+        return _profileImage(e);
       },
     );
   }
 
   Widget _profileImage(String url) {
-    return Padding(
-      padding: EdgeInsets.only(right: 7, left: 10),
-      child: Container(
-        child: CircleAvatar(
-          radius: 25,
-          backgroundImage: NetworkImage(url),
-        ),
+    return Container(
+      padding: EdgeInsets.all(5),
+      child: CircleAvatar(
+        radius: 25,
+        backgroundImage: NetworkImage(url),
       ),
     );
   }

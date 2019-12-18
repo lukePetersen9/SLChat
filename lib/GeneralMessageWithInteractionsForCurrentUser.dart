@@ -36,6 +36,13 @@ class _GeneralMessageWithInteractionsForCurrentUserState
   GlobalKey<State> extentChange = new GlobalKey<State>();
   Color notifBackColor = Colors.red[300];
   Color notifTextColor = Color.fromRGBO(43, 158, 179, 1);
+  Widget profileImage = Text('Something went wong');
+
+  @override
+  void initState() {
+    super.initState();
+    profileImage = fire.getUserProfileImage(widget.email);
+  }
 
   @override
   void dispose() {
@@ -60,7 +67,7 @@ class _GeneralMessageWithInteractionsForCurrentUserState
           },
           icon: Icon(
             Icons.favorite,
-            color: Colors.white70,
+            color: Color.fromRGBO(43, 158, 179, .6),
           ),
         ),
         IconButton(
@@ -71,7 +78,7 @@ class _GeneralMessageWithInteractionsForCurrentUserState
           },
           icon: Icon(
             Icons.thumb_up,
-            color: Colors.white70,
+            color: Color.fromRGBO(43, 158, 179, .6),
           ),
         ),
         IconButton(
@@ -82,7 +89,7 @@ class _GeneralMessageWithInteractionsForCurrentUserState
           },
           icon: Icon(
             Icons.thumb_down,
-            color: Colors.white70,
+            color: Color.fromRGBO(43, 158, 179, .6),
           ),
         ),
         IconButton(
@@ -90,7 +97,7 @@ class _GeneralMessageWithInteractionsForCurrentUserState
           onPressed: () {},
           icon: Icon(
             Icons.delete,
-            color: Colors.white70,
+            color: Color.fromRGBO(43, 158, 179, .6),
           ),
         ),
       ],
@@ -281,10 +288,10 @@ class _GeneralMessageWithInteractionsForCurrentUserState
     Icon icon = Icon(Icons.favorite);
 
     for (int i = 1; i < inter.length; i++) {
-      String type = inter[i]
+      String interaction = inter[i]
           .toString()
           .substring(inter[i].toString().lastIndexOf('@') + 1);
-      switch (type) {
+      switch (interaction) {
         case 'favorite':
           icon = Icon(
             Icons.favorite,
@@ -298,7 +305,7 @@ class _GeneralMessageWithInteractionsForCurrentUserState
             color: Colors.green[300],
             size: 20,
           );
-          ;
+
           break;
         case 'dislike':
           icon = Icon(

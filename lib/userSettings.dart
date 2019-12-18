@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'searchDialog.dart';
 import 'login.dart';
 import 'firestoreMain.dart';
 
 class UserSettings extends StatefulWidget {
-  UserSettings();
+  final String email;
+  UserSettings(this.email);
   @override
   State<StatefulWidget> createState() {
     return UserSettingsState();
@@ -15,6 +15,8 @@ class UserSettings extends StatefulWidget {
 class UserSettingsState extends State<UserSettings> {
   TextEditingController search = new TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  TextEditingController profileURL = new TextEditingController();
+  FirestoreMain fire = new FirestoreMain();
 
   Future<FirebaseUser> getUser() async {
     return await _auth.currentUser();
@@ -22,7 +24,6 @@ class UserSettingsState extends State<UserSettings> {
 
   @override
   Widget build(BuildContext context) {
-    FirestoreMain g = new FirestoreMain();
     return Scaffold(
       appBar: AppBar(
         title: Text('User Settings'),
@@ -55,7 +56,48 @@ class UserSettingsState extends State<UserSettings> {
                   backgroundColor: Colors.black,
                   radius: 75,
                 ),
-                Text('fName lName', )
+                Text(
+                  'fName lName',
+                ),
+                Flex(
+                  direction: Axis.horizontal,
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        'Profile Image URL:',
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontFamily: 'Garamond',
+                            color: Colors.black54),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: TextField(
+                        controller: profileURL,
+                        maxLines: 1,
+                      ),
+                    ),
+                    Expanded(
+                      
+                      child: FlatButton(
+                        onPressed: () {
+                          if (profileURL.text.isNotEmpty) {
+                            fire.updateProfileImage(
+                                widget.email, profileURL.text);
+                          }
+                        },
+                        child: Text(
+                          'update',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontFamily: 'Garamond',
+                              color: Colors.black54),
+                        ),
+                      ),
+                    )
+                  ],
+                )
               ],
             ),
           ),

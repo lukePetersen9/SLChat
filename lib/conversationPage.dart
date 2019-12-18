@@ -44,8 +44,7 @@ class ConversationPageState extends State<ConversationPage> {
       appBar: AppBar(
         elevation: 0,
         leading: FlatButton(
-          onPressed: ()
-          {
+          onPressed: () {
             Navigator.pop(context);
           },
           child: Icon(
@@ -65,8 +64,8 @@ class ConversationPageState extends State<ConversationPage> {
                   SizedBox(
                     width: 7,
                   ),
-                  fire.getUsersInGroup(
-                      widget.currentUserEmail, widget.members, TextStyle(color: Colors.grey[850]))
+                  fire.getUsersInGroup(widget.currentUserEmail, widget.members,
+                      TextStyle(color: Colors.grey[850]))
                 ],
               ),
             ),
@@ -97,7 +96,8 @@ class ConversationPageState extends State<ConversationPage> {
                             EdgeInsets.symmetric(vertical: 3, horizontal: 10),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(25),
-                          border: Border.all(color: Color.fromRGBO(43, 158, 179, 1)),
+                          border: Border.all(
+                              color: Color.fromRGBO(43, 158, 179, 1)),
                         ),
                         child: TextField(
                           cursorColor: Color.fromRGBO(43, 158, 179, 1),
@@ -175,8 +175,10 @@ class ConversationPageState extends State<ConversationPage> {
             if (!snapshot.hasData) return Text('No data found!');
             List<Widget> messages = new List<Widget>();
             for (int i = 0; i < snapshot.data.documents.length; i++) {
-              messages.add(getTextMessage(snapshot.data.documents[i],
-                  i == snapshot.data.documents.length - 1));
+              messages.add(
+                getTextMessage(snapshot.data.documents[i],
+                    i == snapshot.data.documents.length - 1),
+              );
             }
             return SingleChildScrollView(
               controller: scrollController,
@@ -235,7 +237,7 @@ class ConversationPageState extends State<ConversationPage> {
           widget.docID);
     } else {
       return GeneralMessageWithInteractionsForOtherUser(d.data['content'],
-          d.data['sentBy'], d.documentID, d.data['interactions'],widget.docID);
+          d.data['sentBy'], d.documentID, d.data['interactions'], widget.docID);
     }
   }
 
