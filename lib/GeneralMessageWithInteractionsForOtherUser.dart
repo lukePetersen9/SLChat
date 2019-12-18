@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_with_firebase/dateTimeFormat.dart';
 import 'package:flutter_with_firebase/firestoreMain.dart';
+import 'deleteDialogConfirmation.dart';
 
 class GeneralMessageWithInteractionsForOtherUser extends StatefulWidget {
   final String text;
   final String email;
+  final String loggedInUser;
   final String time;
   final List<dynamic> interactions;
   final String docID;
@@ -13,6 +15,7 @@ class GeneralMessageWithInteractionsForOtherUser extends StatefulWidget {
   GeneralMessageWithInteractionsForOtherUser(
     this.text,
     this.email,
+    this.loggedInUser,
     this.time,
     this.interactions,
     this.docID,
@@ -35,7 +38,6 @@ class _GeneralMessageWithInteractionsForOtherUserState
 
   @override
   Widget build(BuildContext context) {
-    print(widget.interactions);
     double maxExtent = .1;
     return Slidable(
       actionPane: SlidableDrawerActionPane(),
@@ -48,7 +50,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
           padding: EdgeInsets.all(0),
           onPressed: () {
             fire.addInteraction(
-                'favorite', widget.email, widget.docID, widget.time);
+                'favorite', widget.loggedInUser, widget.docID, widget.time);
           },
           icon: Icon(
             Icons.favorite,
@@ -59,7 +61,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
           padding: EdgeInsets.all(0),
           onPressed: () {
             fire.addInteraction(
-                'like', widget.email, widget.docID, widget.time);
+                'like', widget.loggedInUser, widget.docID, widget.time);
           },
           icon: Icon(
             Icons.thumb_up,
@@ -70,7 +72,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
           padding: EdgeInsets.all(0),
           onPressed: () {
             fire.addInteraction(
-                'dislike', widget.email, widget.docID, widget.time);
+                'dislike', widget.loggedInUser, widget.docID, widget.time);
           },
           icon: Icon(
             Icons.thumb_down,
@@ -79,7 +81,9 @@ class _GeneralMessageWithInteractionsForOtherUserState
         ),
         IconButton(
           padding: EdgeInsets.all(0),
-          onPressed: () {},
+          onPressed: () {
+            showDeleteDialog();
+          },
           icon: Icon(
             Icons.delete,
             color: Colors.black38,
@@ -101,6 +105,15 @@ class _GeneralMessageWithInteractionsForOtherUserState
     );
   }
 
+  void showDeleteDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return DeleteDialog(widget.loggedInUser, widget.docID, widget.time);
+      },
+    );
+  }
+
   Widget showNotification(int notif) {
     return Padding(
       padding: EdgeInsets.only(right: 5),
@@ -111,7 +124,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
         width: 20,
         height: 20,
         child: Text(
-          '(' + notif.toString() + ')',
+          '(' + (notif-1).toString() + ')',
           style: TextStyle(
               fontSize: 15, fontFamily: 'Garamond', color: notifTextColor),
         ),
@@ -156,7 +169,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
                   fontSize: 22, fontFamily: 'Garamond', color: textColor),
             ),
           ),
-          widget.interactions.length == 0
+          widget.interactions.length <2
               ? Container()
               : showNotification(widget.interactions.length),
         ],
@@ -186,8 +199,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
     for (int i = 1; i < inter.length; i++) {
       String e = inter[i]
           .toString()
-          .substring(0, inter[i].toString().lastIndexOf('@') );
-          print(e);
+          .substring(0, inter[i].toString().lastIndexOf('@'));
       String interaction = inter[i]
           .toString()
           .substring(inter[i].toString().lastIndexOf('@') + 1);

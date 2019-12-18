@@ -174,12 +174,20 @@ class ConversationPageState extends State<ConversationPage> {
               return Center(child: Text('Error: ${snapshot.error}'));
             if (!snapshot.hasData) return Text('No data found!');
             List<Widget> messages = new List<Widget>();
-            for (int i = 0; i < snapshot.data.documents.length; i++) {
-              messages.add(
-                getTextMessage(snapshot.data.documents[i],
-                    i == snapshot.data.documents.length - 1),
-              );
+            bool foundLast = false;
+            for (int i = snapshot.data.documents.length - 1; i > -1; i--) {
+              bool delete = snapshot.data.documents[i].data['interactions']
+                  .contains(widget.currentUserEmail + '@delete');
+              Widget singleMessage = getTextMessage(
+                  snapshot.data.documents[i], !foundLast && !delete);
+              if (!foundLast) {
+                foundLast = !foundLast && !delete;
+              }
+              if (!delete) {
+                messages.add(singleMessage);
+              }
             }
+            messages = messages.reversed.toList();
             return SingleChildScrollView(
               controller: scrollController,
               reverse: true,
@@ -237,7 +245,7 @@ class ConversationPageState extends State<ConversationPage> {
           widget.docID);
     } else {
       return GeneralMessageWithInteractionsForOtherUser(d.data['content'],
-          d.data['sentBy'], d.documentID, d.data['interactions'], widget.docID);
+          d.data['sentBy'],widget.currentUserEmail ,d.documentID, d.data['interactions'], widget.docID);
     }
   }
 

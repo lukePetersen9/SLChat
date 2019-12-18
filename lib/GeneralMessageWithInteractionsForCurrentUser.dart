@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_with_firebase/dateTimeFormat.dart';
 import 'package:flutter_with_firebase/firestoreMain.dart';
+import 'deleteDialogConfirmation.dart';
 
 class GeneralMessageWithInteractionsForCurrentUser extends StatefulWidget {
   final String text;
@@ -94,7 +95,9 @@ class _GeneralMessageWithInteractionsForCurrentUserState
         ),
         IconButton(
           padding: EdgeInsets.all(0),
-          onPressed: () {},
+          onPressed: () {
+            showDeleteDialog();
+          },
           icon: Icon(
             Icons.delete,
             color: Color.fromRGBO(43, 158, 179, .6),
@@ -114,6 +117,15 @@ class _GeneralMessageWithInteractionsForCurrentUserState
           ),
         ),
       ),
+    );
+  }
+
+  void showDeleteDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return DeleteDialog(widget.email, widget.docID, widget.time);
+      },
     );
   }
 
