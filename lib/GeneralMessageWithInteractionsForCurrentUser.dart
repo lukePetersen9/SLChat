@@ -42,7 +42,6 @@ class _GeneralMessageWithInteractionsForCurrentUserState
   @override
   void initState() {
     super.initState();
-    profileImage = fire.getUserProfileImage(widget.email);
   }
 
   @override
@@ -187,7 +186,7 @@ class _GeneralMessageWithInteractionsForCurrentUserState
                   fontSize: 22, fontFamily: 'Garamond', color: textColor),
             ),
           ),
-          fire.getUserProfileImage(widget.email),
+          fire.getUserProfileImage(widget.email,15),
         ],
       ),
     );
@@ -238,7 +237,7 @@ class _GeneralMessageWithInteractionsForCurrentUserState
                       fontSize: 22, fontFamily: 'Garamond', color: textColor),
                 ),
               ),
-              fire.getUserProfileImage(widget.email),
+              fire.getUserProfileImage(widget.email,15),
             ],
           ),
           Padding(
@@ -335,7 +334,7 @@ class _GeneralMessageWithInteractionsForCurrentUserState
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  child: fire.getUserProfileImage(widget.email),
+                  child: fire.getUserProfileImage(widget.email,15),
                 ),
               ),
               Align(

@@ -145,7 +145,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          fire.getUserProfileImage(widget.email),
+          fire.getUserProfileImage(widget.email,15),
           AnimatedContainer(
             duration: Duration(milliseconds: 400),
             constraints: BoxConstraints(
@@ -236,7 +236,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
                 alignment: Alignment.bottomCenter,
                 child: Container(
                   padding: EdgeInsets.all(0),
-                  child: fire.getUserProfileImage(e),
+                  child: fire.getUserProfileImage(e,15),
                   width: 40,
                 ),
               ),

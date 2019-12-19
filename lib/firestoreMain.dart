@@ -188,8 +188,9 @@ class FirestoreMain {
     for (int i = 0; i < emails.length; i++) {
       images.add(
         Positioned(
+          top: 15,
           left: i * 25.0,
-          child: getUserProfileImage(emails[i]),
+          child: getUserProfileImage(emails[i], 20),
         ),
       );
     }
@@ -202,29 +203,97 @@ class FirestoreMain {
     );
   }
 
-  Widget getUserProfileImage(String email) {
+  Widget getUserProfileImage(String email, double rad) {
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance.collection('users').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) {
-          return _profileImage(profileImage);
+          return _profileImage(profileImage, rad);
         }
         String e = snapshot.data.documents
             .firstWhere((test) => test.documentID == email)
             .data['profile_image'];
         profileImage = e;
-        return _profileImage(e);
+        return _profileImage(e, rad);
       },
     );
   }
 
-  Widget _profileImage(String url) {
-    return Container(
-      padding: EdgeInsets.all(5),
-      child: CircleAvatar(
-        radius: 25,
-        backgroundImage: NetworkImage(url),
-      ),
+  Widget getUserNameAndUsernameCurrentUser(
+      String email, double width, double height) {
+    return StreamBuilder<QuerySnapshot>(
+        stream: Firestore.instance
+            .collection('users')
+            .where('email', isEqualTo: email)
+            .snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot == null || snapshot.data == null) {
+            return Container();
+          } else {}
+          List<dynamic> followers = snapshot.data.documents.first['followers'];
+          List<dynamic> following = snapshot.data.documents.first['following'];
+          return Container(
+            width: width,
+            height: height,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Flex(
+                  children: <Widget>[
+                    Expanded(
+                      child: getUserProfileImage(email, 35),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              snapshot.data.documents.first['firstName'] +
+                                  ' ' +
+                                  snapshot.data.documents.first['lastName'],
+                              style: TextStyle(
+                                fontSize: width / 15,
+                                fontFamily: 'Garamond',
+                                color: Colors.grey[800],
+                              ),
+                            ),
+                            Text(
+                              '  ' + snapshot.data.documents.first['username'],
+                              style: TextStyle(
+                                fontSize: width / 19,
+                                fontFamily: 'Garamond',
+                                color: Colors.grey[600],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                  direction: Axis.horizontal,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Text(followers.length.toString() + ' followers'),
+                    Text(following.length.toString() + ' following'),
+                  ],
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+  Widget _profileImage(String url, double rad) {
+    return CircleAvatar(
+      radius: rad,
+      backgroundImage: NetworkImage(url),
     );
   }
 }

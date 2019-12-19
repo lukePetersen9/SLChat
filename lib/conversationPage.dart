@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_with_firebase/dateTimeFormat.dart';
-import 'package:flutter_with_firebase/homepage.dart';
 import 'GeneralMessageWithInteractionsForCurrentUser.dart';
 import 'GeneralMessageWithInteractionsForOtherUser.dart';
 import 'firestoreMain.dart';
