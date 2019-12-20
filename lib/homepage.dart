@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_with_firebase/userSettings.dart';
 import 'searchDialog.dart';
-import 'login.dart';
 import 'firestoreMain.dart';
+import 'generalSearchPage.dart';
 
 class HomePage extends StatefulWidget {
   final String email;
@@ -36,8 +36,8 @@ class HomePageState extends State<HomePage> {
               padding: EdgeInsets.all(5),
               child: Column(
                 children: <Widget>[
-                  g.getUserNameAndUsernameCurrentUser(widget.email, MediaQuery.of(context).size.width, 100),
-
+                  g.getUserNameAndUsernameCurrentUser(
+                      widget.email, MediaQuery.of(context).size.width, 100),
                 ],
               ),
               decoration: BoxDecoration(
@@ -50,7 +50,16 @@ class HomePageState extends State<HomePage> {
             ),
             ListTile(
               title: Text('Settings'),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return UserSettings(widget.email);
+                    },
+                  ),
+                );
+              },
             ),
             ListTile(
               title: Text('Logout'),
@@ -73,19 +82,19 @@ class HomePageState extends State<HomePage> {
         title: Text('Your Conversations',
             style: TextStyle(color: Colors.grey[850])),
         actions: <Widget>[
-          FlatButton(
+          IconButton(
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return UserSettings(widget.email);
+                    return GeneralSearchPage(widget.email);
                   },
                 ),
               );
             },
-            child: Icon(
-              Icons.settings,
+            icon: Icon(
+              Icons.search,
               color: Color.fromRGBO(43, 158, 179, 1),
             ),
           )

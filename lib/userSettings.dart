@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_with_firebase/homepage.dart';
 import 'login.dart';
 import 'firestoreMain.dart';
 
@@ -26,6 +27,19 @@ class UserSettingsState extends State<UserSettings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return HomePage(widget.email);
+                },
+              ),
+            );
+          },
+        ),
         title: Text('User Settings'),
         actions: <Widget>[
           FlatButton(
@@ -79,7 +93,6 @@ class UserSettingsState extends State<UserSettings> {
                       ),
                     ),
                     Expanded(
-                      
                       child: FlatButton(
                         onPressed: () {
                           if (profileURL.text.isNotEmpty) {
