@@ -24,6 +24,22 @@ class FirestoreMain {
     );
   }
 
+  void createNewUser(String email, String username, String f, String l) async {
+    await Firestore.instance.collection('users').document(email).setData(
+      {
+        'followers': [],
+        'following': [],
+        'email': email,
+        'username': username,
+        'firstName': f,
+        'lastName': l,
+        'username': username,
+        'profile_image':
+            'https://i.pinimg.com/236x/10/ae/df/10aedff18fca7367122784b4453c86bb--geometric-art-geometric-patterns.jpg',
+      },
+    );
+  }
+
   void addInteraction(
       String type, String email, String docID, String time) async {
     await Firestore.instance
@@ -232,6 +248,8 @@ class FirestoreMain {
           } else {}
           List<dynamic> followers = snapshot.data.documents.first['followers'];
           List<dynamic> following = snapshot.data.documents.first['following'];
+          int numFollowers = followers == null ? 0 : followers.length;
+          int numFollowing = following == null ? 0 : following.length;
           return Container(
             width: width,
             height: height,
@@ -280,14 +298,226 @@ class FirestoreMain {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    Text(followers.length.toString() + ' followers'),
-                    Text(following.length.toString() + ' following'),
+                    Text(numFollowers.toString() + ' followers'),
+                    Text(numFollowing.toString() + ' following'),
                   ],
                 )
               ],
             ),
           );
         });
+  }
+
+  Widget profileSnippetInGeneralSearch(
+      String email, String loggedInUser, double width, double height) {
+    return StreamBuilder<QuerySnapshot>(
+        stream: Firestore.instance
+            .collection('users')
+            .where('email', isEqualTo: email)
+            .snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot == null || snapshot.data == null) {
+            return Container();
+          }
+          List<dynamic> followers = snapshot.data.documents.first['followers'];
+
+          List<dynamic> following = snapshot.data.documents.first['following'];
+          // print(following.toString() + ' ' + email);
+          return Container(
+            width: width,
+            height: height,
+            child: Flex(
+              children: <Widget>[
+                Expanded(
+                  child: getUserProfileImage(email, 35),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              snapshot.data.documents.first['firstName'] +
+                                  ' ' +
+                                  snapshot.data.documents.first['lastName'],
+                              style: TextStyle(
+                                fontSize: width / 15,
+                                fontFamily: 'Garamond',
+                                color: Colors.grey[800],
+                              ),
+                            ),
+                            following != null &&
+                                    following.contains(loggedInUser)
+                                ? Text(
+                                    'follows you',
+                                    style: TextStyle(
+                                      fontSize: width / 20,
+                                      fontFamily: 'Garamond',
+                                      color: Colors.grey[800],
+                                    ),
+                                  )
+                                : Container(),
+                          ],
+                        ),
+                        Text(
+                          '  ' + snapshot.data.documents.first['username'],
+                          style: TextStyle(
+                            fontSize: width / 19,
+                            fontFamily: 'Garamond',
+                            color: Colors.grey[600],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: following != null && !followers.contains(loggedInUser)
+                      ? Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.blue, width: 3),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: FlatButton(
+                              onPressed: () {
+                                followUser(loggedInUser, email);
+                              },
+                              child: Icon(Icons.add)),
+                        )
+                      : Container(),
+                )
+              ],
+              direction: Axis.horizontal,
+            ),
+          );
+        });
+  }
+
+  Widget profileSnippetInFollowSearch(String email, String loggedInUser,
+      double width, double height, String searchText) {
+    return StreamBuilder<QuerySnapshot>(
+        stream: Firestore.instance
+            .collection('users')
+            .where('email', isEqualTo: email)
+            .snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot == null || snapshot.data == null) {
+            return Container();
+          }
+          String wholeName = snapshot.data.documents.first['firstName'] +
+              ' ' +
+              snapshot.data.documents.first['lastName'];
+          if (!wholeName.contains(searchText) &&
+              !snapshot.data.documents.first['username']
+                  .toString()
+                  .contains(searchText)) {
+            return Container();
+          }
+          List<dynamic> followers = snapshot.data.documents.first['followers'];
+          List<dynamic> following = snapshot.data.documents.first['following'];
+          return Container(
+            width: width,
+            height: height,
+            child: Flex(
+              children: <Widget>[
+                Expanded(
+                  child: getUserProfileImage(email, 35),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              snapshot.data.documents.first['firstName'] +
+                                  ' ' +
+                                  snapshot.data.documents.first['lastName'],
+                              style: TextStyle(
+                                fontSize: width / 15,
+                                fontFamily: 'Garamond',
+                                color: Colors.grey[800],
+                              ),
+                            ),
+                            followers != null &&
+                                    followers.contains(loggedInUser)
+                                ? Text(
+                                    'following',
+                                    style: TextStyle(
+                                      fontSize: width / 20,
+                                      fontFamily: 'Garamond',
+                                      color: Colors.grey[800],
+                                    ),
+                                  )
+                                : Container(),
+                          ],
+                        ),
+                        Text(
+                          '  ' + snapshot.data.documents.first['username'],
+                          style: TextStyle(
+                            fontSize: width / 19,
+                            fontFamily: 'Garamond',
+                            color: Colors.grey[600],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: following != null && !followers.contains(loggedInUser)
+                      ? Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.blue, width: 3),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: FlatButton(
+                              onPressed: () {
+                                followUser(loggedInUser, email);
+                              },
+                              child: Icon(Icons.add)),
+                        )
+                      : Container(),
+                )
+              ],
+              direction: Axis.horizontal,
+            ),
+          );
+        });
+  }
+
+  void followUser(String currentUser, String otherUser) async {
+    print(currentUser + ' is trying to follow ' + otherUser);
+    await Firestore.instance
+        .collection('users')
+        .document(currentUser)
+        .updateData(
+      {
+        'following': FieldValue.arrayUnion(
+          [otherUser],
+        )
+      },
+    );
+    await Firestore.instance.collection('users').document(otherUser).updateData(
+      {
+        'followers': FieldValue.arrayUnion(
+          [currentUser],
+        )
+      },
+    );
   }
 
   Widget _profileImage(String url, double rad) {

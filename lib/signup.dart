@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_with_firebase/firestoreMain.dart';
 import 'package:flutter_with_firebase/homePage.dart';
 import 'dart:async';
 import 'package:simple_animations/simple_animations.dart';
@@ -13,7 +14,7 @@ class Signup extends StatefulWidget {
 }
 
 class SignupState extends State<Signup> {
-  final databaseReference = Firestore.instance;
+  FirestoreMain fire = new FirestoreMain();
   String uname = '';
   String pwd = '';
   String first = '';
@@ -21,8 +22,6 @@ class SignupState extends State<Signup> {
   String email = '';
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -223,7 +222,7 @@ class SignupState extends State<Signup> {
                                           .createUserWithEmailAndPassword(
                                               email: email, password: pwd);
                                       FirebaseUser user = result.user;
-                                      createRecord(email, uname, first, last);
+                                      fire.createNewUser(email, uname, first, last);
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(builder: (context) {
@@ -263,20 +262,6 @@ class SignupState extends State<Signup> {
         ),
         scrollDirection: Axis.vertical,
       ),
-    );
-  }
-
-  void createRecord(String email, String username, String f, String l) async {
-    await databaseReference.collection('users').document(email).setData(
-      {
-        'email': email,
-        'username': username,
-        'firstName': f,
-        'lastName': l,
-        'username': username,
-        'profile_image':
-            'https://i.pinimg.com/236x/10/ae/df/10aedff18fca7367122784b4453c86bb--geometric-art-geometric-patterns.jpg',
-      },
     );
   }
 }
