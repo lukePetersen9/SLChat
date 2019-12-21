@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'firestoreMain.dart';
+import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
 
 class DeleteDialog extends StatefulWidget {
   final String userEmail;

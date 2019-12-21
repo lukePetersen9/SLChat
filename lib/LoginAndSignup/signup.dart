@@ -1,11 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_with_firebase/firestoreMain.dart';
+import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
 import 'package:flutter_with_firebase/homePage.dart';
-import 'dart:async';
-import 'package:simple_animations/simple_animations.dart';
-import 'Animation/FadeAnimation.dart';
+import 'package:flutter_with_firebase/Animation/FadeAnimation.dart';
 import 'login.dart';
 
 class Signup extends StatefulWidget {
@@ -222,7 +219,8 @@ class SignupState extends State<Signup> {
                                           .createUserWithEmailAndPassword(
                                               email: email, password: pwd);
                                       FirebaseUser user = result.user;
-                                      fire.createNewUser(email, uname, first, last);
+                                      fire.createNewUser(
+                                          email, uname, first, last);
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(builder: (context) {

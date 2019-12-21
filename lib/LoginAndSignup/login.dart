@@ -1,16 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_with_firebase/signup.dart';
-import 'homePage.dart';
+import 'package:flutter_with_firebase/LoginAndSignup/login.dart';
+import 'package:flutter_with_firebase/LoginAndSignup/signup.dart';
+import 'package:flutter_with_firebase/Homepage/homepage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:simple_animations/simple_animations.dart';
-import 'Animation/FadeAnimation.dart';
+import 'package:flutter_with_firebase/Animation/FadeAnimation.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
 class Login extends StatefulWidget {
   @override
-   State<StatefulWidget> createState() => LoginState();
+  State<StatefulWidget> createState() => LoginState();
 }
 
 class LoginState extends State<Login> {
@@ -23,7 +24,7 @@ class LoginState extends State<Login> {
     super.initState();
     getUser().then((user) {
       if (user != null) {
-      //  print(user.email);
+        //  print(user.email);
         Navigator.push(
           context,
           MaterialPageRoute(

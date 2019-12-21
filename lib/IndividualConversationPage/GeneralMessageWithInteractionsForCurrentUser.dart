@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutter_with_firebase/dateTimeFormat.dart';
-import 'package:flutter_with_firebase/firestoreMain.dart';
-import 'deleteDialogConfirmation.dart';
+import 'package:flutter_with_firebase/HelperClass/dateTimeFormat.dart';
+import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
+import 'package:flutter_with_firebase/AlertDialogs/deleteDialogConfirmation.dart';
 
 class GeneralMessageWithInteractionsForCurrentUser extends StatefulWidget {
   final String text;

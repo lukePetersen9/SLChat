@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'conversationPage.dart';
-import 'firestoreMain.dart';
+import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
 
 class SearchDialog extends StatefulWidget {
   final String userEmail;
@@ -68,22 +67,20 @@ class SearchDialogState extends State<SearchDialog> {
             }
             List<Widget> searchResultTextBox = new List<Widget>();
             for (String name in searchResults) {
-              if(name != widget.userEmail)
-              {
-searchResultTextBox.add(
-                new FlatButton(
-                  onPressed: () {
-                    List<String> user = new List<String>();
+              if (name != widget.userEmail) {
+                searchResultTextBox.add(
+                  new FlatButton(
+                    onPressed: () {
+                      List<String> user = new List<String>();
 
-                    user.add(name);
+                      user.add(name);
 
-                    fire.makeNewConversation(widget.userEmail, user);
-                  },
-                  child: Text(name),
-                ),
-              );
+                      fire.makeNewConversation(widget.userEmail, user);
+                    },
+                    child: Text(name),
+                  ),
+                );
               }
-              
             }
             return SingleChildScrollView(
               child: Column(

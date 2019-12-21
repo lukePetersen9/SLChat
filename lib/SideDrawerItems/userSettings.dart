@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_with_firebase/homepage.dart';
-import 'login.dart';
-import 'firestoreMain.dart';
+import 'package:flutter_with_firebase/Homepage/homepage.dart';
+import 'package:flutter_with_firebase/LoginAndSignup/login.dart';
+import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
 
 class UserSettings extends StatefulWidget {
   final String email;

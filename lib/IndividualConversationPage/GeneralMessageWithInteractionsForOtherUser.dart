@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutter_with_firebase/dateTimeFormat.dart';
-import 'package:flutter_with_firebase/firestoreMain.dart';
-import 'deleteDialogConfirmation.dart';
+import 'package:flutter_with_firebase/HelperClass/dateTimeFormat.dart';
+import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
+import 'package:flutter_with_firebase/AlertDialogs/deleteDialogConfirmation.dart';
 
 class GeneralMessageWithInteractionsForOtherUser extends StatefulWidget {
   final String text;
@@ -124,7 +124,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
         width: 20,
         height: 20,
         child: Text(
-          '(' + (notif-1).toString() + ')',
+          '(' + (notif - 1).toString() + ')',
           style: TextStyle(
               fontSize: 15, fontFamily: 'Garamond', color: notifTextColor),
         ),
@@ -145,7 +145,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          fire.getUserProfileImage(widget.email,15),
+          fire.getUserProfileImage(widget.email, 15),
           AnimatedContainer(
             duration: Duration(milliseconds: 400),
             constraints: BoxConstraints(
@@ -169,7 +169,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
                   fontSize: 22, fontFamily: 'Garamond', color: textColor),
             ),
           ),
-          widget.interactions.length <2
+          widget.interactions.length < 2
               ? Container()
               : showNotification(widget.interactions.length),
         ],
@@ -236,7 +236,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
                 alignment: Alignment.bottomCenter,
                 child: Container(
                   padding: EdgeInsets.all(0),
-                  child: fire.getUserProfileImage(e,15),
+                  child: fire.getUserProfileImage(e, 15),
                   width: 40,
                 ),
               ),

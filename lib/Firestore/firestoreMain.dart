@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'conversationPage.dart';
+import 'package:flutter_with_firebase/IndividualConversationPage/conversationPage.dart';
 
 class FirestoreMain {
   String profileImage =

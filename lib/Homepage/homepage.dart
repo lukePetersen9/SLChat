@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_with_firebase/userSettings.dart';
-import 'searchDialog.dart';
-import 'firestoreMain.dart';
-import 'generalSearchPage.dart';
+import 'package:flutter_with_firebase/SideDrawerItems/userSettings.dart';
+import 'package:flutter_with_firebase/AlertDialogs/searchDialog.dart';
+import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
+import 'package:flutter_with_firebase/Homepage/generalSearchPage.dart';
 
 class HomePage extends StatefulWidget {
   final String email;
