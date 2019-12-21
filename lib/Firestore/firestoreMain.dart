@@ -6,20 +6,55 @@ class FirestoreMain {
   String defaultProfileImage =
       'https://cdn150.picsart.com/upscale-245339439045212.png?r1024x1024';
 
-  void makeNewConversation(
-      String userEmail, List<String> otherUserEmails) async {
-    var now = new DateTime.now();
-    String docID = userEmail + otherUserEmails.toString();
-    await Firestore.instance
-        .collection("conversations")
-        .document(docID)
-        .setData(
-      {
-        'started': now,
-        'members': [userEmail] + otherUserEmails,
-        'lastOpened' + userEmail: now.toString(),
-        'lastMessage': 'send a message!',
-        'lastMessageTime': now.toString(),
+  void makeNewConversation(String userEmail, List<String> otherUserEmails,
+      BuildContext context) async {
+    Firestore.instance
+        .collection('conversations')
+        .where('members', arrayContains: userEmail)
+        .snapshots()
+        .listen(
+      (data) {
+        bool alreadyExists = false;
+        String docID = '';
+        for (DocumentSnapshot d in data.documents) {
+          bool everyEmail = true;
+          for (String email in otherUserEmails) {
+            if (!d.documentID.contains(email)) {
+              everyEmail = false;
+            }
+          }
+          if (everyEmail &&
+              d.documentID.length ==
+                  (userEmail + otherUserEmails.toList().toString()).length) {
+            alreadyExists = true;
+            docID = d.documentID;
+          }
+        }
+        if (!alreadyExists) {
+          var now = new DateTime.now();
+          String docID = userEmail + otherUserEmails.toString();
+          Firestore.instance
+              .collection("conversations")
+              .document(docID)
+              .setData(
+            {
+              'started': now,
+              'members': [userEmail] + otherUserEmails,
+              'lastOpened' + userEmail: now.toString(),
+              'lastMessage': 'send a message!',
+              'lastMessageTime': now.toString(),
+            },
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return ConversationPage(userEmail, docID, otherUserEmails);
+              },
+            ),
+          );
+        }
       },
     );
   }

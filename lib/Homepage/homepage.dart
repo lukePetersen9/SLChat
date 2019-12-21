@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_with_firebase/AlertDialogs/searchDialog.dart';
+import 'package:flutter_with_firebase/AlertDialogs/startANewConversationDialog.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
 import 'package:flutter_with_firebase/SideDrawerItems/homepageDrawer.dart';
 import 'package:flutter_with_firebase/Homepage/generalSearchPage.dart';
@@ -78,7 +78,7 @@ class HomePageState extends State<HomePage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return SearchDialog(widget.email);
+        return StartANewConversationDialog(widget.email);
       },
     );
   }
