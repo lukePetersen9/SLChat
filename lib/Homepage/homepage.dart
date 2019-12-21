@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_with_firebase/SideDrawerItems/userSettings.dart';
 import 'package:flutter_with_firebase/AlertDialogs/searchDialog.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
+import 'package:flutter_with_firebase/SideDrawerItems/homepageDrawer.dart';
 import 'package:flutter_with_firebase/Homepage/generalSearchPage.dart';
 
 class HomePage extends StatefulWidget {
@@ -28,46 +28,7 @@ class HomePageState extends State<HomePage> {
     FirestoreMain g = new FirestoreMain();
     return Scaffold(
       key: _scaffoldKey,
-      drawer: new Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              padding: EdgeInsets.all(5),
-              child: Column(
-                children: <Widget>[
-                  g.getUserNameAndUsernameCurrentUser(
-                      widget.email, MediaQuery.of(context).size.width, 100),
-                ],
-              ),
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(43, 158, 179, 1),
-              ),
-            ),
-            ListTile(
-              title: Text('Your Profile'),
-              onTap: () {},
-            ),
-            ListTile(
-              title: Text('Settings'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return UserSettings(widget.email);
-                    },
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              title: Text('Logout'),
-              onTap: () {},
-            ),
-          ],
-        ),
-      ),
+      drawer: HomepageDrawer(widget.email),
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         leading: GestureDetector(

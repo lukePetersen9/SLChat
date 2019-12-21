@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FollowingList extends StatefulWidget {
+class FollowerList extends StatefulWidget {
   final FirestoreMain fire = new FirestoreMain();
   final String email;
-  FollowingList(this.email);
+  FollowerList(this.email);
   @override
   State<StatefulWidget> createState() {
-    return FollowingListState();
+    return FollowerListState();
   }
 }
 
-class FollowingListState extends State<FollowingList> {
+class FollowerListState extends State<FollowerList> {
   FirestoreMain fire = new FirestoreMain();
   String searchText = '';
   @override
@@ -25,7 +25,7 @@ class FollowingListState extends State<FollowingList> {
               Navigator.of(context).pop();
             },
           ),
-          title: Text('Following')),
+          title: Text('Followers')),
       body: Flex(
         direction: Axis.vertical,
         children: <Widget>[
@@ -62,14 +62,14 @@ class FollowingListState extends State<FollowingList> {
           ),
           Expanded(
             flex: 10,
-            child: displayFollowingSearch(searchText),
+            child: displayFollowerSearch(searchText),
           ),
         ],
       ),
     );
   }
 
-  Widget displayFollowingSearch(String s) {
+  Widget displayFollowerSearch(String s) {
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance
           .collection('users')
@@ -91,11 +91,11 @@ class FollowingListState extends State<FollowingList> {
               return Center(child: Text('Error: ${snapshot.error}'));
             if (!snapshot.hasData) return Text('No data found!');
             List<dynamic> followers =
-                snapshot.data.documents.first['following'];
+                snapshot.data.documents.first['followers'];
             List<Widget> searchResultTextBox = new List<Widget>();
             for (String email in followers) {
               searchResultTextBox.add(
-                profileSnippetInFollowingSearch(email, widget.email,
+                profileSnippetInFollowerSearch(email, widget.email,
                     MediaQuery.of(context).size.width, 100, s),
               );
             }
@@ -112,7 +112,7 @@ class FollowingListState extends State<FollowingList> {
     );
   }
 
-  Widget profileSnippetInFollowingSearch(String email, String loggedInUser,
+  Widget profileSnippetInFollowerSearch(String email, String loggedInUser,
       double width, double height, String searchText) {
     return StreamBuilder<QuerySnapshot>(
         stream: Firestore.instance
@@ -140,8 +140,7 @@ class FollowingListState extends State<FollowingList> {
             child: Flex(
               children: <Widget>[
                 Expanded(
-                  child: fire.profileImage(
-                      snapshot.data.documents.first['profile_image'], 35),
+                  child: fire.getUserProfileImage(email, 35),
                 ),
                 Expanded(
                   flex: 3,
@@ -165,10 +164,10 @@ class FollowingListState extends State<FollowingList> {
                                 color: Colors.grey[800],
                               ),
                             ),
-                            following != null &&
-                                    following.contains(loggedInUser)
+                            followers != null &&
+                                    followers.contains(loggedInUser)
                                 ? Text(
-                                    'follows you',
+                                    'following',
                                     style: TextStyle(
                                       fontSize: width / 20,
                                       fontFamily: 'Garamond',
@@ -190,6 +189,21 @@ class FollowingListState extends State<FollowingList> {
                     ),
                   ),
                 ),
+                Expanded(
+                  child: following != null && !followers.contains(loggedInUser)
+                      ? Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.blue, width: 3),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: FlatButton(
+                              onPressed: () {
+                                fire.followUser(loggedInUser, email);
+                              },
+                              child: Icon(Icons.add)),
+                        )
+                      : Container(),
+                )
               ],
               direction: Axis.horizontal,
             ),

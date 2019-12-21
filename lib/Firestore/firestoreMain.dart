@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_with_firebase/IndividualConversationPage/conversationPage.dart';
 
 class FirestoreMain {
-  String profileImage =
+  String defaultProfileImage =
       'https://cdn150.picsart.com/upscale-245339439045212.png?r1024x1024';
 
   void makeNewConversation(
@@ -224,88 +224,15 @@ class FirestoreMain {
       stream: Firestore.instance.collection('users').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) {
-          return _profileImage(profileImage, rad);
+          return profileImage(defaultProfileImage, rad);
         }
         String e = snapshot.data.documents
             .firstWhere((test) => test.documentID == email)
             .data['profile_image'];
-        profileImage = e;
-        return _profileImage(e, rad);
+        defaultProfileImage = e;
+        return profileImage(e, rad);
       },
     );
-  }
-
-  Widget getUserNameAndUsernameCurrentUser(
-      String email, double width, double height) {
-    return StreamBuilder<QuerySnapshot>(
-        stream: Firestore.instance
-            .collection('users')
-            .where('email', isEqualTo: email)
-            .snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot == null || snapshot.data == null) {
-            return Container();
-          } else {}
-          List<dynamic> followers = snapshot.data.documents.first['followers'];
-          List<dynamic> following = snapshot.data.documents.first['following'];
-          int numFollowers = followers == null ? 0 : followers.length;
-          int numFollowing = following == null ? 0 : following.length;
-          return Container(
-            width: width,
-            height: height,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Flex(
-                  children: <Widget>[
-                    Expanded(
-                      child: getUserProfileImage(email, 35),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              snapshot.data.documents.first['firstName'] +
-                                  ' ' +
-                                  snapshot.data.documents.first['lastName'],
-                              style: TextStyle(
-                                fontSize: width / 15,
-                                fontFamily: 'Garamond',
-                                color: Colors.grey[800],
-                              ),
-                            ),
-                            Text(
-                              '  ' + snapshot.data.documents.first['username'],
-                              style: TextStyle(
-                                fontSize: width / 19,
-                                fontFamily: 'Garamond',
-                                color: Colors.grey[600],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                  direction: Axis.horizontal,
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Text(numFollowers.toString() + ' followers'),
-                    Text(numFollowing.toString() + ' following'),
-                  ],
-                )
-              ],
-            ),
-          );
-        });
   }
 
   Widget profileSnippetInGeneralSearch(
@@ -520,7 +447,7 @@ class FirestoreMain {
     );
   }
 
-  Widget _profileImage(String url, double rad) {
+  Widget profileImage(String url, double rad) {
     return CircleAvatar(
       radius: rad,
       backgroundImage: NetworkImage(url),
