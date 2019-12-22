@@ -1,9 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_with_firebase/SideDrawerItems/userSettings.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_with_firebase/FollowingAndFollowerLists/followingList.dart';
 import 'package:flutter_with_firebase/FollowingAndFollowerLists/followerList.dart';
+import 'package:flutter_with_firebase/User/profilepage.dart';
+
+import '../LoginAndSignup/login.dart';
 
 class HomepageDrawer extends StatelessWidget {
   final FirestoreMain fire = new FirestoreMain();
@@ -29,7 +33,11 @@ class HomepageDrawer extends StatelessWidget {
           ),
           ListTile(
             title: Text('Your Profile'),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return ProfilePage(email);
+              }));
+            },
           ),
           ListTile(
             title: Text('Settings'),
@@ -46,7 +54,12 @@ class HomepageDrawer extends StatelessWidget {
           ),
           ListTile(
             title: Text('Logout'),
-            onTap: () {},
+            onTap: () {
+              FirebaseAuth.instance.signOut();
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return Login();
+              }));
+            },
           ),
         ],
       ),

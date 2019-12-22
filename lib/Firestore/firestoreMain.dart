@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_with_firebase/IndividualConversationPage/conversationPage.dart';
+import 'package:flutter_with_firebase/User/profilepage.dart';
 
 class FirestoreMain {
   String defaultProfileImage =
@@ -291,7 +292,16 @@ class FirestoreMain {
             child: Flex(
               children: <Widget>[
                 Expanded(
-                  child: getUserProfileImage(email, 35),
+                  child: FlatButton(
+                    child: getUserProfileImage(email, 35),
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (context) {
+                          return ProfilePage(email);
+                        },
+                      ));
+                    },
+                  ),
                 ),
                 Expanded(
                   flex: 3,

@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
-import 'package:flutter_with_firebase/homePage.dart';
+import 'package:flutter_with_firebase/Homepage/homepage.dart';
 import 'package:flutter_with_firebase/Animation/FadeAnimation.dart';
 import 'login.dart';
 
