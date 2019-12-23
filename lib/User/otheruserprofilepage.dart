@@ -16,7 +16,7 @@ class OtherUserProfilePage extends StatefulWidget {
 
 class OtherUserProfilePageState extends State<OtherUserProfilePage> {
   String firstName, lastName, username, profilePicture, bio;
-  String followButton = 'Follow';
+  String followButton;
   int followerCount, followingCount;
   FirestoreMain fire = FirestoreMain();
   @override
@@ -108,12 +108,8 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
           else
           {
             fire.followUser(widget.currentUser, widget.otherUser);
-            followButton = 'UnFollow';
+            followButton = 'Unfollow';
           }
-
-          setState(() {
-            
-          });
         },
       ),
     );
@@ -134,6 +130,10 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
         followingCount = data.documents[0].data['following'].length;
         if (data.documents[0].data['followers'].contains('s@s.net')) {
           followButton = 'Unfollow';
+        }
+        else
+        {
+          followButton = 'Follow';
         }
       });
     });
