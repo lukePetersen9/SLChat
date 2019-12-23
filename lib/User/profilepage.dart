@@ -22,29 +22,32 @@ class ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(title: Text('Profile')),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height / 3,
-              color: Color.fromRGBO(43, 158, 179, 1),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  CircleAvatar(
-                    radius: MediaQuery.of(context).size.width / 5,
-                    backgroundImage: NetworkImage(profilePicture),
-                  ),
-                  Text('${firstName} ${lastName}',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: MediaQuery.of(context).size.height / 25)),
-                  Text(username,
-                      style: TextStyle(
-                          color: Colors.grey[100],
-                          fontSize: MediaQuery.of(context).size.height / 35)),
-                ],
-              )),
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height / 3,
+            color: Color.fromRGBO(43, 158, 179, 1),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                CircleAvatar(
+                  radius: MediaQuery.of(context).size.width / 5,
+                  backgroundImage: NetworkImage(profilePicture),
+                ),
+                Text('${firstName} ${lastName}',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: MediaQuery.of(context).size.height / 25)),
+                Text(username,
+                    style: TextStyle(
+                        color: Colors.grey[100],
+                        fontSize: MediaQuery.of(context).size.height / 35)),
+              ],
+            ),
+          ),
           Row(
             children: <Widget>[
               Container(
@@ -113,9 +116,18 @@ class ProfilePageState extends State<ProfilePage> {
                     ));
                   },
                 ),
-              )
+              ),
             ],
           ),
+          SizedBox(height: MediaQuery.of(context).size.height / 35),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text('Bio', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35)),
+              Text(bio),
+            ],
+          )
         ],
       ),
     );
@@ -132,6 +144,7 @@ class ProfilePageState extends State<ProfilePage> {
         lastName = data.documents[0].data['lastName'];
         username = data.documents[0].data['username'];
         profilePicture = data.documents[0].data['profile_image'];
+        bio = data.documents[0].data['bio'];
         followerCount = data.documents[0].data['followers'].length;
         followingCount = data.documents[0].data['following'].length;
       });

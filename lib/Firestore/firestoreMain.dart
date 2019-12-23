@@ -294,7 +294,7 @@ class FirestoreMain {
               children: <Widget>[
                 Expanded(
                   child: FlatButton(
-                    child: getUserProfileImage(email, 35),
+                    child: getUserProfileImage(email, 25),
                     onPressed: () {
                       Navigator.push(context, MaterialPageRoute(
                         builder: (context) {

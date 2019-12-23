@@ -25,6 +25,8 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
     return Scaffold(
       appBar: AppBar(title: Text('Profile')),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Container(
               width: MediaQuery.of(context).size.width,
@@ -96,6 +98,15 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
               ),
             ],
           ),
+          SizedBox(height: MediaQuery.of(context).size.height / 35),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text('Bio', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35)),
+              Text(bio),
+            ],
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -125,6 +136,7 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
         firstName = data.documents[0].data['firstName'];
         lastName = data.documents[0].data['lastName'];
         username = data.documents[0].data['username'];
+        bio = data.documents[0].data['bio'];
         profilePicture = data.documents[0].data['profile_image'];
         followerCount = data.documents[0].data['followers'].length;
         followingCount = data.documents[0].data['following'].length;
