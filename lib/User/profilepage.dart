@@ -71,11 +71,14 @@ class ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) {
-                        return FollowerList(widget.email);
-                      },
-                    ));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return FollowerList(widget.email);
+                        },
+                      ),
+                    );
                   },
                 ),
               ),

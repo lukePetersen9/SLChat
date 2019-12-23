@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_with_firebase/IndividualConversationPage/conversationPage.dart';
+import 'package:flutter_with_firebase/User/otheruserprofilepage.dart';
 import 'package:flutter_with_firebase/User/profilepage.dart';
 
 class FirestoreMain {
@@ -297,7 +298,7 @@ class FirestoreMain {
                     onPressed: () {
                       Navigator.push(context, MaterialPageRoute(
                         builder: (context) {
-                          return ProfilePage(email);
+                          return OtherUserProfilePage(loggedInUser, email);
                         },
                       ));
                     },
@@ -488,6 +489,27 @@ class FirestoreMain {
         'followers': FieldValue.arrayUnion(
           [currentUser],
         )
+      },
+    );
+  }
+
+  void unfollowUser(String currentUser, String otherUser) async {
+    print(currentUser + ' is trying to unfollow ' + otherUser);
+    await Firestore.instance
+        .collection('users')
+        .document(currentUser)
+        .updateData(
+      {
+        'following': FieldValue.arrayRemove(
+          [otherUser],
+        ),
+      },
+    );
+    await Firestore.instance.collection('users').document(otherUser).updateData(
+      {
+        'followers': FieldValue.arrayRemove(
+          [currentUser],
+        ),
       },
     );
   }
