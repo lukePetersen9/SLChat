@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_with_firebase/User/editUserProfile.dart';
 
 import '../FollowingAndFollowerLists/followerList.dart';
 import '../FollowingAndFollowerLists/followingList.dart';
@@ -14,13 +15,40 @@ class ProfilePage extends StatefulWidget {
 }
 
 class ProfilePageState extends State<ProfilePage> {
-  String firstName, lastName, username, profilePicture, bio;
-  int followerCount, followingCount;
+  String firstName = '',
+      lastName = '',
+      username = '',
+      profilePicture =
+          'https://previews.123rf.com/images/salamatik/salamatik1801/salamatik180100019/92979836-profile-anonymous-face-icon-gray-silhouette-person-male-default-avatar-photo-placeholder-isolated-on.jpg',
+      bio = '';
+  int followerCount = 0, followingCount = 0;
+  @override
+  void initState() {
+    super.initState();
+    getProfileInfo(widget.email);
+  }
+
   @override
   Widget build(BuildContext context) {
-    getProfileInfo(widget.email);
     return Scaffold(
-      appBar: AppBar(title: Text('Profile')),
+      appBar: AppBar(
+        title: Text('Profile'),
+        actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return EditUserProfilePage(widget.email);
+                  },
+                ),
+              );
+            },
+            icon: Icon(Icons.edit),
+          )
+        ],
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -37,7 +65,7 @@ class ProfilePageState extends State<ProfilePage> {
                   radius: MediaQuery.of(context).size.width / 5,
                   backgroundImage: NetworkImage(profilePicture),
                 ),
-                Text('${firstName} ${lastName}',
+                Text(firstName + ' ' + lastName,
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: MediaQuery.of(context).size.height / 25)),
@@ -124,7 +152,8 @@ class ProfilePageState extends State<ProfilePage> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text('Bio', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35)),
+              Text('Bio',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35)),
               Text(bio),
             ],
           )

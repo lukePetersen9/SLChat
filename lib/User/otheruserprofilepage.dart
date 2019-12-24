@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_with_firebase/FollowingAndFollowerLists/followerList.dart';
 import '../Firestore/firestoreMain.dart';
 import '../FollowingAndFollowerLists/followingList.dart';
 
 class OtherUserProfilePage extends StatefulWidget {
   final String otherUser;
   final String currentUser;
-  OtherUserProfilePage(this.currentUser,this.otherUser);
+  OtherUserProfilePage(this.currentUser, this.otherUser);
   @override
   State<StatefulWidget> createState() {
     return OtherUserProfilePageState();
@@ -15,13 +16,23 @@ class OtherUserProfilePage extends StatefulWidget {
 }
 
 class OtherUserProfilePageState extends State<OtherUserProfilePage> {
-  String firstName, lastName, username, profilePicture, bio;
-  String followButton;
-  int followerCount, followingCount;
+  String firstName = '',
+      lastName = '',
+      username = '',
+      profilePicture =
+          'https://previews.123rf.com/images/salamatik/salamatik1801/salamatik180100019/92979836-profile-anonymous-face-icon-gray-silhouette-person-male-default-avatar-photo-placeholder-isolated-on.jpg',
+      bio = '';
+  String followButton = '';
+  int followerCount = 0, followingCount = 0;
   FirestoreMain fire = FirestoreMain();
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     getProfileInfo(widget.otherUser);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Profile')),
       body: Column(
@@ -40,7 +51,7 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
                     radius: MediaQuery.of(context).size.width / 5,
                     backgroundImage: NetworkImage(profilePicture),
                   ),
-                  Text('${firstName} ${lastName}',
+                  Text(firstName + ' ' + lastName,
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: MediaQuery.of(context).size.height / 25)),
@@ -63,14 +74,30 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
                 ),
                 child: Column(
                   children: <Widget>[
-                    Text('Followers',
+                    Text(
+                      'Followers',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: MediaQuery.of(context).size.width / 15),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return FollowerList(widget.otherUser);
+                            },
+                          ),
+                        );
+                      },
+                      child: Text(
+                        followerCount.toString(),
                         style: TextStyle(
                             color: Colors.black,
-                            fontSize: MediaQuery.of(context).size.width / 15)),
-                    Text(followerCount.toString(),
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: MediaQuery.of(context).size.width / 5)),
+                            fontSize: MediaQuery.of(context).size.width / 5),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -89,10 +116,22 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: MediaQuery.of(context).size.width / 15)),
-                    Text(followingCount.toString(),
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: MediaQuery.of(context).size.width / 5)),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return FollowingList(widget.otherUser);
+                            },
+                          ),
+                        );
+                      },
+                      child: Text(followingCount.toString(),
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: MediaQuery.of(context).size.width / 5)),
+                    ),
                   ],
                 ),
               ),
@@ -103,30 +142,37 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text('Bio', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35)),
+              Text('Bio',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35)),
               Text(bio),
             ],
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        label: Text(followButton),
-        onPressed: () {
-          if (followButton == 'Unfollow') {
-            fire.unfollowUser(widget.currentUser, widget.otherUser);
-            followButton = 'Follow';
-            }
-          else
-          {
-            fire.followUser(widget.currentUser, widget.otherUser);
-            followButton = 'Unfollow';
-          }
-        },
-      ),
+      floatingActionButton: widget.currentUser == widget.otherUser
+          ? null
+          : FloatingActionButton.extended(
+              label: Text(followButton),
+              onPressed: () {
+                if (followButton == 'Unfollow') {
+                  fire.unfollowUser(widget.currentUser, widget.otherUser);
+                  setState(() {
+                    followerCount--;
+                    followButton = 'Follow';
+                  });
+                } else {
+                  fire.followUser(widget.currentUser, widget.otherUser);
+                  setState(() {
+                    followerCount++;
+                    followButton = 'Unfollow';
+                  });
+                }
+              },
+            ),
     );
   }
 
-  void getProfileInfo(String email) {
+  void getProfileInfo(String email) async {
     var userQuery = Firestore.instance
         .collection('users')
         .where('email', isEqualTo: email)
@@ -140,11 +186,9 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
         profilePicture = data.documents[0].data['profile_image'];
         followerCount = data.documents[0].data['followers'].length;
         followingCount = data.documents[0].data['following'].length;
-        if (data.documents[0].data['followers'].contains('s@s.net')) {
+        if (data.documents[0].data['followers'].contains(widget.currentUser)) {
           followButton = 'Unfollow';
-        }
-        else
-        {
+        } else {
           followButton = 'Follow';
         }
       });

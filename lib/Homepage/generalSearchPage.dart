@@ -65,22 +65,26 @@ class GeneralSearchPageState extends State<GeneralSearchPage> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: TextField(
-              cursorColor: Colors.white38,
-              decoration: InputDecoration.collapsed(
-                hintText: 'Search...',
-                hintStyle: TextStyle(
+                cursorColor: Colors.white38,
+                decoration: InputDecoration.collapsed(
+                  hintText: 'Search...',
+                  hintStyle: TextStyle(
+                      fontSize: 22,
+                      fontFamily: 'Garamond',
+                      color: Colors.white54),
+                ),
+                style: TextStyle(
                     fontSize: 22,
                     fontFamily: 'Garamond',
                     color: Colors.white54),
-              ),
-              style: TextStyle(
-                  fontSize: 22, fontFamily: 'Garamond', color: Colors.white54),
-              onChanged: (change) {
-                setState(() {
-                  searchText = change;
-                });
-              },
-            ),
+                onChanged: (change) {
+                  print(this.mounted);
+                  if (this.mounted) {
+                    setState(() {
+                      searchText = change;
+                    });
+                  }
+                }),
           ),
         ),
         body: TabBarView(
@@ -181,7 +185,6 @@ class GeneralSearchPageState extends State<GeneralSearchPage> {
   }
 
   Widget displayGeneralSearch(String s) {
-    List<String> searchResults = new List<String>();
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance.collection('users').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -199,7 +202,7 @@ class GeneralSearchPageState extends State<GeneralSearchPage> {
             if (snapshot.hasError)
               return Center(child: Text('Error: ${snapshot.error}'));
             if (!snapshot.hasData) return Text('No data found!');
-
+            List<String> searchResults = new List<String>();
             for (DocumentSnapshot d in snapshot.data.documents) {
               String wholeName = d.data['firstName'] + ' ' + d.data['lastName'];
               if (wholeName.contains(s) ||

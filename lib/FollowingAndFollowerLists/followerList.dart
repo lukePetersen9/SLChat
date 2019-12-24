@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_with_firebase/User/otheruserprofilepage.dart';
 
 class FollowerList extends StatefulWidget {
   final FirestoreMain fire = new FirestoreMain();
@@ -134,78 +135,92 @@ class FollowerListState extends State<FollowerList> {
           }
           List<dynamic> followers = snapshot.data.documents.first['followers'];
           List<dynamic> following = snapshot.data.documents.first['following'];
-          return Container(
-            width: width,
-            height: height,
-            child: Flex(
-              children: <Widget>[
-                Expanded(
-                  child: fire.getUserProfileImage(email, 35),
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return OtherUserProfilePage(loggedInUser, email);
+                  },
                 ),
-                Expanded(
-                  flex: 3,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text(
-                              snapshot.data.documents.first['firstName'] +
-                                  ' ' +
-                                  snapshot.data.documents.first['lastName'],
-                              style: TextStyle(
-                                fontSize: width / 15,
-                                fontFamily: 'Garamond',
-                                color: Colors.grey[800],
+              );
+            },
+            child: Container(
+              width: width,
+              height: height,
+              child: Flex(
+                children: <Widget>[
+                  Expanded(
+                    child: fire.getUserProfileImage(email, 35),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 10),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                snapshot.data.documents.first['firstName'] +
+                                    ' ' +
+                                    snapshot.data.documents.first['lastName'],
+                                style: TextStyle(
+                                  fontSize: width / 15,
+                                  fontFamily: 'Garamond',
+                                  color: Colors.grey[800],
+                                ),
                               ),
-                            ),
-                            followers != null &&
-                                    followers.contains(loggedInUser)
-                                ? Text(
-                                    'following',
-                                    style: TextStyle(
-                                      fontSize: width / 20,
-                                      fontFamily: 'Garamond',
-                                      color: Colors.grey[800],
-                                    ),
-                                  )
-                                : Container(),
-                          ],
-                        ),
-                        Text(
-                          '  ' + snapshot.data.documents.first['username'],
-                          style: TextStyle(
-                            fontSize: width / 19,
-                            fontFamily: 'Garamond',
-                            color: Colors.grey[600],
+                              followers != null &&
+                                      followers.contains(loggedInUser)
+                                  ? Text(
+                                      'following',
+                                      style: TextStyle(
+                                        fontSize: width / 20,
+                                        fontFamily: 'Garamond',
+                                        color: Colors.grey[800],
+                                      ),
+                                    )
+                                  : Container(),
+                            ],
                           ),
-                        )
-                      ],
+                          Text(
+                            '  ' + snapshot.data.documents.first['username'],
+                            style: TextStyle(
+                              fontSize: width / 19,
+                              fontFamily: 'Garamond',
+                              color: Colors.grey[600],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: following != null && !followers.contains(loggedInUser)
-                      ? Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.blue, width: 3),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: FlatButton(
-                              onPressed: () {
-                                fire.followUser(loggedInUser, email);
-                              },
-                              child: Icon(Icons.add)),
-                        )
-                      : Container(),
-                )
-              ],
-              direction: Axis.horizontal,
+                  Expanded(
+                    child: following != null &&
+                            !followers.contains(loggedInUser) &&
+                            loggedInUser != email
+                        ? Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.blue, width: 3),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: FlatButton(
+                                onPressed: () {
+                                  fire.followUser(loggedInUser, email);
+                                },
+                                child: Icon(Icons.add)),
+                          )
+                        : Container(),
+                  )
+                ],
+                direction: Axis.horizontal,
+              ),
             ),
           );
         });

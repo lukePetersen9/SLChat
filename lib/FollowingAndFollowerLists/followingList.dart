@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_with_firebase/User/otheruserprofilepage.dart';
 
 class FollowingList extends StatefulWidget {
   final FirestoreMain fire = new FirestoreMain();
@@ -134,64 +135,76 @@ class FollowingListState extends State<FollowingList> {
           }
           List<dynamic> followers = snapshot.data.documents.first['followers'];
           List<dynamic> following = snapshot.data.documents.first['following'];
-          return Container(
-            width: width,
-            height: height,
-            child: Flex(
-              children: <Widget>[
-                Expanded(
-                  child: fire.profileImage(
-                      snapshot.data.documents.first['profile_image'], 35),
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return OtherUserProfilePage(loggedInUser, email);
+                  },
                 ),
-                Expanded(
-                  flex: 3,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text(
-                              snapshot.data.documents.first['firstName'] +
-                                  ' ' +
-                                  snapshot.data.documents.first['lastName'],
-                              style: TextStyle(
-                                fontSize: width / 15,
-                                fontFamily: 'Garamond',
-                                color: Colors.grey[800],
+              );
+            },
+            child: Container(
+              width: width,
+              height: height,
+              child: Flex(
+                children: <Widget>[
+                  Expanded(
+                    child: fire.profileImage(
+                        snapshot.data.documents.first['profile_image'], 35),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 10),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                snapshot.data.documents.first['firstName'] +
+                                    ' ' +
+                                    snapshot.data.documents.first['lastName'],
+                                style: TextStyle(
+                                  fontSize: width / 15,
+                                  fontFamily: 'Garamond',
+                                  color: Colors.grey[800],
+                                ),
                               ),
-                            ),
-                            following != null &&
-                                    following.contains(loggedInUser)
-                                ? Text(
-                                    'follows you',
-                                    style: TextStyle(
-                                      fontSize: width / 20,
-                                      fontFamily: 'Garamond',
-                                      color: Colors.grey[800],
-                                    ),
-                                  )
-                                : Container(),
-                          ],
-                        ),
-                        Text(
-                          '  ' + snapshot.data.documents.first['username'],
-                          style: TextStyle(
-                            fontSize: width / 19,
-                            fontFamily: 'Garamond',
-                            color: Colors.grey[600],
+                              following != null &&
+                                      following.contains(loggedInUser)
+                                  ? Text(
+                                      'follows you',
+                                      style: TextStyle(
+                                        fontSize: width / 20,
+                                        fontFamily: 'Garamond',
+                                        color: Colors.grey[800],
+                                      ),
+                                    )
+                                  : Container(),
+                            ],
                           ),
-                        )
-                      ],
+                          Text(
+                            '  ' + snapshot.data.documents.first['username'],
+                            style: TextStyle(
+                              fontSize: width / 19,
+                              fontFamily: 'Garamond',
+                              color: Colors.grey[600],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-              direction: Axis.horizontal,
+                ],
+                direction: Axis.horizontal,
+              ),
             ),
           );
         });
