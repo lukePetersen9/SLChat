@@ -67,11 +67,11 @@ class HomepageDrawer extends StatelessWidget {
   }
 
   Widget getUserNameAndUsernameCurrentUser(
-      String email, double width, double height) {
+      String e, double width, double height) {
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance
           .collection('users')
-          .where('email', isEqualTo: email)
+          .where('email', isEqualTo: e)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot == null || snapshot.data == null) {
@@ -135,7 +135,7 @@ class HomepageDrawer extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return FollowerList(email);
+                            return FollowerList(e, e);
                           },
                         ),
                       );
@@ -148,7 +148,7 @@ class HomepageDrawer extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return FollowingList(email);
+                            return FollowingList(email, email);
                           },
                         ),
                       );

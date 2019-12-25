@@ -86,7 +86,7 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return FollowerList(widget.otherUser);
+                              return FollowerList(widget.currentUser, widget.otherUser);
                             },
                           ),
                         );
@@ -122,7 +122,7 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return FollowingList(widget.otherUser);
+                              return FollowingList(widget.currentUser,widget.otherUser);
                             },
                           ),
                         );

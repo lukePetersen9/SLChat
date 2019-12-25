@@ -10,11 +10,11 @@ class FirestoreMain {
 
   void makeNewConversation(String userEmail, List<String> otherUserEmails,
       BuildContext context) async {
-    Firestore.instance
+    var q = Firestore.instance
         .collection('conversations')
         .where('members', arrayContains: userEmail)
-        .snapshots()
-        .listen(
+        .getDocuments()
+        .then(
       (data) {
         bool alreadyExists = false;
         String docID = '';
@@ -42,10 +42,19 @@ class FirestoreMain {
             {
               'started': now,
               'members': [userEmail] + otherUserEmails,
+              'readBy': [],
               'lastOpened' + userEmail: now.toString(),
               'lastMessage': 'send a message!',
               'lastMessageTime': now.toString(),
             },
+          );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return ConversationPage(userEmail, docID, otherUserEmails);
+              },
+            ),
           );
         } else {
           Navigator.push(
@@ -113,6 +122,17 @@ class FirestoreMain {
     );
   }
 
+  void markConvoAsRead(String email, String docID) async {
+    await Firestore.instance
+        .collection('conversations')
+        .document(docID)
+        .updateData(
+      {
+        'readBy': FieldValue.arrayUnion([email])
+      },
+    );
+  }
+
   Widget showConversations(String email) {
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance
@@ -139,12 +159,14 @@ class FirestoreMain {
             for (DocumentSnapshot s in snapshot.data.documents) {
               String time = s.data['lastMessageTime'];
               String lastMsg = s.data['lastMessage'];
-              List<dynamic> members = new List<dynamic>();
-              members.addAll(s.data['members']);
+              List<dynamic> members = List.from(s.data['members']);
+              List<dynamic> readBy = List.from(s.data['readBy']);
               members.remove(email);
+              print(readBy);
               times.add(time);
               tiles[time] = GestureDetector(
                 onTap: () {
+                  markConvoAsRead(email, s.documentID);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -188,6 +210,9 @@ class FirestoreMain {
                           )
                         ],
                       ),
+                      readBy.contains(email)
+                          ? Container()
+                          : Icon(Icons.fiber_new)
                     ],
                   ),
                 ),
@@ -504,7 +529,6 @@ class FirestoreMain {
   }
 
   void followUser(String currentUser, String otherUser) async {
-    print(currentUser + ' is trying to follow ' + otherUser);
     await Firestore.instance
         .collection('users')
         .document(currentUser)

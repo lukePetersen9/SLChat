@@ -106,7 +106,7 @@ class ProfilePageState extends State<ProfilePage> {
                       context,
                       MaterialPageRoute(
                         builder: (context) {
-                          return FollowerList(widget.email);
+                          return FollowerList(widget.email, widget.email);
                         },
                       ),
                     );
@@ -139,7 +139,7 @@ class ProfilePageState extends State<ProfilePage> {
                   onPressed: () {
                     Navigator.push(context, MaterialPageRoute(
                       builder: (context) {
-                        return FollowingList(widget.email);
+                        return FollowingList(widget.email, widget.email);
                       },
                     ));
                   },

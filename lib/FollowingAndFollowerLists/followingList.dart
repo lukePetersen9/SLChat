@@ -5,8 +5,9 @@ import 'package:flutter_with_firebase/User/otheruserprofilepage.dart';
 
 class FollowingList extends StatefulWidget {
   final FirestoreMain fire = new FirestoreMain();
-  final String email;
-  FollowingList(this.email);
+  final String currentUserEmail;
+  final String otherUserEmail;
+  FollowingList(this.currentUserEmail,this.otherUserEmail);
   @override
   State<StatefulWidget> createState() {
     return FollowingListState();
@@ -74,7 +75,7 @@ class FollowingListState extends State<FollowingList> {
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance
           .collection('users')
-          .where('email', isEqualTo: widget.email)
+          .where('email', isEqualTo: widget.otherUserEmail)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
@@ -96,7 +97,7 @@ class FollowingListState extends State<FollowingList> {
             List<Widget> searchResultTextBox = new List<Widget>();
             for (String email in followers) {
               searchResultTextBox.add(
-                profileSnippetInFollowingSearch(email, widget.email,
+                profileSnippetInFollowingSearch(email, widget.currentUserEmail,
                     MediaQuery.of(context).size.width, 100, s),
               );
             }
@@ -202,6 +203,23 @@ class FollowingListState extends State<FollowingList> {
                       ),
                     ),
                   ),
+                   Expanded(
+                    child: following != null &&
+                            !followers.contains(loggedInUser) &&
+                            loggedInUser != email
+                        ? Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.blue, width: 3),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: FlatButton(
+                                onPressed: () {
+                                  fire.followUser(loggedInUser, email);
+                                },
+                                child: Icon(Icons.add)),
+                          )
+                        : Container(),
+                  )
                 ],
                 direction: Axis.horizontal,
               ),

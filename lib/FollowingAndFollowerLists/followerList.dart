@@ -5,8 +5,9 @@ import 'package:flutter_with_firebase/User/otheruserprofilepage.dart';
 
 class FollowerList extends StatefulWidget {
   final FirestoreMain fire = new FirestoreMain();
-  final String email;
-  FollowerList(this.email);
+  final String currentUserEmail;
+  final String otherUserEmail;
+  FollowerList(this.currentUserEmail, this.otherUserEmail);
   @override
   State<StatefulWidget> createState() {
     return FollowerListState();
@@ -74,7 +75,7 @@ class FollowerListState extends State<FollowerList> {
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance
           .collection('users')
-          .where('email', isEqualTo: widget.email)
+          .where('email', isEqualTo: widget.otherUserEmail).limit(1)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
@@ -96,7 +97,7 @@ class FollowerListState extends State<FollowerList> {
             List<Widget> searchResultTextBox = new List<Widget>();
             for (String email in followers) {
               searchResultTextBox.add(
-                profileSnippetInFollowerSearch(email, widget.email,
+                profileSnippetInFollowerSearch(email, widget.currentUserEmail,
                     MediaQuery.of(context).size.width, 100, s),
               );
             }

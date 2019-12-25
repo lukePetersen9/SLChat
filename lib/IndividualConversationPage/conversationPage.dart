@@ -211,7 +211,7 @@ class ConversationPageState extends State<ConversationPage> {
     }
     if (!alreadyRead) {
       try {
-        databaseReference
+        Firestore.instance
             .collection("conversations")
             .document(widget.docID)
             .collection('messages')
@@ -220,6 +220,18 @@ class ConversationPageState extends State<ConversationPage> {
           {
             'readBy': FieldValue.arrayUnion(
               [widget.currentUserEmail + '@' + DateTime.now().toString()],
+            ),
+          },
+        );
+      } catch (e) {}
+      try {
+        Firestore.instance
+            .collection("conversations")
+            .document(widget.docID)
+            .updateData(
+          {
+            'readBy': FieldValue.arrayUnion(
+              [widget.currentUserEmail],
             ),
           },
         );
@@ -243,8 +255,13 @@ class ConversationPageState extends State<ConversationPage> {
           readDelivered,
           widget.docID);
     } else {
-      return GeneralMessageWithInteractionsForOtherUser(d.data['content'],
-          d.data['sentBy'],widget.currentUserEmail ,d.documentID, d.data['interactions'], widget.docID);
+      return GeneralMessageWithInteractionsForOtherUser(
+          d.data['content'],
+          d.data['sentBy'],
+          widget.currentUserEmail,
+          d.documentID,
+          d.data['interactions'],
+          widget.docID);
     }
   }
 
@@ -271,6 +288,7 @@ class ConversationPageState extends State<ConversationPage> {
           .document(widget.docID)
           .updateData(
         {
+          'readBy': FieldValue.arrayRemove(widget.members),
           'lastMessage': value,
           'lastMessageTime': now.toString(),
         },
