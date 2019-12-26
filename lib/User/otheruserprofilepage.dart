@@ -23,6 +23,7 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
           'https://previews.123rf.com/images/salamatik/salamatik1801/salamatik180100019/92979836-profile-anonymous-face-icon-gray-silhouette-person-male-default-avatar-photo-placeholder-isolated-on.jpg',
       bio = '';
   String followButton = '';
+  bool isPrivate = false;
   int followerCount = 0, followingCount = 0;
   FirestoreMain fire = FirestoreMain();
   @override
@@ -51,10 +52,32 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
                     radius: MediaQuery.of(context).size.width / 5,
                     backgroundImage: NetworkImage(profilePicture),
                   ),
-                  Text(firstName + ' ' + lastName,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: MediaQuery.of(context).size.height / 25)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        firstName + ' ' + lastName,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: MediaQuery.of(context).size.height / 25),
+                      ),
+                      isPrivate
+                          ? Container(
+                              child: Icon(
+                                Icons.lock,
+                                color: Colors.white,
+                              ),
+                              padding: EdgeInsets.only(left: 10),
+                            )
+                          : Container(
+                              child: Icon(
+                                Icons.lock_open,
+                                color: Colors.white,
+                              ),
+                              padding: EdgeInsets.only(left: 10),
+                            ),
+                    ],
+                  ),
                   Text(username,
                       style: TextStyle(
                           color: Colors.grey[100],
@@ -86,7 +109,8 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return FollowerList(widget.currentUser, widget.otherUser);
+                              return FollowerList(
+                                  widget.currentUser, widget.otherUser);
                             },
                           ),
                         );
@@ -122,7 +146,8 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return FollowingList(widget.currentUser,widget.otherUser);
+                              return FollowingList(
+                                  widget.currentUser, widget.otherUser);
                             },
                           ),
                         );
@@ -183,6 +208,7 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
         lastName = data.documents[0].data['lastName'];
         username = data.documents[0].data['username'];
         bio = data.documents[0].data['bio'];
+        isPrivate = data.documents[0].data['isPrivate'];
         profilePicture = data.documents[0].data['profile_image'];
         followerCount = data.documents[0].data['followers'].length;
         followingCount = data.documents[0].data['following'].length;

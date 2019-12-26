@@ -75,7 +75,8 @@ class FollowerListState extends State<FollowerList> {
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance
           .collection('users')
-          .where('email', isEqualTo: widget.otherUserEmail).limit(1)
+          .where('email', isEqualTo: widget.otherUserEmail)
+          .limit(1)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
@@ -165,7 +166,7 @@ class FollowerListState extends State<FollowerList> {
                         children: <Widget>[
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
                               Text(
                                 snapshot.data.documents.first['firstName'] +
@@ -177,14 +178,24 @@ class FollowerListState extends State<FollowerList> {
                                   color: Colors.grey[800],
                                 ),
                               ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 10),
+                                child: Icon(
+                                    snapshot.data.documents[0].data['isPrivate']
+                                        ? Icons.lock
+                                        : Icons.lock_open),
+                              ),
                               followers != null &&
                                       followers.contains(loggedInUser)
-                                  ? Text(
-                                      'following',
-                                      style: TextStyle(
-                                        fontSize: width / 20,
-                                        fontFamily: 'Garamond',
-                                        color: Colors.grey[800],
+                                  ? Padding(
+                                      padding: EdgeInsets.only(left: 20),
+                                      child: Text(
+                                        'following',
+                                        style: TextStyle(
+                                          fontSize: width / 20,
+                                          fontFamily: 'Garamond',
+                                          color: Colors.grey[800],
+                                        ),
                                       ),
                                     )
                                   : Container(),

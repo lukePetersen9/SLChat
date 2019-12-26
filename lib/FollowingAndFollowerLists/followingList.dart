@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_with_firebase/User/otherUserProfilePagePrivate.dart';
 import 'package:flutter_with_firebase/User/otheruserprofilepage.dart';
 
 class FollowingList extends StatefulWidget {
   final FirestoreMain fire = new FirestoreMain();
   final String currentUserEmail;
   final String otherUserEmail;
-  FollowingList(this.currentUserEmail,this.otherUserEmail);
+  FollowingList(this.currentUserEmail, this.otherUserEmail);
   @override
   State<StatefulWidget> createState() {
     return FollowingListState();
@@ -142,7 +143,11 @@ class FollowingListState extends State<FollowingList> {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return OtherUserProfilePage(loggedInUser, email);
+                    return snapshot.data.documents.first['isPrivate'] &&
+                            !(following != null &&
+                                following.contains(loggedInUser))
+                        ? OtherUserProfilePagePrivate(loggedInUser, email)
+                        : OtherUserProfilePage(loggedInUser, email);
                   },
                 ),
               );
@@ -178,14 +183,24 @@ class FollowingListState extends State<FollowingList> {
                                   color: Colors.grey[800],
                                 ),
                               ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 10),
+                                child: Icon(
+                                    snapshot.data.documents[0].data['isPrivate']
+                                        ? Icons.lock
+                                        : Icons.lock_open),
+                              ),
                               following != null &&
                                       following.contains(loggedInUser)
-                                  ? Text(
-                                      'follows you',
-                                      style: TextStyle(
-                                        fontSize: width / 20,
-                                        fontFamily: 'Garamond',
-                                        color: Colors.grey[800],
+                                  ? Padding(
+                                      padding: EdgeInsets.only(left: 20),
+                                      child: Text(
+                                        'follows you',
+                                        style: TextStyle(
+                                          fontSize: width / 20,
+                                          fontFamily: 'Garamond',
+                                          color: Colors.grey[800],
+                                        ),
                                       ),
                                     )
                                   : Container(),
@@ -203,7 +218,7 @@ class FollowingListState extends State<FollowingList> {
                       ),
                     ),
                   ),
-                   Expanded(
+                  Expanded(
                     child: following != null &&
                             !followers.contains(loggedInUser) &&
                             loggedInUser != email

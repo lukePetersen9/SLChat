@@ -100,15 +100,35 @@ class HomepageDrawer extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text(
-                            snapshot.data.documents.first['firstName'] +
-                                ' ' +
-                                snapshot.data.documents.first['lastName'],
-                            style: TextStyle(
-                              fontSize: width / 15,
-                              fontFamily: 'Garamond',
-                              color: Colors.grey[800],
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Text(
+                                snapshot.data.documents.first['firstName'] +
+                                    ' ' +
+                                    snapshot.data.documents.first['lastName'],
+                                style: TextStyle(
+                                  fontSize: width / 15,
+                                  fontFamily: 'Garamond',
+                                  color: Colors.grey[800],
+                                ),
+                              ),
+                              snapshot.data.documents.first['isPrivate']
+                                  ? Container(
+                                      child: Icon(
+                                        Icons.lock,
+                                        color: Colors.white,
+                                      ),
+                                      padding: EdgeInsets.only(left: 10),
+                                    )
+                                  : Container(
+                                      child: Icon(
+                                        Icons.lock_open,
+                                        color: Colors.white,
+                                      ),
+                                      padding: EdgeInsets.only(left: 10),
+                                    ),
+                            ],
                           ),
                           Text(
                             '  ' + snapshot.data.documents.first['username'],

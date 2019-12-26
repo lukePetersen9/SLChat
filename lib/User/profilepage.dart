@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_with_firebase/Homepage/homepage.dart';
 import 'package:flutter_with_firebase/User/editUserProfile.dart';
 
 import '../FollowingAndFollowerLists/followerList.dart';
@@ -21,6 +22,7 @@ class ProfilePageState extends State<ProfilePage> {
       profilePicture =
           'https://previews.123rf.com/images/salamatik/salamatik1801/salamatik180100019/92979836-profile-anonymous-face-icon-gray-silhouette-person-male-default-avatar-photo-placeholder-isolated-on.jpg',
       bio = '';
+  bool isPrivate = false;
   int followerCount = 0, followingCount = 0;
   @override
   void initState() {
@@ -33,6 +35,19 @@ class ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
+        leading: IconButton(
+          icon: Icon(Icons.home),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return HomePage(widget.email);
+                },
+              ),
+            );
+          },
+        ),
         actions: <Widget>[
           IconButton(
             onPressed: () {
@@ -65,10 +80,32 @@ class ProfilePageState extends State<ProfilePage> {
                   radius: MediaQuery.of(context).size.width / 5,
                   backgroundImage: NetworkImage(profilePicture),
                 ),
-                Text(firstName + ' ' + lastName,
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: MediaQuery.of(context).size.height / 25)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      firstName + ' ' + lastName,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: MediaQuery.of(context).size.height / 25),
+                    ),
+                    isPrivate
+                        ? Container(
+                            child: Icon(
+                              Icons.lock,
+                              color: Colors.white,
+                            ),
+                            padding: EdgeInsets.only(left: 10),
+                          )
+                        : Container(
+                            child: Icon(
+                              Icons.lock_open,
+                              color: Colors.white,
+                            ),
+                            padding: EdgeInsets.only(left: 10),
+                          ),
+                  ],
+                ),
                 Text(username,
                     style: TextStyle(
                         color: Colors.grey[100],
@@ -174,6 +211,7 @@ class ProfilePageState extends State<ProfilePage> {
         username = data.documents[0].data['username'];
         profilePicture = data.documents[0].data['profile_image'];
         bio = data.documents[0].data['bio'];
+        isPrivate = data.documents[0].data['isPrivate'];
         followerCount = data.documents[0].data['followers'].length;
         followingCount = data.documents[0].data['following'].length;
       });

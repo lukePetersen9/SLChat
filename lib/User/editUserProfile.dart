@@ -4,6 +4,7 @@ import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
 import 'profilepage.dart';
 import '../FollowingAndFollowerLists/followerList.dart';
 import '../FollowingAndFollowerLists/followingList.dart';
+import 'package:flutter_with_firebase/AlertDialogs/leaveEditingProfilePageConfirmation.dart';
 
 class EditUserProfilePage extends StatefulWidget {
   final String email;
@@ -18,7 +19,7 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
   String initialUsername = '';
   String profilePicture =
       'https://previews.123rf.com/images/salamatik/salamatik1801/salamatik180100019/92979836-profile-anonymous-face-icon-gray-silhouette-person-male-default-avatar-photo-placeholder-isolated-on.jpg';
-
+  bool isPrivate = false;
   TextEditingController first = new TextEditingController();
   TextEditingController last = new TextEditingController();
   TextEditingController user = new TextEditingController();
@@ -36,8 +37,13 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         title: Text('Edit Profile'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: () {
+            _showDialog();
+          },
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -75,8 +81,23 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
               ),
               Text('Bio:'),
               TextField(
+                maxLines: null,
                 controller: b,
-              )
+              ),
+              Row(
+                children: <Widget>[
+                  Text('Private '),
+                  Icon(isPrivate ? Icons.lock : Icons.lock_open),
+                  Switch(
+                    value: isPrivate,
+                    onChanged: (b) {
+                      setState(() {
+                        isPrivate = b;
+                      });
+                    },
+                  ),
+                ],
+              ),
             ],
           ),
           FlatButton(
@@ -86,8 +107,8 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
                   last.text.isNotEmpty &&
                   b.text.isNotEmpty &&
                   goodUsername) {
-                fire.updateUserData(
-                    widget.email, user.text, first.text, last.text, b.text);
+                fire.updateUserData(widget.email, user.text, first.text,
+                    last.text, b.text, isPrivate);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -122,6 +143,15 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
     );
   }
 
+  void _showDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return LeaveEditingProfilePageConfirmationDialog(widget.email);
+      },
+    );
+  }
+
   void getProfileInfo() {
     var userQuery = Firestore.instance
         .collection('users')
@@ -137,6 +167,7 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
           initialUsername = data.documents[0].data['username'];
           user = new TextEditingController(text: initialUsername);
           profilePicture = data.documents[0].data['profile_image'];
+          isPrivate = data.documents[0].data['isPrivate'];
           b = new TextEditingController(text: data.documents[0].data['bio']);
         });
       }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_with_firebase/IndividualConversationPage/conversationPage.dart';
+import 'package:flutter_with_firebase/User/otherUserProfilePagePrivate.dart';
 import 'package:flutter_with_firebase/User/otheruserprofilepage.dart';
 import 'package:flutter_with_firebase/User/profilepage.dart';
 
@@ -75,20 +76,22 @@ class FirestoreMain {
       {
         'followers': [],
         'following': [],
+        'notifications': [],
         'email': email,
         'username': username,
         'firstName': f,
         'lastName': l,
         'username': username,
         'bio': 'Default Bio',
+        'isPrivate': false,
         'profile_image':
             'https://i.pinimg.com/236x/10/ae/df/10aedff18fca7367122784b4453c86bb--geometric-art-geometric-patterns.jpg',
       },
     );
   }
 
-  void updateUserData(
-      String email, String username, String f, String l, String bio) async {
+  void updateUserData(String email, String username, String f, String l,
+      String bio, bool p) async {
     await Firestore.instance.collection('users').document(email).updateData(
       {
         'username': username,
@@ -96,6 +99,7 @@ class FirestoreMain {
         'lastName': l,
         'username': username,
         'bio': bio,
+        'isPrivate': p,
       },
     );
   }
@@ -162,7 +166,6 @@ class FirestoreMain {
               List<dynamic> members = List.from(s.data['members']);
               List<dynamic> readBy = List.from(s.data['readBy']);
               members.remove(email);
-              print(readBy);
               times.add(time);
               tiles[time] = GestureDetector(
                 onTap: () {
@@ -330,7 +333,11 @@ class FirestoreMain {
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  return OtherUserProfilePage(loggedInUser, email);
+                  return snapshot.data.documents.first['isPrivate'] &&
+                          !(following != null &&
+                              following.contains(loggedInUser))
+                      ? OtherUserProfilePagePrivate(loggedInUser, email)
+                      : OtherUserProfilePage(loggedInUser, email);
                 },
               ),
             );
@@ -353,7 +360,7 @@ class FirestoreMain {
                       children: <Widget>[
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: <Widget>[
                             Text(
                               snapshot.data.documents.first['firstName'] +
@@ -365,14 +372,24 @@ class FirestoreMain {
                                 color: Colors.grey[800],
                               ),
                             ),
+                            Padding(
+                              padding: EdgeInsets.only(left: 10),
+                              child: Icon(
+                                  snapshot.data.documents[0].data['isPrivate']
+                                      ? Icons.lock
+                                      : Icons.lock_open),
+                            ),
                             following != null &&
                                     following.contains(loggedInUser)
-                                ? Text(
-                                    'follows you',
-                                    style: TextStyle(
-                                      fontSize: width / 20,
-                                      fontFamily: 'Garamond',
-                                      color: Colors.grey[800],
+                                ? Padding(
+                                    padding: EdgeInsets.only(left: 20),
+                                    child: Text(
+                                      'follows you',
+                                      style: TextStyle(
+                                        fontSize: width / 20,
+                                        fontFamily: 'Garamond',
+                                        color: Colors.grey[800],
+                                      ),
                                     ),
                                   )
                                 : Container(),
@@ -444,7 +461,11 @@ class FirestoreMain {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return OtherUserProfilePage(loggedInUser, email);
+                    return snapshot.data.documents.first['isPrivate'] &&
+                            !(following != null &&
+                                following.contains(loggedInUser))
+                        ? OtherUserProfilePagePrivate(loggedInUser, email)
+                        : OtherUserProfilePage(loggedInUser, email);
                   },
                 ),
               );
