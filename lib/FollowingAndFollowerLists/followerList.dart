@@ -137,6 +137,8 @@ class FollowerListState extends State<FollowerList> {
           }
           List<dynamic> followers = snapshot.data.documents.first['followers'];
           List<dynamic> following = snapshot.data.documents.first['following'];
+          List<dynamic> requests =
+              snapshot.data.documents.first['notifications'];
           return GestureDetector(
             onTap: () {
               Navigator.push(
@@ -216,7 +218,9 @@ class FollowerListState extends State<FollowerList> {
                   Expanded(
                     child: following != null &&
                             !followers.contains(loggedInUser) &&
-                            loggedInUser != email
+                            loggedInUser != email &&
+                            requests != null &&
+                            !requests.contains(loggedInUser)
                         ? Container(
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.blue, width: 3),
@@ -224,11 +228,31 @@ class FollowerListState extends State<FollowerList> {
                             ),
                             child: FlatButton(
                                 onPressed: () {
-                                  fire.followUser(loggedInUser, email);
+                                  fire.followUser(
+                                      loggedInUser,
+                                      email,
+                                      snapshot
+                                          .data.documents.first['isPrivate']);
                                 },
                                 child: Icon(Icons.add)),
                           )
-                        : Container(),
+                        : requests != null && requests.contains(loggedInUser)
+                            ? Container(
+                                decoration: BoxDecoration(
+                                  border:
+                                      Border.all(color: Colors.blue, width: 3),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  'Pending',
+                                  style: TextStyle(
+                                    fontSize: width / 19,
+                                    fontFamily: 'Garamond',
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              )
+                            : Container(),
                   )
                 ],
                 direction: Axis.horizontal,

@@ -77,6 +77,7 @@ class FirestoreMain {
         'followers': [],
         'following': [],
         'notifications': [],
+        'pending': [],
         'email': email,
         'username': username,
         'firstName': f,
@@ -133,6 +134,56 @@ class FirestoreMain {
         .updateData(
       {
         'readBy': FieldValue.arrayUnion([email])
+      },
+    );
+  }
+
+  void acceptFollowRequest(String loggedInUser, String otherUser) async {
+    await Firestore.instance
+        .collection('users')
+        .document(loggedInUser)
+        .updateData(
+      {
+        'followers': FieldValue.arrayUnion([otherUser]),
+        'notifications': FieldValue.arrayRemove([otherUser])
+      },
+    );
+    await Firestore.instance.collection('users').document(otherUser).updateData(
+      {
+        'following': FieldValue.arrayUnion([loggedInUser]),
+        'pending': FieldValue.arrayRemove([loggedInUser])
+      },
+    );
+  }
+
+  void rejectFollowRequest(String loggedInUser, String otherUser) async {
+    await Firestore.instance
+        .collection('users')
+        .document(loggedInUser)
+        .updateData(
+      {
+        'notifications': FieldValue.arrayRemove([otherUser])
+      },
+    );
+    await Firestore.instance.collection('users').document(otherUser).updateData(
+      {
+        'pending': FieldValue.arrayRemove([loggedInUser])
+      },
+    );
+  }
+
+  void cancelPendingFollow(String loggedInUser, String otherUser) async {
+    await Firestore.instance
+        .collection('users')
+        .document(loggedInUser)
+        .updateData(
+      {
+        'pending': FieldValue.arrayRemove([otherUser])
+      },
+    );
+    await Firestore.instance.collection('users').document(otherUser).updateData(
+      {
+        'notifications': FieldValue.arrayRemove([loggedInUser])
       },
     );
   }
@@ -327,6 +378,7 @@ class FirestoreMain {
         }
         List<dynamic> followers = snapshot.data.documents.first['followers'];
         List<dynamic> following = snapshot.data.documents.first['following'];
+        List<dynamic> requests = snapshot.data.documents.first['notifications'];
         return GestureDetector(
           onTap: () {
             Navigator.push(
@@ -410,7 +462,9 @@ class FirestoreMain {
                 Expanded(
                   child: following != null &&
                           !followers.contains(loggedInUser) &&
-                          loggedInUser != email
+                          loggedInUser != email &&
+                          requests != null &&
+                          !requests.contains(loggedInUser)
                       ? Container(
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.blue, width: 3),
@@ -418,11 +472,28 @@ class FirestoreMain {
                           ),
                           child: FlatButton(
                               onPressed: () {
-                                followUser(loggedInUser, email);
+                                followUser(loggedInUser, email,
+                                    snapshot.data.documents.first['isPrivate']);
                               },
                               child: Icon(Icons.add)),
                         )
-                      : Container(),
+                      : requests != null && requests.contains(loggedInUser)
+                          ? Container(
+                              decoration: BoxDecoration(
+                                border:
+                                    Border.all(color: Colors.blue, width: 3),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'Pending',
+                                style: TextStyle(
+                                  fontSize: width / 19,
+                                  fontFamily: 'Garamond',
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            )
+                          : Container(),
                 )
               ],
               direction: Axis.horizontal,
@@ -455,6 +526,8 @@ class FirestoreMain {
           }
           List<dynamic> followers = snapshot.data.documents.first['followers'];
           List<dynamic> following = snapshot.data.documents.first['following'];
+          List<dynamic> requests =
+              snapshot.data.documents.first['notifications'];
           return GestureDetector(
             onTap: () {
               Navigator.push(
@@ -527,7 +600,9 @@ class FirestoreMain {
                   ),
                   Expanded(
                     child: following != null &&
-                            !followers.contains(loggedInUser)
+                            !followers.contains(loggedInUser) &&
+                            requests != null &&
+                            !requests.contains(loggedInUser)
                         ? Container(
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.blue, width: 3),
@@ -535,11 +610,31 @@ class FirestoreMain {
                             ),
                             child: FlatButton(
                                 onPressed: () {
-                                  followUser(loggedInUser, email);
+                                  followUser(
+                                      loggedInUser,
+                                      email,
+                                      snapshot
+                                          .data.documents.first['isPrivate']);
                                 },
                                 child: Icon(Icons.add)),
                           )
-                        : Container(),
+                        : requests != null && requests.contains(loggedInUser)
+                            ? Container(
+                                decoration: BoxDecoration(
+                                  border:
+                                      Border.all(color: Colors.blue, width: 3),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  'Pending',
+                                  style: TextStyle(
+                                    fontSize: width / 19,
+                                    fontFamily: 'Garamond',
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              )
+                            : Container(),
                   )
                 ],
                 direction: Axis.horizontal,
@@ -549,24 +644,50 @@ class FirestoreMain {
         });
   }
 
-  void followUser(String currentUser, String otherUser) async {
-    await Firestore.instance
-        .collection('users')
-        .document(currentUser)
-        .updateData(
-      {
-        'following': FieldValue.arrayUnion(
-          [otherUser],
-        )
-      },
-    );
-    await Firestore.instance.collection('users').document(otherUser).updateData(
-      {
-        'followers': FieldValue.arrayUnion(
-          [currentUser],
-        )
-      },
-    );
+  void followUser(String currentUser, String otherUser, bool isPrivate) async {
+    if (isPrivate) {
+      await Firestore.instance
+          .collection('users')
+          .document(currentUser)
+          .updateData(
+        {
+          'pending': FieldValue.arrayUnion(
+            [otherUser],
+          )
+        },
+      );
+      await Firestore.instance
+          .collection('users')
+          .document(otherUser)
+          .updateData(
+        {
+          'notifications': FieldValue.arrayUnion(
+            [currentUser],
+          )
+        },
+      );
+    } else {
+      await Firestore.instance
+          .collection('users')
+          .document(currentUser)
+          .updateData(
+        {
+          'following': FieldValue.arrayUnion(
+            [otherUser],
+          )
+        },
+      );
+      await Firestore.instance
+          .collection('users')
+          .document(otherUser)
+          .updateData(
+        {
+          'followers': FieldValue.arrayUnion(
+            [currentUser],
+          )
+        },
+      );
+    }
   }
 
   void unfollowUser(String currentUser, String otherUser) async {

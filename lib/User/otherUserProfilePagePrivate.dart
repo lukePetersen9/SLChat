@@ -102,7 +102,8 @@ class OtherUserProfilePagePrivateState
                     followButton = 'Follow';
                   });
                 } else {
-                  fire.followUser(widget.currentUser, widget.otherUser);
+                  fire.followUser(
+                      widget.currentUser, widget.otherUser, isPrivate);
                   setState(() {
                     followerCount++;
                     followButton = 'Unfollow';

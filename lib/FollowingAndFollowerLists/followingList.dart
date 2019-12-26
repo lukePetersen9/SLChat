@@ -229,7 +229,11 @@ class FollowingListState extends State<FollowingList> {
                             ),
                             child: FlatButton(
                                 onPressed: () {
-                                  fire.followUser(loggedInUser, email);
+                                  fire.followUser(
+                                      loggedInUser,
+                                      email,
+                                      snapshot
+                                          .data.documents.first['isPrivate']);
                                 },
                                 child: Icon(Icons.add)),
                           )

@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_with_firebase/SideDrawerItems/followPendingList.dart';
+import 'package:flutter_with_firebase/SideDrawerItems/followRequestList.dart';
 import 'package:flutter_with_firebase/SideDrawerItems/userSettings.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -40,6 +42,42 @@ class HomepageDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+            title: Row(
+              children: <Widget>[
+                Text('Follow Requests'),
+                getRequestNotif(),
+              ],
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return FollowRequestList(email);
+                  },
+                ),
+              );
+            },
+          ),
+          ListTile(
+            title: Row(
+              children: <Widget>[
+                Text('Pending Requests'),
+                getPendingRequestNotif(),
+              ],
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return FollowPendingList(email);
+                  },
+                ),
+              );
+            },
+          ),
+          ListTile(
             title: Text('Settings'),
             onTap: () {
               Navigator.push(
@@ -63,6 +101,66 @@ class HomepageDrawer extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget getRequestNotif() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: Firestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot == null || snapshot.data == null) {
+          return Container();
+        } else {}
+        List<dynamic> requests = snapshot.data.documents.first['notifications'];
+        int numNotifs = requests == null ? 0 : requests.length;
+
+        return Padding(
+          padding: EdgeInsets.only(left: 20),
+          child: Container(
+            alignment: Alignment.center,
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              color: Colors.teal[200],
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(numNotifs.toString()),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget getPendingRequestNotif() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: Firestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot == null || snapshot.data == null) {
+          return Container();
+        } else {}
+        List<dynamic> requests = snapshot.data.documents.first['pending'];
+        int numNotifs = requests == null ? 0 : requests.length;
+
+        return Padding(
+          padding: EdgeInsets.only(left: 20),
+          child: Container(
+            alignment: Alignment.center,
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              color: Colors.teal[200],
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(numNotifs.toString()),
+          ),
+        );
+      },
     );
   }
 
