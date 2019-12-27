@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_with_firebase/SideDrawerItems/followPendingList.dart';
 import 'package:flutter_with_firebase/SideDrawerItems/followRequestList.dart';
-import 'package:flutter_with_firebase/SideDrawerItems/userSettings.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_with_firebase/FollowingAndFollowerLists/followingList.dart';
@@ -72,19 +71,6 @@ class HomepageDrawer extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) {
                     return FollowPendingList(email);
-                  },
-                ),
-              );
-            },
-          ),
-          ListTile(
-            title: Text('Settings'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return UserSettings(email);
                   },
                 ),
               );

@@ -23,6 +23,7 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
   TextEditingController first = new TextEditingController();
   TextEditingController last = new TextEditingController();
   TextEditingController user = new TextEditingController();
+  TextEditingController profileImageUrl = new TextEditingController();
   TextEditingController b = new TextEditingController();
   FirestoreMain fire = new FirestoreMain();
   bool goodUsername = true;
@@ -45,82 +46,94 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
           },
         ),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          fire.profileImage(profilePicture, 30),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Text('First Name:'),
-              TextField(
-                controller: first,
-              ),
-              Text('Last Name:'),
-              TextField(
-                controller: last,
-              ),
-              Text('Username:'),
-              Row(
+              fire.profileImage(profilePicture, 30),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  Container(
-                    width: 200,
-                    child: TextField(
-                      controller: user,
-                      onChanged: (change) {
-                        checkUserName(change);
-                      },
-                    ),
+                  Text('First Name:'),
+                  TextField(
+                    controller: first,
                   ),
-                  Icon(
-                    goodUsername ? Icons.mood : Icons.mood_bad,
-                    color: goodUsername ? Colors.green : Colors.red,
-                  )
+                  Text('Last Name:'),
+                  TextField(
+                    controller: last,
+                  ),
+                  Text('Username:'),
+                  Row(
+                    children: <Widget>[
+                      Container(
+                        width: 200,
+                        child: TextField(
+                          controller: user,
+                          onChanged: (change) {
+                            checkUserName(change);
+                          },
+                        ),
+                      ),
+                      Icon(
+                        goodUsername ? Icons.mood : Icons.mood_bad,
+                        color: goodUsername ? Colors.green : Colors.red,
+                      )
+                    ],
+                  ),
+                  Text('Bio:'),
+                  TextField(
+                    maxLines: null,
+                    controller: b,
+                  ),
+                  Text('Profile Image URL:'),
+                  TextField(
+                    controller: profileImageUrl,
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Text('Private '),
+                      Icon(isPrivate ? Icons.lock : Icons.lock_open),
+                      Switch(
+                        value: isPrivate,
+                        onChanged: (b) {
+                          setState(() {
+                            isPrivate = b;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                 ],
               ),
-              Text('Bio:'),
-              TextField(
-                maxLines: null,
-                controller: b,
-              ),
-              Row(
-                children: <Widget>[
-                  Text('Private '),
-                  Icon(isPrivate ? Icons.lock : Icons.lock_open),
-                  Switch(
-                    value: isPrivate,
-                    onChanged: (b) {
-                      setState(() {
-                        isPrivate = b;
-                      });
-                    },
-                  ),
-                ],
-              ),
+              FlatButton(
+                child: Text('save changes'),
+                onPressed: () {
+                  if (first.text.isNotEmpty &&
+                      last.text.isNotEmpty &&
+                      b.text.isNotEmpty &&
+                      goodUsername) {
+                    fire.updateUserData(widget.email, user.text, first.text,
+                        last.text, b.text, isPrivate);
+                        if(profileImageUrl.text.isNotEmpty && profileImageUrl.text != profilePicture)
+                        {
+                          fire.updateProfileImage(widget.email, profileImageUrl.text);
+                        }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return ProfilePage(widget.email);
+                        },
+                      ),
+                    );
+                  }
+                },
+              )
             ],
           ),
-          FlatButton(
-            child: Text('save changes'),
-            onPressed: () {
-              if (first.text.isNotEmpty &&
-                  last.text.isNotEmpty &&
-                  b.text.isNotEmpty &&
-                  goodUsername) {
-                fire.updateUserData(widget.email, user.text, first.text,
-                    last.text, b.text, isPrivate);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return ProfilePage(widget.email);
-                    },
-                  ),
-                );
-              }
-            },
-          )
-        ],
+        ),
       ),
     );
   }
@@ -169,6 +182,7 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
           profilePicture = data.documents[0].data['profile_image'];
           isPrivate = data.documents[0].data['isPrivate'];
           b = new TextEditingController(text: data.documents[0].data['bio']);
+          profileImageUrl = new TextEditingController(text: profilePicture);
         });
       }
     });
