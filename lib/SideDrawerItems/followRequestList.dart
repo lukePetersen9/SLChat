@@ -57,11 +57,18 @@ class FollowRequestListState extends State<FollowRequestList> {
             List<dynamic> requests =
                 snapshot.data.documents.first['notifications'];
             List<Widget> searchResultTextBox = new List<Widget>();
-            for (String email in requests) {
+            if(requests == null)
+            {
+              return Text('You have no follow requests');
+            }
+            else{
+               for (String email in requests) {
               searchResultTextBox.add(
                 profileSnippetInRequestList(email, widget.currentUserEmail,
                     MediaQuery.of(context).size.width, 100),
               );
+            }
+           
             }
             if (searchResultTextBox.length == 0) {
               searchResultTextBox.add(Text('You have no follow requests'));
