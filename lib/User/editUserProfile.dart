@@ -9,8 +9,7 @@ import 'package:flutter_with_firebase/AlertDialogs/leaveEditingProfilePageConfir
 
 class EditUserProfilePage extends StatefulWidget {
   final String email;
-  final UserModel model;
-  EditUserProfilePage(this.email, this.model);
+  EditUserProfilePage(this.email);
   @override
   State<StatefulWidget> createState() {
     return EditUserProfilePageState();
@@ -118,15 +117,16 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
                       goodUsername) {
                     fire.updateUserData(widget.email, user.text, first.text,
                         last.text, b.text, isPrivate);
-                        if(profileImageUrl.text.isNotEmpty && profileImageUrl.text != profilePicture)
-                        {
-                          fire.updateProfileImage(widget.email, profileImageUrl.text);
-                        }
+                    if (profileImageUrl.text.isNotEmpty &&
+                        profileImageUrl.text != profilePicture) {
+                      fire.updateProfileImage(
+                          widget.email, profileImageUrl.text);
+                    }
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) {
-                          return ProfilePage(widget.email, new UserModel(widget.email));
+                          return ProfilePage(widget.email);
                         },
                       ),
                     );
@@ -162,7 +162,7 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return LeaveEditingProfilePageConfirmationDialog(widget.email, widget.model);
+        return LeaveEditingProfilePageConfirmationDialog(widget.email);
       },
     );
   }

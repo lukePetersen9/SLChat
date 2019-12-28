@@ -6,8 +6,7 @@ import 'package:flutter_with_firebase/User/profilepage.dart';
 
 class LeaveEditingProfilePageConfirmationDialog extends StatelessWidget {
   final String email;
-  final UserModel model;
-  LeaveEditingProfilePageConfirmationDialog(this.email, this.model);
+  LeaveEditingProfilePageConfirmationDialog(this.email);
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +58,7 @@ class LeaveEditingProfilePageConfirmationDialog extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  return ProfilePage(email, model);
+                  return ProfilePage(email );
                 },
               ),
             );

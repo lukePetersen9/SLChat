@@ -9,8 +9,8 @@ import '../FollowingAndFollowerLists/followingList.dart';
 class OtherUserProfilePage extends StatefulWidget {
   final String otherUser;
   final String currentUser;
-  final UserModel model;
-  OtherUserProfilePage(this.currentUser, this.otherUser, this.model);
+
+  OtherUserProfilePage(this.currentUser, this.otherUser);
   @override
   State<StatefulWidget> createState() {
     return OtherUserProfilePageState();
@@ -112,7 +112,7 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
                           MaterialPageRoute(
                             builder: (context) {
                               return FollowerList(
-                                  widget.currentUser, widget.otherUser, widget.model);
+                                  widget.currentUser, widget.otherUser);
                             },
                           ),
                         );
@@ -149,7 +149,7 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
                           MaterialPageRoute(
                             builder: (context) {
                               return FollowingList(
-                                  widget.currentUser, widget.otherUser,widget.model);
+                                  widget.currentUser, widget.otherUser);
                             },
                           ),
                         );

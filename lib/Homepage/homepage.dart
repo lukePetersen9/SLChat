@@ -30,53 +30,53 @@ class HomePageState extends State<HomePage> {
     FirestoreMain g = new FirestoreMain();
     UserModel model = new UserModel(widget.email);
     return ScopedModel<UserModel>(
-          model: model,
-          child: Scaffold(
-          key: _scaffoldKey,
-          drawer: HomepageDrawer(widget.email, model),
-          backgroundColor: Colors.grey[100],
-          appBar: AppBar(
-            leading: GestureDetector(
-              onTap: () => _scaffoldKey.currentState.openDrawer(),
-              child: Container(
-                width: 40,
-                child: g.getUserProfileImage(widget.email, 25),
-              ),
+      model: model,
+      child: Scaffold(
+        key: _scaffoldKey,
+        drawer: HomepageDrawer(widget.email),
+        backgroundColor: Colors.grey[100],
+        appBar: AppBar(
+          leading: GestureDetector(
+            onTap: () => _scaffoldKey.currentState.openDrawer(),
+            child: Container(
+              width: 40,
+              child: g.getUserProfileImage(widget.email, 25),
             ),
-            elevation: 0,
-            backgroundColor: Colors.grey[300],
-            title: Text('Your Conversations',
-                  style: TextStyle(color: Colors.grey[850])),
-            actions: <Widget>[
-              IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return GeneralSearchPage(widget.email);
-                      },
-                    ),
-                  );
-                },
-                icon: Icon(
-                  Icons.search,
-                  color: Color.fromRGBO(43, 158, 179, 1),
-                ),
-              )
-            ],
           ),
-          floatingActionButton: FloatingActionButton(
-            backgroundColor: Color.fromRGBO(43, 158, 179, 1),
-            child: Icon(Icons.chat),
-            onPressed: () {
-              _showDialog();
-            },
-          ),
-          body: SingleChildScrollView(
-            child: g.showConversations(widget.email),
-          ),
+          elevation: 0,
+          backgroundColor: Colors.grey[300],
+          title: Text('Your Conversations',
+              style: TextStyle(color: Colors.grey[850])),
+          actions: <Widget>[
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return GeneralSearchPage(widget.email);
+                    },
+                  ),
+                );
+              },
+              icon: Icon(
+                Icons.search,
+                color: Color.fromRGBO(43, 158, 179, 1),
+              ),
+            )
+          ],
         ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Color.fromRGBO(43, 158, 179, 1),
+          child: Icon(Icons.chat),
+          onPressed: () {
+            _showDialog();
+          },
+        ),
+        body: SingleChildScrollView(
+          child: g.showConversations(widget.email),
+        ),
+      ),
     );
   }
 

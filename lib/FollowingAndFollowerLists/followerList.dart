@@ -8,7 +8,7 @@ class FollowerList extends StatefulWidget {
   final FirestoreMain fire = new FirestoreMain();
   final String currentUserEmail;
   final String otherUserEmail;
-  FollowerList(this.currentUserEmail, this.otherUserEmail, UserModel model);
+  FollowerList(this.currentUserEmail, this.otherUserEmail);
   @override
   State<StatefulWidget> createState() {
     return FollowerListState();

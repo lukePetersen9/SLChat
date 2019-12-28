@@ -15,8 +15,7 @@ import '../LoginAndSignup/login.dart';
 class HomepageDrawer extends StatelessWidget {
   final FirestoreMain fire = new FirestoreMain();
   final String email;
-  final UserModel model;
-  HomepageDrawer(this.email, this.model);
+  HomepageDrawer(this.email);
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -43,7 +42,7 @@ class HomepageDrawer extends StatelessWidget {
             ),
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return ProfilePage(email, model);
+                return ProfilePage(email);
               }));
             },
           ),
@@ -59,7 +58,7 @@ class HomepageDrawer extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return FollowRequestList(email, model);
+                    return FollowRequestList(email);
                   },
                 ),
               );
@@ -77,7 +76,7 @@ class HomepageDrawer extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return FollowPendingList(email, model);
+                    return FollowPendingList(email);
                   },
                 ),
               );
@@ -246,7 +245,7 @@ class HomepageDrawer extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return FollowerList(e,e,model);
+                            return FollowerList(e,e);
                           },
                         ),
                       );
@@ -259,7 +258,7 @@ class HomepageDrawer extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return FollowingList(email,email,model);
+                            return FollowingList(email,email);
                           },
                         ),
                       );

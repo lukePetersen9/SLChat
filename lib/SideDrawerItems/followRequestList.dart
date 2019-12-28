@@ -7,9 +7,8 @@ import 'package:flutter_with_firebase/User/otheruserprofilepage.dart';
 class FollowRequestList extends StatefulWidget {
   final FirestoreMain fire = new FirestoreMain();
   final String currentUserEmail;
-  final UserModel model;
 
-  FollowRequestList(this.currentUserEmail, this.model);
+  FollowRequestList(this.currentUserEmail);
   @override
   State<StatefulWidget> createState() {
     return FollowRequestListState();
@@ -115,7 +114,7 @@ class FollowRequestListState extends State<FollowRequestList> {
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  return OtherUserProfilePage(loggedInUser, email, widget.model);
+                  return OtherUserProfilePage(loggedInUser, email);
                 },
               ),
             );

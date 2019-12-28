@@ -8,9 +8,9 @@ import 'package:scoped_model/scoped_model.dart';
 class FollowPendingList extends StatefulWidget {
   final FirestoreMain fire = new FirestoreMain();
   final String currentUserEmail;
-  final UserModel model;
 
-  FollowPendingList(this.currentUserEmail, this.model);
+
+  FollowPendingList(this.currentUserEmail);
   @override
   State<StatefulWidget> createState() {
     return FollowPendingListState();
@@ -115,7 +115,7 @@ for (String email in pending) {
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  return OtherUserProfilePage(loggedInUser, email, widget.model);
+                  return OtherUserProfilePage(loggedInUser, email);
                 },
               ),
             );
