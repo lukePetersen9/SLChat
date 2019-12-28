@@ -25,7 +25,7 @@ class StartANewConversationDialogState
         borderRadius: BorderRadius.circular(20),
       ),
       backgroundColor: Colors.grey[100],
-      title: Text('model.bio'),
+      title: Text('Start a New Conversation'),
       content: Flex(
         direction: Axis.vertical,
         children: <Widget>[
