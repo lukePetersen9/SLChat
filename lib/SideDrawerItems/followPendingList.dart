@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_with_firebase/Scoped/userModel.dart';
 import 'package:flutter_with_firebase/User/otheruserprofilepage.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class FollowPendingList extends StatefulWidget {
   final FirestoreMain fire = new FirestoreMain();
   final String currentUserEmail;
+  final UserModel model;
 
-  FollowPendingList(this.currentUserEmail);
+  FollowPendingList(this.currentUserEmail, this.model);
   @override
   State<StatefulWidget> createState() {
     return FollowPendingListState();
@@ -27,7 +30,7 @@ class FollowPendingListState extends State<FollowPendingList> {
               Navigator.of(context).pop();
             },
           ),
-          title: Text('Pending Follows')),
+          title: ScopedModelDescendant<UserModel>(builder:(context, child, model){ return Text('Pending Follows');})),
       body: displayFollowerSearch(searchText),
     );
   }
@@ -56,12 +59,19 @@ class FollowPendingListState extends State<FollowPendingList> {
             if (!snapshot.hasData) return Text('No data found!');
             List<dynamic> pending = snapshot.data.documents.first['pending'];
             List<Widget> searchResultTextBox = new List<Widget>();
-            for (String email in pending) {
+            if(pending == null)
+            {
+              return Text('No Pending Requests');
+            }
+            else{
+for (String email in pending) {
               searchResultTextBox.add(
                 profileSnippetInRequestList(email, widget.currentUserEmail,
                     MediaQuery.of(context).size.width, 100),
               );
             }
+            }
+            
             if (searchResultTextBox.length == 0) {
               searchResultTextBox.add(Text('You have no pending follows'));
             }
@@ -105,7 +115,7 @@ class FollowPendingListState extends State<FollowPendingList> {
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  return OtherUserProfilePage(loggedInUser, email);
+                  return OtherUserProfilePage(loggedInUser, email, widget.model);
                 },
               ),
             );

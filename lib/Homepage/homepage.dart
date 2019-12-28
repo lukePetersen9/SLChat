@@ -28,11 +28,12 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     FirestoreMain g = new FirestoreMain();
+    UserModel model = new UserModel(widget.email);
     return ScopedModel<UserModel>(
-          model: new UserModel(widget.email),
+          model: model,
           child: Scaffold(
           key: _scaffoldKey,
-          drawer: HomepageDrawer(widget.email),
+          drawer: HomepageDrawer(widget.email, model),
           backgroundColor: Colors.grey[100],
           appBar: AppBar(
             leading: GestureDetector(

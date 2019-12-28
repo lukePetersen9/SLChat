@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
+import 'package:flutter_with_firebase/Scoped/userModel.dart';
 import 'profilepage.dart';
 import '../FollowingAndFollowerLists/followerList.dart';
 import '../FollowingAndFollowerLists/followingList.dart';
@@ -8,7 +9,8 @@ import 'package:flutter_with_firebase/AlertDialogs/leaveEditingProfilePageConfir
 
 class EditUserProfilePage extends StatefulWidget {
   final String email;
-  EditUserProfilePage(this.email);
+  final UserModel model;
+  EditUserProfilePage(this.email, this.model);
   @override
   State<StatefulWidget> createState() {
     return EditUserProfilePageState();
@@ -124,7 +126,7 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
                       context,
                       MaterialPageRoute(
                         builder: (context) {
-                          return ProfilePage(widget.email);
+                          return ProfilePage(widget.email, new UserModel(widget.email));
                         },
                       ),
                     );
@@ -160,7 +162,7 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return LeaveEditingProfilePageConfirmationDialog(widget.email);
+        return LeaveEditingProfilePageConfirmationDialog(widget.email, widget.model);
       },
     );
   }
