@@ -23,4 +23,7 @@ class UserModel extends Model {
       notifyListeners();
     });
   }
+  static of (BuildContext context){
+    return ScopedModel.of<UserModel>(context);
+  }
 }

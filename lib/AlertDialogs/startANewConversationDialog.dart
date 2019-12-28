@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
+import 'package:flutter_with_firebase/Scoped/userModel.dart';
 
 class StartANewConversationDialog extends StatefulWidget {
   final String userEmail;
@@ -24,7 +25,7 @@ class StartANewConversationDialogState
         borderRadius: BorderRadius.circular(20),
       ),
       backgroundColor: Colors.grey[100],
-      title: Text('Start a New Conversation'),
+      title: Text('model.bio'),
       content: Flex(
         direction: Axis.vertical,
         children: <Widget>[
