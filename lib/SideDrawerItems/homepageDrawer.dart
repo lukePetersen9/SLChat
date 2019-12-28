@@ -15,7 +15,8 @@ import '../LoginAndSignup/login.dart';
 class HomepageDrawer extends StatelessWidget {
   final FirestoreMain fire = new FirestoreMain();
   final String email;
-  HomepageDrawer(this.email);
+  final UserModel model;
+  HomepageDrawer(this.email, this.model);
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -42,7 +43,7 @@ class HomepageDrawer extends StatelessWidget {
             ),
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return ProfilePage(email);
+                return ProfilePage(email, model);
               }));
             },
           ),
@@ -58,7 +59,7 @@ class HomepageDrawer extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return FollowRequestList(email);
+                    return FollowRequestList(email, model);
                   },
                 ),
               );
@@ -76,7 +77,7 @@ class HomepageDrawer extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return FollowPendingList(email);
+                    return FollowPendingList(email, model);
                   },
                 ),
               );
@@ -245,7 +246,7 @@ class HomepageDrawer extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return FollowerList(e, e);
+                            return FollowerList(e,e,model);
                           },
                         ),
                       );
@@ -258,7 +259,7 @@ class HomepageDrawer extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return FollowingList(email, email);
+                            return FollowingList(email,email,model);
                           },
                         ),
                       );

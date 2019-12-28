@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_with_firebase/Scoped/userModel.dart';
 import 'package:flutter_with_firebase/User/otherUserProfilePagePrivate.dart';
 import 'package:flutter_with_firebase/User/otheruserprofilepage.dart';
 
@@ -8,7 +9,7 @@ class FollowingList extends StatefulWidget {
   final FirestoreMain fire = new FirestoreMain();
   final String currentUserEmail;
   final String otherUserEmail;
-  FollowingList(this.currentUserEmail, this.otherUserEmail);
+  FollowingList(this.currentUserEmail, this.otherUserEmail, UserModel model);
   @override
   State<StatefulWidget> createState() {
     return FollowingListState();

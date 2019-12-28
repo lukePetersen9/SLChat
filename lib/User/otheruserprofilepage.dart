@@ -2,13 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_with_firebase/FollowingAndFollowerLists/followerList.dart';
+import 'package:flutter_with_firebase/Scoped/userModel.dart';
 import '../Firestore/firestoreMain.dart';
 import '../FollowingAndFollowerLists/followingList.dart';
 
 class OtherUserProfilePage extends StatefulWidget {
   final String otherUser;
   final String currentUser;
-  OtherUserProfilePage(this.currentUser, this.otherUser);
+  final UserModel model;
+  OtherUserProfilePage(this.currentUser, this.otherUser, this.model);
   @override
   State<StatefulWidget> createState() {
     return OtherUserProfilePageState();
@@ -110,7 +112,7 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
                           MaterialPageRoute(
                             builder: (context) {
                               return FollowerList(
-                                  widget.currentUser, widget.otherUser);
+                                  widget.currentUser, widget.otherUser, widget.model);
                             },
                           ),
                         );
@@ -147,7 +149,7 @@ class OtherUserProfilePageState extends State<OtherUserProfilePage> {
                           MaterialPageRoute(
                             builder: (context) {
                               return FollowingList(
-                                  widget.currentUser, widget.otherUser);
+                                  widget.currentUser, widget.otherUser,widget.model);
                             },
                           ),
                         );

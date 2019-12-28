@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
+import 'package:flutter_with_firebase/Scoped/userModel.dart';
 import 'package:flutter_with_firebase/User/profilepage.dart';
 
 class LeaveEditingProfilePageConfirmationDialog extends StatelessWidget {
   final String email;
-  LeaveEditingProfilePageConfirmationDialog(this.email);
+  final UserModel model;
+  LeaveEditingProfilePageConfirmationDialog(this.email, this.model);
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +59,7 @@ class LeaveEditingProfilePageConfirmationDialog extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  return ProfilePage(email);
+                  return ProfilePage(email, model);
                 },
               ),
             );
