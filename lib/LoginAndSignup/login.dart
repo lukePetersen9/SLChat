@@ -27,12 +27,22 @@ class LoginState extends State<Login> {
     super.initState();
     getUser().then((user) {
       if (user != null) {
-        //  print(user.email);
+        print('logging in');
+
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) {
-              return HomePage(user.email);
+              return ScopedModel<UserModel>(
+                model: new UserModel(user.email),
+                child: MaterialApp(
+                  title: 'Scoped Model MultiPage Demo',
+                  theme: ThemeData(
+                    primarySwatch: Colors.blue,
+                  ),
+                  home: HomePage(),
+                ),
+              );
             },
           ),
         );
@@ -228,7 +238,16 @@ class LoginState extends State<Login> {
           context,
           MaterialPageRoute(
             builder: (context) {
-              return HomePage(user.email);
+              return ScopedModel<UserModel>(
+                model: new UserModel(user.email),
+                child: MaterialApp(
+                  title: 'Scoped Model MultiPage Demo',
+                  theme: ThemeData(
+                    primarySwatch: Colors.blue,
+                  ),
+                  home: HomePage(),
+                ),
+              );
             },
           ),
         );

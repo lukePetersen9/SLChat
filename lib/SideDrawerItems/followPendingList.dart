@@ -9,7 +9,6 @@ class FollowPendingList extends StatefulWidget {
   final FirestoreMain fire = new FirestoreMain();
   final String currentUserEmail;
 
-
   FollowPendingList(this.currentUserEmail);
   @override
   State<StatefulWidget> createState() {
@@ -24,13 +23,14 @@ class FollowPendingListState extends State<FollowPendingList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          title: ScopedModelDescendant<UserModel>(builder:(context, child, model){ return Text('Pending Follows');})),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        title: Text('Pending Follows'),
+      ),
       body: displayFollowerSearch(searchText),
     );
   }
@@ -59,19 +59,17 @@ class FollowPendingListState extends State<FollowPendingList> {
             if (!snapshot.hasData) return Text('No data found!');
             List<dynamic> pending = snapshot.data.documents.first['pending'];
             List<Widget> searchResultTextBox = new List<Widget>();
-            if(pending == null)
-            {
+            if (pending == null) {
               return Text('No Pending Requests');
+            } else {
+              for (String email in pending) {
+                searchResultTextBox.add(
+                  profileSnippetInRequestList(email, widget.currentUserEmail,
+                      MediaQuery.of(context).size.width, 100),
+                );
+              }
             }
-            else{
-for (String email in pending) {
-              searchResultTextBox.add(
-                profileSnippetInRequestList(email, widget.currentUserEmail,
-                    MediaQuery.of(context).size.width, 100),
-              );
-            }
-            }
-            
+
             if (searchResultTextBox.length == 0) {
               searchResultTextBox.add(Text('You have no pending follows'));
             }

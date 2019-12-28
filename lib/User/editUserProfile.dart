@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
 import 'package:flutter_with_firebase/Scoped/userModel.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'profilepage.dart';
 import '../FollowingAndFollowerLists/followerList.dart';
 import '../FollowingAndFollowerLists/followingList.dart';
@@ -52,6 +53,11 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
+              ScopedModelDescendant<UserModel>(
+                builder: (context, child, model) {
+                  return Text(model.bio);
+                },
+              ),
               fire.profileImage(profilePicture, 30),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

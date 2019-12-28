@@ -13,6 +13,7 @@ import 'package:scoped_model/scoped_model.dart';
 import '../LoginAndSignup/login.dart';
 
 class HomepageDrawer extends StatelessWidget {
+  static final String route = 'HomePage-Drawer';
   final FirestoreMain fire = new FirestoreMain();
   final String email;
   HomepageDrawer(this.email);
@@ -35,11 +36,7 @@ class HomepageDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            title: ScopedModelDescendant<UserModel>(
-              builder: (context, child, model) {
-                return Text('Your Profile');
-              }
-            ),
+            title: Text('Your Profile'),
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return ProfilePage(email);
@@ -245,7 +242,7 @@ class HomepageDrawer extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return FollowerList(e,e);
+                            return FollowerList(e, e);
                           },
                         ),
                       );
@@ -258,7 +255,7 @@ class HomepageDrawer extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return FollowingList(email,email);
+                            return FollowingList(email, email);
                           },
                         ),
                       );

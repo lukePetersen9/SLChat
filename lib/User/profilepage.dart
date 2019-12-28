@@ -26,6 +26,7 @@ class ProfilePageState extends State<ProfilePage> {
       bio = '';
   bool isPrivate = false;
   int followerCount = 0, followingCount = 0;
+
   @override
   void initState() {
     super.initState();
@@ -44,7 +45,7 @@ class ProfilePageState extends State<ProfilePage> {
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  return HomePage(widget.email);
+                  return HomePage();
                 },
               ),
             );
