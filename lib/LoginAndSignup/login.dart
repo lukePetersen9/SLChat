@@ -36,6 +36,7 @@ class LoginState extends State<Login> {
               return ScopedModel<UserModel>(
                 model: new UserModel(user.email),
                 child: MaterialApp(
+                  debugShowCheckedModeBanner: false,
                   title: 'Scoped Model MultiPage Demo',
                   theme: ThemeData(
                     primarySwatch: Colors.blue,

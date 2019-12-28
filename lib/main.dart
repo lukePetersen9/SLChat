@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Scoped Model MultiPage Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,

@@ -125,11 +125,13 @@ class GeneralSearchPageState extends State<GeneralSearchPage> {
                 List<dynamic> followers =
                     snapshot.data.documents.first['followers'];
                 List<Widget> searchResultTextBox = new List<Widget>();
-                for (String email in followers) {
-                  searchResultTextBox.add(
-                    fire.profileSnippetInFollowSearch(email, model.email,
-                        MediaQuery.of(context).size.width, 100, s),
-                  );
+                if (followers != null) {
+                  for (String email in followers) {
+                    searchResultTextBox.add(
+                      fire.profileSnippetInFollowSearch(email, model.email,
+                          MediaQuery.of(context).size.width, 100, s),
+                    );
+                  }
                 }
                 return SingleChildScrollView(
                   child: Column(
@@ -147,7 +149,7 @@ class GeneralSearchPageState extends State<GeneralSearchPage> {
   }
 
   Widget displayFollowingSearch(String s) {
-    ScopedModelDescendant<UserModel>(
+    return ScopedModelDescendant<UserModel>(
       builder: (context, child, model) {
         return StreamBuilder<QuerySnapshot>(
           stream: Firestore.instance
@@ -173,11 +175,13 @@ class GeneralSearchPageState extends State<GeneralSearchPage> {
                 List<dynamic> followers =
                     snapshot.data.documents.first['following'];
                 List<Widget> searchResultTextBox = new List<Widget>();
-                for (String email in followers) {
-                  searchResultTextBox.add(
-                    fire.profileSnippetInFollowSearch(email, model.email,
-                        MediaQuery.of(context).size.width, 100, s),
-                  );
+                if (followers != null) {
+                  for (String email in followers) {
+                    searchResultTextBox.add(
+                      fire.profileSnippetInFollowSearch(email, model.email,
+                          MediaQuery.of(context).size.width, 100, s),
+                    );
+                  }
                 }
                 return SingleChildScrollView(
                   child: Column(
@@ -195,7 +199,7 @@ class GeneralSearchPageState extends State<GeneralSearchPage> {
   }
 
   Widget displayGeneralSearch(String s) {
-    ScopedModelDescendant<UserModel>(
+    return ScopedModelDescendant<UserModel>(
       builder: (context, child, model) {
         return StreamBuilder<QuerySnapshot>(
           stream: Firestore.instance.collection('users').snapshots(),
@@ -225,11 +229,15 @@ class GeneralSearchPageState extends State<GeneralSearchPage> {
                   }
                 }
                 List<Widget> searchResultTextBox = new List<Widget>();
-                for (String name in searchResults) {
-                  searchResultTextBox.add(
-                    fire.profileSnippetInGeneralSearch(name, model.email,
-                        MediaQuery.of(context).size.width, 100),
-                  );
+                if (searchResults == null) {
+                  return Text('No Users Found');
+                } else {
+                  for (String name in searchResults) {
+                    searchResultTextBox.add(
+                      fire.profileSnippetInGeneralSearch(name, model.email,
+                          MediaQuery.of(context).size.width, 100),
+                    );
+                  }
                 }
 
                 return SingleChildScrollView(

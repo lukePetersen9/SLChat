@@ -91,12 +91,8 @@ class HomePageState extends State<HomePage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return ScopedModelDescendant<UserModel>(
-          builder: (context, child, model) {
-            return StartANewConversationDialog(model.email);
+        return StartANewConversationDialog('s@s.net');
           },
         );
-      },
-    );
   }
 }
