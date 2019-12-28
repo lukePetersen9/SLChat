@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_with_firebase/Scoped/userModel.dart';
 import 'package:flutter_with_firebase/SideDrawerItems/followPendingList.dart';
 import 'package:flutter_with_firebase/SideDrawerItems/followRequestList.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
@@ -7,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_with_firebase/FollowingAndFollowerLists/followingList.dart';
 import 'package:flutter_with_firebase/FollowingAndFollowerLists/followerList.dart';
 import 'package:flutter_with_firebase/User/profilepage.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 import '../LoginAndSignup/login.dart';
 
@@ -33,7 +35,11 @@ class HomepageDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            title: Text('Your Profile'),
+            title: ScopedModelDescendant<UserModel>(
+              builder: (context, child, model) {
+                return Text('Your Profile');
+              }
+            ),
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return ProfilePage(email);

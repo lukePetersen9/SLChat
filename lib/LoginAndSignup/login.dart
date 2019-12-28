@@ -4,6 +4,8 @@ import 'package:flutter_with_firebase/LoginAndSignup/login.dart';
 import 'package:flutter_with_firebase/LoginAndSignup/signup.dart';
 import 'package:flutter_with_firebase/Homepage/homepage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_with_firebase/Scoped/userModel.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'dart:async';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:flutter_with_firebase/Animation/FadeAnimation.dart';
@@ -16,6 +18,7 @@ class Login extends StatefulWidget {
 
 class LoginState extends State<Login> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
   final databaseReference = Firestore.instance;
   String email = "";
   String pwd = "";

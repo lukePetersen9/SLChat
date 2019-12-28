@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'LoginAndSignup/login.dart';
+import 'Scoped/userModel.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
