@@ -44,7 +44,8 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
           onPressed: () {
-            _showDialog();
+           // _showDialog();
+           Navigator.of(context).pop();
           },
         ),
       ),
@@ -165,10 +166,11 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
   }
 
   void _showDialog() {
+    var model = ScopedModel.of<UserModel>(context);
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return LeaveEditingProfilePageConfirmationDialog(widget.email);
+        return LeaveEditingProfilePageConfirmationDialog(model.email);
       },
     );
   }
