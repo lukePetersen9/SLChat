@@ -35,14 +35,17 @@ class LoginState extends State<Login> {
             builder: (context) {
               return ScopedModel<UserModel>(
                 model: new UserModel(user.email),
-                child: MaterialApp(
-                  debugShowCheckedModeBanner: false,
-                  title: 'Scoped Model MultiPage Demo',
-                  theme: ThemeData(
-                    primarySwatch: Colors.blue,
-                  ),
-                  home: HomePage(),
-                ),
+                child: ScopedModelDescendant<UserModel>(
+                    builder: (context, child, model) {
+                  return MaterialApp(
+                    debugShowCheckedModeBanner: false,
+                    title: 'Scoped Model MultiPage Demo',
+                    theme: ThemeData(
+                      primarySwatch: Colors.blue,
+                    ),
+                    home: HomePage(),
+                  );
+                }),
               );
             },
           ),

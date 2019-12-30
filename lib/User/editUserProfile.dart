@@ -31,21 +31,16 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
   bool goodUsername = true;
 
   @override
-  void initState() {
-    super.initState();
-    getProfileInfo();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    getProfileInfo();
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Profile'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
           onPressed: () {
-           // _showDialog();
-           Navigator.of(context).pop();
+             //_showDialog();
+            Navigator.of(context).pop();
           },
         ),
       ),
@@ -54,11 +49,6 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              ScopedModelDescendant<UserModel>(
-                builder: (context, child, model) {
-                  return Text(model.bio);
-                },
-              ),
               fire.profileImage(profilePicture, 30),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,25 +166,19 @@ class EditUserProfilePageState extends State<EditUserProfilePage> {
   }
 
   void getProfileInfo() {
-    var userQuery = Firestore.instance
-        .collection('users')
-        .where('email', isEqualTo: widget.email)
-        .limit(1);
-    userQuery.getDocuments().then((data) {
-      if (this.mounted) {
-        setState(() {
-          first = new TextEditingController(
-              text: data.documents[0].data['firstName']);
+    var model = ScopedModel.of<UserModel>(context, rebuildOnChange: true);
+    setState(() {
+      first = new TextEditingController(
+              text: model.firstName);
           last = new TextEditingController(
-              text: data.documents[0].data['lastName']);
-          initialUsername = data.documents[0].data['username'];
+              text: model.lastName);
+          initialUsername = model.username;
           user = new TextEditingController(text: initialUsername);
-          profilePicture = data.documents[0].data['profile_image'];
-          isPrivate = data.documents[0].data['isPrivate'];
-          b = new TextEditingController(text: data.documents[0].data['bio']);
+          profilePicture = model.profileImage;
+          isPrivate = model.isPrivate;
+          b = new TextEditingController(text: model.bio);
           profileImageUrl = new TextEditingController(text: profilePicture);
-        });
-      }
     });
+    
   }
 }

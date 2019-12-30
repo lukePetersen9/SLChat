@@ -10,7 +10,9 @@ class LeaveEditingProfilePageConfirmationDialog extends StatelessWidget {
   LeaveEditingProfilePageConfirmationDialog(this.email);
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return ScopedModel<UserModel>(
+      model: new UserModel(email),
+      child: AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
@@ -54,10 +56,12 @@ class LeaveEditingProfilePageConfirmationDialog extends StatelessWidget {
               ),
             ),
             onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder:(context) => ProfilePage(email)));
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => ProfilePage(email)));
             },
           ),
         ],
-      );
+      ),
+    );
   }
 }
