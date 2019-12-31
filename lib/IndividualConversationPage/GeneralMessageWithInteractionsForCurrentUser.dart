@@ -8,6 +8,7 @@ class GeneralMessageWithInteractionsForCurrentUser extends StatefulWidget {
   final String text;
   final String time;
   final String email;
+  final String messID;
   final bool isLast;
   final String readDelivered;
   final List<dynamic> interactions;
@@ -16,6 +17,7 @@ class GeneralMessageWithInteractionsForCurrentUser extends StatefulWidget {
   GeneralMessageWithInteractionsForCurrentUser(
     this.text,
     this.time,
+    this.messID,
     this.interactions,
     this.email,
     this.isLast,
@@ -63,7 +65,7 @@ class _GeneralMessageWithInteractionsForCurrentUserState
           padding: EdgeInsets.all(0),
           onPressed: () {
             fire.addInteraction(
-                'favorite', widget.email, widget.docID, widget.time);
+                'favorite', widget.email, 'widget.data.reference.path');
           },
           icon: Icon(
             Icons.favorite,
@@ -74,7 +76,7 @@ class _GeneralMessageWithInteractionsForCurrentUserState
           padding: EdgeInsets.all(0),
           onPressed: () {
             fire.addInteraction(
-                'like', widget.email, widget.docID, widget.time);
+                'like', widget.email, 'widget.data.reference.path');
           },
           icon: Icon(
             Icons.thumb_up,
@@ -85,7 +87,7 @@ class _GeneralMessageWithInteractionsForCurrentUserState
           padding: EdgeInsets.all(0),
           onPressed: () {
             fire.addInteraction(
-                'dislike', widget.email, widget.docID, widget.time);
+                'dislike', widget.email, 'widget.data.reference.path');
           },
           icon: Icon(
             Icons.thumb_down,
@@ -95,7 +97,7 @@ class _GeneralMessageWithInteractionsForCurrentUserState
         IconButton(
           padding: EdgeInsets.all(0),
           onPressed: () {
-            showDeleteDialog();
+            //showDeleteDialog();
           },
           icon: Icon(
             Icons.delete,
@@ -123,7 +125,7 @@ class _GeneralMessageWithInteractionsForCurrentUserState
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return DeleteDialog(widget.email, widget.docID, widget.time);
+        return DeleteDialog(widget.email, widget.email);
       },
     );
   }
@@ -186,7 +188,7 @@ class _GeneralMessageWithInteractionsForCurrentUserState
                   fontSize: 22, fontFamily: 'Garamond', color: textColor),
             ),
           ),
-          fire.getUserProfileImage(widget.email,15),
+          fire.getUserProfileImage(widget.email, 15),
         ],
       ),
     );
@@ -237,7 +239,7 @@ class _GeneralMessageWithInteractionsForCurrentUserState
                       fontSize: 22, fontFamily: 'Garamond', color: textColor),
                 ),
               ),
-              fire.getUserProfileImage(widget.email,15),
+              fire.getUserProfileImage(widget.email, 15),
             ],
           ),
           Padding(
@@ -334,7 +336,7 @@ class _GeneralMessageWithInteractionsForCurrentUserState
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  child: fire.getUserProfileImage(widget.email,15),
+                  child: fire.getUserProfileImage(widget.email, 15),
                 ),
               ),
               Align(

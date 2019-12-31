@@ -20,7 +20,6 @@ class ProfilePage extends StatefulWidget {
 class ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
-  
       var model = ScopedModel.of<UserModel>(context, rebuildOnChange: true);
       return Scaffold(
         appBar: AppBar(

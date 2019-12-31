@@ -105,16 +105,18 @@ class FirestoreMain {
     );
   }
 
-  void addInteraction(
-      String type, String email, String docID, String time) async {
-    await Firestore.instance
-        .collection("conversations")
-        .document(docID)
-        .collection('messages')
-        .document(time)
-        .updateData(
+  Future<void> addInteraction(String type, String email, String path) async {
+    await Firestore.instance.document(path).updateData(
       {
         'interactions': FieldValue.arrayUnion([email + '@' + type])
+      },
+    );
+  }
+
+  Future<void> removeInteraction(String type, String email, String path) async {
+    await Firestore.instance.document(path).updateData(
+      {
+        'interactions': FieldValue.arrayRemove([email + '@' + type])
       },
     );
   }
@@ -350,6 +352,7 @@ class FirestoreMain {
   }
 
   Widget getUserProfileImage(String email, double rad) {
+    return profileImage(defaultProfileImage, rad);
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance.collection('users').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {

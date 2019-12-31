@@ -7,6 +7,7 @@ import 'package:flutter_with_firebase/AlertDialogs/deleteDialogConfirmation.dart
 class GeneralMessageWithInteractionsForOtherUser extends StatefulWidget {
   final String text;
   final String email;
+  final String messID;
   final String loggedInUser;
   final String time;
   final List<dynamic> interactions;
@@ -15,6 +16,7 @@ class GeneralMessageWithInteractionsForOtherUser extends StatefulWidget {
   GeneralMessageWithInteractionsForOtherUser(
     this.text,
     this.email,
+    this.messID,
     this.loggedInUser,
     this.time,
     this.interactions,
@@ -50,43 +52,43 @@ class _GeneralMessageWithInteractionsForOtherUserState
           padding: EdgeInsets.all(0),
           onPressed: () {
             fire.addInteraction(
-                'favorite', widget.loggedInUser, widget.docID, widget.time);
+                'favorite', widget.email, 'widget.data.reference.path');
           },
           icon: Icon(
             Icons.favorite,
-            color: Colors.black38,
+            color: Color.fromRGBO(43, 158, 179, .6),
           ),
         ),
         IconButton(
           padding: EdgeInsets.all(0),
           onPressed: () {
             fire.addInteraction(
-                'like', widget.loggedInUser, widget.docID, widget.time);
+                'like', widget.email, 'widget.data.reference.path');
           },
           icon: Icon(
             Icons.thumb_up,
-            color: Colors.black38,
+            color: Color.fromRGBO(43, 158, 179, .6),
           ),
         ),
         IconButton(
           padding: EdgeInsets.all(0),
           onPressed: () {
             fire.addInteraction(
-                'dislike', widget.loggedInUser, widget.docID, widget.time);
+                'dislike', widget.email, 'widget.data.reference.path');
           },
           icon: Icon(
             Icons.thumb_down,
-            color: Colors.black38,
+            color: Color.fromRGBO(43, 158, 179, .6),
           ),
         ),
         IconButton(
           padding: EdgeInsets.all(0),
           onPressed: () {
-            showDeleteDialog();
+            //showDeleteDialog();
           },
           icon: Icon(
             Icons.delete,
-            color: Colors.black38,
+            color: Color.fromRGBO(43, 158, 179, .6),
           ),
         ),
       ],
@@ -109,7 +111,7 @@ class _GeneralMessageWithInteractionsForOtherUserState
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return DeleteDialog(widget.loggedInUser, widget.docID, widget.time);
+        return DeleteDialog(widget.loggedInUser, widget.time);
       },
     );
   }

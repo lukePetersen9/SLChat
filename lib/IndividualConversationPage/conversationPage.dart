@@ -2,6 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_with_firebase/HelperClass/dateTimeFormat.dart';
+import 'package:flutter_with_firebase/IndividualConversationPage/textMessage.dart';
+import '../Scoped/userModel.dart';
+import '../Scoped/userModel.dart';
+import '../Scoped/userModel.dart';
 import 'GeneralMessageWithInteractionsForCurrentUser.dart';
 import 'GeneralMessageWithInteractionsForOtherUser.dart';
 import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
@@ -25,15 +29,24 @@ class ConversationPageState extends State<ConversationPage> {
   DateTimeFormat dateTimeFormat = new DateTimeFormat();
   FirestoreMain fire = new FirestoreMain();
   bool showTime = false, interactWithMessage = false;
+  Map<dynamic, UserModel> userMap = new Map<dynamic, UserModel>();
 
   @override
   void initState() {
+    
+    for (String e in widget.members) {
+      UserModel.simple().getSimpleUserModel(e).then(
+        (data) {
+          userMap[e] = data;
+        },
+      );
+    }
+    UserModel.simple().getSimpleUserModel(widget.currentUserEmail).then(
+      (data) {
+        userMap[widget.currentUserEmail] = data;
+      },
+    );
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override
@@ -59,12 +72,12 @@ class ConversationPageState extends State<ConversationPage> {
               padding: EdgeInsets.only(left: 10),
               child: Row(
                 children: <Widget>[
-                  fire.displayProfileImages(widget.members),
+                  // fire.displayProfileImages(widget.members),
                   SizedBox(
                     width: 7,
                   ),
-                  fire.getUsersInGroup(widget.currentUserEmail, widget.members,
-                      TextStyle(color: Colors.grey[850]))
+                  //  fire.getUsersInGroup(widget.currentUserEmail, widget.members,
+                  //      TextStyle(color: Colors.grey[850]))
                 ],
               ),
             ),
@@ -131,11 +144,6 @@ class ConversationPageState extends State<ConversationPage> {
                           if (msgController.text != null &&
                               msgController.text != "") {
                             addToMessages(msgController.text);
-                            setState(() {
-                              scrollController.jumpTo(
-                                  scrollController.position.maxScrollExtent);
-                              msgController.clear();
-                            });
                           }
                         },
                       ),
@@ -156,47 +164,34 @@ class ConversationPageState extends State<ConversationPage> {
           .collection('conversations')
           .document(docID)
           .collection('messages')
+          .orderBy('sentAt', descending: true)
+          .limit(35)
           .snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) {
-          return new Text('${snapshot.error}');
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(
+            child: ListView(
+              children: <Widget>[
+                Text('Send a message!'),
+              ],
+            ),
+          );
         }
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-          case ConnectionState.waiting:
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          case ConnectionState.active:
-          case ConnectionState.done:
-            if (snapshot.hasError)
-              return Center(child: Text('Error: ${snapshot.error}'));
-            if (!snapshot.hasData) return Text('No data found!');
-            List<Widget> messages = new List<Widget>();
-            bool foundLast = false;
-            for (int i = snapshot.data.documents.length - 1; i > -1; i--) {
-              bool delete = snapshot.data.documents[i].data['interactions']
-                  .contains(widget.currentUserEmail + '@delete');
-              Widget singleMessage = getTextMessage(
-                  snapshot.data.documents[i], !foundLast && !delete);
-              if (!foundLast) {
-                foundLast = !foundLast && !delete;
-              }
-              if (!delete) {
-                messages.add(singleMessage);
-              }
-            }
-            messages = messages.reversed.toList();
-            return SingleChildScrollView(
-              controller: scrollController,
-              reverse: true,
-              child: Column(
-                children: messages,
-              ),
-            );
-          default:
-            return Text('error');
-        }
+        return ListView.builder(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          controller: scrollController,
+          reverse: true,
+          itemBuilder: (context, index) {
+            return TextMessage(
+                widget.currentUserEmail,
+                snapshot.data.documents[index],
+                widget.docID,
+                snapshot.data.documents[index].documentID,
+                userMap);
+          },
+          itemCount: snapshot.data.documents.length,
+          scrollDirection: Axis.vertical,
+        );
       },
     );
   }
@@ -248,6 +243,7 @@ class ConversationPageState extends State<ConversationPage> {
     if (d.data['sentBy'] == widget.currentUserEmail) {
       return GeneralMessageWithInteractionsForCurrentUser(
           d.data['content'],
+          d.data['sentAt'],
           d.documentID,
           d.data['interactions'],
           widget.currentUserEmail,
@@ -258,8 +254,9 @@ class ConversationPageState extends State<ConversationPage> {
       return GeneralMessageWithInteractionsForOtherUser(
           d.data['content'],
           d.data['sentBy'],
-          widget.currentUserEmail,
           d.documentID,
+          widget.currentUserEmail,
+          d.data['sentAt'],
           d.data['interactions'],
           widget.docID);
     }
@@ -267,21 +264,27 @@ class ConversationPageState extends State<ConversationPage> {
 
   void addToMessages(String value) async {
     var now = new DateTime.now();
+    msgController.clear();
     try {
       databaseReference
           .collection("conversations")
           .document(widget.docID)
           .collection('messages')
-          .document(now.toString())
+          .document()
           .setData(
         {
+          'sentAt': now.toString(),
           'content': value,
           'sentBy': widget.currentUserEmail,
           'readBy': [widget.currentUserEmail],
-          'interactions': ['init'],
+          'interactions': [],
         },
       );
-    } catch (e) {}
+      scrollController.animateTo(0.0,
+          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+    } catch (e) {
+      print(e);
+    }
     try {
       databaseReference
           .collection("conversations")

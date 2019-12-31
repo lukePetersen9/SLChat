@@ -4,10 +4,9 @@ import 'package:flutter_with_firebase/Firestore/firestoreMain.dart';
 
 class DeleteDialog extends StatefulWidget {
   final String userEmail;
-  final String docID;
-  final String time;
+  final String path;
 
-  DeleteDialog(this.userEmail, this.docID, this.time);
+  DeleteDialog(this.userEmail, this.path);
   @override
   State<StatefulWidget> createState() {
     return DeleteDialogState();
@@ -64,8 +63,7 @@ class DeleteDialogState extends State<DeleteDialog> {
             ),
           ),
           onPressed: () {
-            fire.addInteraction(
-                'delete', widget.userEmail, widget.docID, widget.time);
+            fire.addInteraction('delete', widget.userEmail, widget.path);
             Navigator.of(context).pop();
           },
         ),
