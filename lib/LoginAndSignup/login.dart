@@ -72,156 +72,163 @@ class LoginState extends State<Login> {
       dismissOtherOnShow: true,
       movingOnWindowChange: true,
       toastPositions: StyledToastPosition.top,
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              FadeAnimation(
-                1,
-                Container(
-                  height: 250,
-                  decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius:
-                          BorderRadius.only(bottomLeft: Radius.circular(60)),
-                      image: DecorationImage(
-                        image: AssetImage('images/low-poly-elephant.png'),
-                        fit: BoxFit.cover,
-                      )),
+      child: WillPopScope(
+              child: Scaffold(
+          body: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                FadeAnimation(
+                  1,
+                  Container(
+                    height: 250,
+                    decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius:
+                            BorderRadius.only(bottomLeft: Radius.circular(60)),
+                        image: DecorationImage(
+                          image: AssetImage('images/low-poly-elephant.png'),
+                          fit: BoxFit.cover,
+                        )),
+                  ),
                 ),
-              ),
-              SizedBox(height: 20),
-              FadeAnimation(
-                  1.5,
-                  Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            height: 300,
-                            padding: EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(30),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color.fromRGBO(148, 104, 244, .3),
-                                    blurRadius: 5,
-                                    offset: Offset(0, 5),
-                                  )
-                                ]),
-                            child: Flex(
-                              direction: Axis.vertical,
-                              children: <Widget>[
-                                Expanded(
-                                  child: Container(
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(),
-                                    child: Text(
-                                      'Welcome!',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        fontSize: 45,
+                SizedBox(height: 20),
+                FadeAnimation(
+                    1.5,
+                    Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Column(
+                          children: <Widget>[
+                            Container(
+                              height: 300,
+                              padding: EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(30),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color.fromRGBO(148, 104, 244, .3),
+                                      blurRadius: 5,
+                                      offset: Offset(0, 5),
+                                    )
+                                  ]),
+                              child: Flex(
+                                direction: Axis.vertical,
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Container(
+                                      padding: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(),
+                                      child: Text(
+                                        'Welcome!',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 45,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            bottom: BorderSide(
-                                                color: Colors.grey[200]))),
-                                    child: TextField(
-                                      decoration: InputDecoration.collapsed(
-                                          border: InputBorder.none,
-                                          hintText: 'Email',
-                                          hintStyle:
-                                              TextStyle(color: Colors.grey)),
-                                      onChanged: (text) {
-                                        email = text;
-                                      },
+                                  Expanded(
+                                    child: Container(
+                                      padding: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                          border: Border(
+                                              bottom: BorderSide(
+                                                  color: Colors.grey[200]))),
+                                      child: TextField(
+                                        decoration: InputDecoration.collapsed(
+                                            border: InputBorder.none,
+                                            hintText: 'Email',
+                                            hintStyle:
+                                                TextStyle(color: Colors.grey)),
+                                        onChanged: (text) {
+                                          email = text;
+                                        },
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    height: 50,
-                                    padding: EdgeInsets.all(10),
-                                    child: TextField(
-                                      decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          hintText: 'Password',
-                                          hintStyle:
-                                              TextStyle(color: Colors.grey)),
-                                      onChanged: (text) {
-                                        pwd = text;
-                                      },
-                                      obscureText: true,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 25),
-                          FadeAnimation(
-                              2.0,
-                              Container(
-                                child: Align(
-                                  alignment: Alignment.center,
-                                  child: RaisedButton(
-                                    color: Color.fromRGBO(148, 104, 244, 1),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
+                                  Expanded(
                                     child: Container(
                                       height: 50,
-                                      child: Align(
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            'Login',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 25,
-                                            ),
-                                          )),
+                                      padding: EdgeInsets.all(10),
+                                      child: TextField(
+                                        decoration: InputDecoration(
+                                            border: InputBorder.none,
+                                            hintText: 'Password',
+                                            hintStyle:
+                                                TextStyle(color: Colors.grey)),
+                                        onChanged: (text) {
+                                          pwd = text;
+                                        },
+                                        obscureText: true,
+                                      ),
                                     ),
-                                    onPressed: () {
-                                      signIn(context, email, pwd);
-                                    },
                                   ),
-                                ),
-                              )),
-                          SizedBox(height: 5),
-                          FadeAnimation(
-                              2.5,
-                              Container(
-                                  child: FlatButton(
-                                child: Text(
-                                  'Create a new Account',
-                                  style: TextStyle(
-                                    fontSize: 12,
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 25),
+                            FadeAnimation(
+                                2.0,
+                                Container(
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: RaisedButton(
+                                      color: Color.fromRGBO(148, 104, 244, 1),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      child: Container(
+                                        height: 50,
+                                        child: Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              'Login',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 25,
+                                              ),
+                                            )),
+                                      ),
+                                      onPressed: () {
+                                        signIn(context, email, pwd);
+                                      },
+                                    ),
                                   ),
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) {
-                                      return Signup();
-                                    }),
-                                  );
-                                },
-                              ))),
-                        ],
-                      )))
-            ],
+                                )),
+                            SizedBox(height: 5),
+                            FadeAnimation(
+                                2.5,
+                                Container(
+                                    child: FlatButton(
+                                  child: Text(
+                                    'Create a new Account',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) {
+                                        return Signup();
+                                      }),
+                                    );
+                                  },
+                                ))),
+                          ],
+                        )))
+              ],
+            ),
+            scrollDirection: Axis.vertical,
           ),
-          scrollDirection: Axis.vertical,
         ),
+        onWillPop: preventBackPress,
       ),
     );
+  }
+
+  Future<bool> preventBackPress(){
+    return Future.value(false);
   }
 
   Future<void> signIn(

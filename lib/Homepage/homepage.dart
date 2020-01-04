@@ -28,63 +28,70 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: ScopedModelDescendant<UserModel>(
-        builder: (context, child, model) {
-          return HomepageDrawer(model.email);
-        },
-      ),
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        leading: GestureDetector(
-          onTap: () => _scaffoldKey.currentState.openDrawer(),
-          child: Container(
-            width: 40,
-            child: ScopedModelDescendant<UserModel>(
-                builder: (context, child, model) {
-              return g.profileImage(model.profileImage, 25);
-            }),
-          ),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.grey[300],
-        title: Text('Your Conversations',
-            style: TextStyle(color: Colors.grey[850])),
-        actions: <Widget>[
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return GeneralSearchPage();
-                  },
-                ),
-              );
-            },
-            icon: Icon(
-              Icons.search,
-              color: Color.fromRGBO(43, 158, 179, 1),
-            ),
-          )
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Color.fromRGBO(43, 158, 179, 1),
-        child: Icon(Icons.chat),
-        onPressed: () {
-          _showDialog();
-        },
-      ),
-      body: SingleChildScrollView(
-        child: ScopedModelDescendant<UserModel>(
+    return WillPopScope(
+          child: Scaffold(
+        key: _scaffoldKey,
+        drawer: ScopedModelDescendant<UserModel>(
           builder: (context, child, model) {
-            return g.showConversations(model.email);
+            return HomepageDrawer(model.email);
           },
         ),
+        backgroundColor: Colors.grey[100],
+        appBar: AppBar(
+          leading: GestureDetector(
+            onTap: () => _scaffoldKey.currentState.openDrawer(),
+            child: Container(
+              width: 40,
+              child: ScopedModelDescendant<UserModel>(
+                  builder: (context, child, model) {
+                return g.profileImage(model.profileImage, 25);
+              }),
+            ),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.grey[300],
+          title: Text('Your Conversations',
+              style: TextStyle(color: Colors.grey[850])),
+          actions: <Widget>[
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return GeneralSearchPage();
+                    },
+                  ),
+                );
+              },
+              icon: Icon(
+                Icons.search,
+                color: Color.fromRGBO(43, 158, 179, 1),
+              ),
+            )
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Color.fromRGBO(43, 158, 179, 1),
+          child: Icon(Icons.chat),
+          onPressed: () {
+            _showDialog();
+          },
+        ),
+        body: SingleChildScrollView(
+          child: ScopedModelDescendant<UserModel>(
+            builder: (context, child, model) {
+              return g.showConversations(model.email);
+            },
+          ),
+        ),
       ),
+      onWillPop: preventBackpress
     );
+  }
+
+  Future<bool> preventBackpress(){
+    return Future.value(false);
   }
 
   void _showDialog() {
