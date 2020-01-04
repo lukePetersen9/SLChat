@@ -384,7 +384,7 @@ class FirestoreMain {
   }
 
   Widget getUserProfileImage(String email, double rad) {
-    return profileImage(defaultProfileImage, rad);
+    //return profileImage(defaultProfileImage, rad);
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance.collection('users').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
