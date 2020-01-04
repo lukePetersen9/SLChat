@@ -30,23 +30,39 @@ class ConversationPageState extends State<ConversationPage> {
   FirestoreMain fire = new FirestoreMain();
   bool showTime = false, interactWithMessage = false;
   Map<dynamic, UserModel> userMap = new Map<dynamic, UserModel>();
+  int numMessages;
 
   @override
   void initState() {
-    
+    scrollController.addListener(_scrollListener);
+    numMessages = 30;
     for (String e in widget.members) {
+      userMap[e] = UserModel.simple();
       UserModel.simple().getSimpleUserModel(e).then(
         (data) {
           userMap[e] = data;
+          setState(() {});
         },
       );
     }
+    userMap[widget.currentUserEmail] = UserModel.simple();
     UserModel.simple().getSimpleUserModel(widget.currentUserEmail).then(
       (data) {
         userMap[widget.currentUserEmail] = data;
+        setState(() {});
       },
     );
+
     super.initState();
+  }
+
+  _scrollListener() {
+    if (scrollController.offset >= scrollController.position.maxScrollExtent &&
+        !scrollController.position.outOfRange) {
+      setState(() {
+        numMessages += 30;
+      });
+    }
   }
 
   @override
@@ -68,93 +84,144 @@ class ConversationPageState extends State<ConversationPage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Container(
-              padding: EdgeInsets.only(left: 10),
-              child: Row(
-                children: <Widget>[
-                  // fire.displayProfileImages(widget.members),
-                  SizedBox(
-                    width: 7,
-                  ),
-                  //  fire.getUsersInGroup(widget.currentUserEmail, widget.members,
-                  //      TextStyle(color: Colors.grey[850]))
-                ],
+            displayProfileImages(),
+            Text(
+              namesInGroup(),
+              style: TextStyle(
+                fontSize: 20,
+                fontFamily: 'Garamond',
+                color: Colors.grey[800],
               ),
             ),
           ],
         ),
       ),
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: Flex(
-          direction: Axis.vertical,
-          children: <Widget>[
-            Expanded(
-              flex: MediaQuery.of(context).viewInsets.bottom == 0 ? 8 : 5,
-              child: displayMessages(widget.docID),
-            ),
-            Expanded(
-              child: Flex(
-                direction: Axis.horizontal,
-                children: <Widget>[
-                  Expanded(
-                    flex: 5,
-                    child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 3, horizontal: 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(25),
-                          border: Border.all(
-                              color: Color.fromRGBO(43, 158, 179, 1)),
-                        ),
-                        child: TextField(
-                          cursorColor: Color.fromRGBO(43, 158, 179, 1),
-                          style: TextStyle(
-                              fontSize: 22,
-                              fontFamily: 'Garamond',
-                              color: Colors.grey[850]),
-                          controller: msgController,
-                          maxLines: null,
-                          keyboardType: TextInputType.multiline,
-                          decoration: InputDecoration.collapsed(
-                            hintStyle: TextStyle(
-                                fontSize: 15,
-                                fontFamily: 'Garamond',
-                                color: Colors.grey[400]),
-                            hintText: 'your message...',
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
+      body: Flex(
+        direction: Axis.vertical,
+        children: <Widget>[
+          Expanded(
+            flex: MediaQuery.of(context).viewInsets.bottom == 0 ? 8 : 5,
+            child: displayMessages(widget.docID),
+          ),
+          Expanded(
+            child: Flex(
+              direction: Axis.horizontal,
+              children: <Widget>[
+                Expanded(
+                  flex: 5,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                     child: Container(
-                      alignment: Alignment.center,
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.send,
-                          color: Color.fromRGBO(43, 158, 179, 1),
-                          size: 35,
+                      padding:
+                          EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        border:
+                            Border.all(color: Color.fromRGBO(43, 158, 179, 1)),
+                      ),
+                      child: TextField(
+                        cursorColor: Color.fromRGBO(43, 158, 179, 1),
+                        style: TextStyle(
+                            fontSize: 22,
+                            fontFamily: 'Garamond',
+                            color: Colors.grey[850]),
+                        controller: msgController,
+                        maxLines: null,
+                        keyboardType: TextInputType.multiline,
+                        decoration: InputDecoration.collapsed(
+                          hintStyle: TextStyle(
+                              fontSize: 15,
+                              fontFamily: 'Garamond',
+                              color: Colors.grey[400]),
+                          hintText: 'your message...',
                         ),
-                        onPressed: () {
-                          if (msgController.text != null &&
-                              msgController.text != "") {
-                            addToMessages(msgController.text);
-                          }
-                        },
                       ),
                     ),
-                  )
-                ],
-              ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.send,
+                        color: Color.fromRGBO(43, 158, 179, 1),
+                        size: 35,
+                      ),
+                      onPressed: () {
+                        if (msgController.text != null &&
+                            msgController.text != "") {
+                          addToMessages(msgController.text);
+                        }
+                      },
+                    ),
+                  ),
+                )
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+  }
+
+  String namesInGroup() {
+    List<String> names = new List<String>();
+    for (String e in widget.members) {
+      names.add(
+        userMap[e].firstName +
+            ' ' +
+            (userMap[e].lastName.isNotEmpty
+                ? userMap[e].lastName.toString().substring(0, 1) + '.'
+                : ''),
+      );
+    }
+    String formattedNames = "";
+    for (int i = 0; i < names.length - 2; i++) {
+      formattedNames += names[i] + ', ';
+    }
+    if (names.length > 2) {
+      formattedNames +=
+          names[names.length - 2] + ' & ' + names[names.length - 1];
+    } else if (names.length == 2) {
+      formattedNames += names[0] + ' & ' + names[1];
+    } else {
+      formattedNames = names[0];
+    }
+    if (formattedNames.length > 30) {
+      formattedNames = formattedNames.substring(0, 27) + '...';
+    }
+    return formattedNames;
+  }
+
+  Widget displayProfileImages() {
+    List<Widget> images = new List<Widget>();
+    images.add(
+      Container(
+        width: 1,
+        height: 1,
+      ),
+    );
+    for (int i = 0;
+        i < (widget.members.length > 4 ? 5 : widget.members.length);
+        i++) {
+      UserModel user = userMap[widget.members.elementAt(i)];
+      images.add(
+        Positioned(
+          left: i * 25.0,
+          child: CircleAvatar(
+            radius: 25,
+            backgroundImage: NetworkImage(user.profileImage),
+          ),
+        ),
+      );
+    }
+    return Container(
+      width: 25.0 * images.length + 5,
+      child: Stack(
+          overflow: Overflow.visible,
+          alignment: Alignment.centerLeft,
+          children: images),
     );
   }
 
@@ -165,7 +232,7 @@ class ConversationPageState extends State<ConversationPage> {
           .document(docID)
           .collection('messages')
           .orderBy('sentAt', descending: true)
-          .limit(35)
+          .limit(numMessages)
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
@@ -177,11 +244,50 @@ class ConversationPageState extends State<ConversationPage> {
             ),
           );
         }
+        print(snapshot.data.documents.length);
         return ListView.builder(
           padding: EdgeInsets.symmetric(horizontal: 10),
           controller: scrollController,
           reverse: true,
           itemBuilder: (context, index) {
+            if (snapshot.data.documents[index]['sentBy'] !=
+                widget.currentUserEmail) {
+              bool alreadyRead = false;
+              for (String s in snapshot.data.documents[index]['readBy']) {
+                if (s.contains(widget.currentUserEmail)) {
+                  alreadyRead = true;
+                }
+              }
+              if (!alreadyRead) {
+                try {
+                  Firestore.instance
+                      .document(snapshot.data.documents[index].reference.path)
+                      .updateData(
+                    {
+                      'readBy': FieldValue.arrayUnion(
+                        [
+                          widget.currentUserEmail +
+                              '@' +
+                              DateTime.now().toString()
+                        ],
+                      ),
+                    },
+                  );
+                } catch (e) {}
+                try {
+                  Firestore.instance
+                      .collection("conversations")
+                      .document(widget.docID)
+                      .updateData(
+                    {
+                      'readBy': FieldValue.arrayUnion(
+                        [widget.currentUserEmail],
+                      ),
+                    },
+                  );
+                } catch (e) {}
+              }
+            }
             return TextMessage(
                 widget.currentUserEmail,
                 snapshot.data.documents[index],
@@ -194,72 +300,6 @@ class ConversationPageState extends State<ConversationPage> {
         );
       },
     );
-  }
-
-  Widget getTextMessage(DocumentSnapshot d, bool isLast) {
-    List<dynamic> readList = d.data['readBy'];
-    bool alreadyRead = false;
-    for (String s in readList) {
-      if (s.contains(widget.currentUserEmail)) {
-        alreadyRead = true;
-      }
-    }
-    if (!alreadyRead) {
-      try {
-        Firestore.instance
-            .collection("conversations")
-            .document(widget.docID)
-            .collection('messages')
-            .document(d.documentID)
-            .updateData(
-          {
-            'readBy': FieldValue.arrayUnion(
-              [widget.currentUserEmail + '@' + DateTime.now().toString()],
-            ),
-          },
-        );
-      } catch (e) {}
-      try {
-        Firestore.instance
-            .collection("conversations")
-            .document(widget.docID)
-            .updateData(
-          {
-            'readBy': FieldValue.arrayUnion(
-              [widget.currentUserEmail],
-            ),
-          },
-        );
-      } catch (e) {}
-    }
-    String readDelivered = readList.length > 1
-        ? 'read ' +
-            dateTimeFormat.getDisplayDateText(
-                DateTime.parse(readList[1]
-                    .toString()
-                    .substring(readList[1].toString().lastIndexOf('@') + 1)),
-                DateTime.now())
-        : 'delivered';
-    if (d.data['sentBy'] == widget.currentUserEmail) {
-      return GeneralMessageWithInteractionsForCurrentUser(
-          d.data['content'],
-          d.data['sentAt'],
-          d.documentID,
-          d.data['interactions'],
-          widget.currentUserEmail,
-          isLast,
-          readDelivered,
-          widget.docID);
-    } else {
-      return GeneralMessageWithInteractionsForOtherUser(
-          d.data['content'],
-          d.data['sentBy'],
-          d.documentID,
-          widget.currentUserEmail,
-          d.data['sentAt'],
-          d.data['interactions'],
-          widget.docID);
-    }
   }
 
   void addToMessages(String value) async {

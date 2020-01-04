@@ -10,12 +10,12 @@ import 'deleteDialogConfirmation.dart';
 
 class MessageDetailsDialog extends StatefulWidget {
   final DocumentSnapshot messageData;
-  final UserModel currentUserModel;
+  final String currentUserEmail;
   final Map<dynamic, UserModel> userMap;
 
   MessageDetailsDialog(
+    this.currentUserEmail,
     this.messageData,
-    this.currentUserModel,
     this.userMap,
   );
   @override
@@ -61,13 +61,13 @@ class MessageDetailsDialogState extends State<MessageDetailsDialog>
       begin: Color.fromRGBO(43, 158, 179, .6),
       end: Colors.orange[200],
     ).animate(dislikeController);
-    if (interactions.contains(widget.currentUserModel.email + '@favorite')) {
+    if (interactions.contains(widget.currentUserEmail + '@favorite')) {
       favoriteController.forward();
     }
-    if (interactions.contains(widget.currentUserModel.email + '@like')) {
+    if (interactions.contains(widget.currentUserEmail + '@like')) {
       likeController.forward();
     }
-    if (interactions.contains(widget.currentUserModel.email + '@dislike')) {
+    if (interactions.contains(widget.currentUserEmail + '@dislike')) {
       dislikeController.forward();
     }
     s = Firestore.instance
@@ -75,8 +75,6 @@ class MessageDetailsDialogState extends State<MessageDetailsDialog>
         .snapshots()
         .listen(
       (data) {
-        print(
-            this.mounted.toString() + ' for ' + widget.messageData['content']);
         if (this.mounted) {
           setState(
             () {
@@ -207,9 +205,9 @@ class MessageDetailsDialogState extends State<MessageDetailsDialog>
                   ],
                 ),
                 widget.userMap[widget.messageData['sentBy']].followers
-                        .contains(widget.currentUserModel.email)
+                        .contains(widget.currentUserEmail)
                     ? widget.userMap[widget.messageData['sentBy']].following
-                            .contains(widget.currentUserModel.email)
+                            .contains(widget.currentUserEmail)
                         ? Text(
                             'follows you',
                             style: TextStyle(
@@ -219,7 +217,7 @@ class MessageDetailsDialogState extends State<MessageDetailsDialog>
                             ),
                           )
                         : Container()
-                    : widget.currentUserModel.email ==
+                    : widget.currentUserEmail ==
                             widget.userMap[widget.messageData['sentBy']].email
                         ? Container()
                         : GestureDetector(
@@ -263,47 +261,75 @@ class MessageDetailsDialogState extends State<MessageDetailsDialog>
           Container(
             constraints: BoxConstraints(minHeight: 100, maxHeight: 200),
             width: MediaQuery.of(context).size.width * .8,
-            height: 150,
+            height: MediaQuery.of(context).size.height * .15,
             child: GridView.builder(
-              itemCount: interactions.length,
-              gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount:
-                      interactions.length > 2 ? 4 : interactions.length + 1),
-              itemBuilder: (BuildContext context, int index) => Stack(
-                children: <Widget>[
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: Icon(
-                      interactions[index].toString().substring(
-                                  interactions[index]
-                                          .toString()
-                                          .lastIndexOf('@') +
-                                      1) ==
-                              'favorite'
-                          ? Icons.favorite
-                          : interactions[index].toString().substring(
-                                      interactions[index]
-                                              .toString()
-                                              .lastIndexOf('@') +
-                                          1) ==
-                                  'like'
-                              ? Icons.thumb_up
-                              : Icons.thumb_down,
+                itemCount: interactions.length,
+                gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4),
+                itemBuilder: (BuildContext context, int index) {
+                  String email = interactions[index].toString().substring(
+                      0, interactions[index].toString().lastIndexOf('@'));
+                  return Padding(
+                    padding: EdgeInsets.all(3),
+                    child: Stack(
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.topCenter,
+                          child: CircleAvatar(
+                            radius: 25,
+                            backgroundImage: NetworkImage(
+                                widget.userMap[email].profileImage),
+                          ),
+                        ),
+                        Align(
+                            alignment: Alignment.topLeft,
+                            child: interactions[index].toString().substring(
+                                        interactions[index]
+                                                .toString()
+                                                .lastIndexOf('@') +
+                                            1) ==
+                                    'favorite'
+                                ? Icon(
+                                    Icons.favorite,
+                                    size: 25,
+                                    color: Colors.red[200],
+                                  )
+                                : interactions[index].toString().substring(
+                                            interactions[index]
+                                                    .toString()
+                                                    .lastIndexOf('@') +
+                                                1) ==
+                                        'like'
+                                    ? Icon(
+                                        Icons.thumb_up,
+                                        size: 25,
+                                        color: Colors.green[200],
+                                      )
+                                    : Icon(
+                                        Icons.thumb_down,
+                                        size: 25,
+                                        color: Colors.orange[200],
+                                      )),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Text(
+                            widget.userMap[email].firstName.length > 12
+                                ? widget.userMap[email].firstName
+                                        .substring(0, 12) +
+                                    '...'
+                                : widget.userMap[email].firstName,
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'Garamond',
+                              color: Color.fromRGBO(43, 158, 179, 1),
+                            ),
+                          ),
+                        )
+                      ],
                     ),
-                  ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: CircleAvatar(
-                      radius: 20,
-                      backgroundImage: NetworkImage(widget
-                          .userMap[interactions[index].toString().substring(0,
-                              interactions[index].toString().lastIndexOf('@'))]
-                          .profileImage),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                  );
+                }),
           ),
         ],
       ),
@@ -343,7 +369,7 @@ class MessageDetailsDialogState extends State<MessageDetailsDialog>
       context: context,
       builder: (BuildContext context) {
         return DeleteDialog(
-            widget.currentUserModel.email, widget.messageData.reference.path);
+            widget.currentUserEmail, widget.messageData.reference.path);
       },
     ).whenComplete(
       () {
@@ -368,10 +394,9 @@ class MessageDetailsDialogState extends State<MessageDetailsDialog>
                 : type == 'like' ? _likeTween.value : _dislikeTween.value,
           ),
           onPressed: () {
-            if (interactions
-                .contains(widget.currentUserModel.email + '@' + type)) {
+            if (interactions.contains(widget.currentUserEmail + '@' + type)) {
               fire
-                  .removeInteraction(type, widget.currentUserModel.email,
+                  .removeInteraction(type, widget.currentUserEmail,
                       widget.messageData.reference.path)
                   .then(
                 (data) {
@@ -392,7 +417,7 @@ class MessageDetailsDialogState extends State<MessageDetailsDialog>
               );
             } else {
               fire
-                  .addInteraction(type, widget.currentUserModel.email,
+                  .addInteraction(type, widget.currentUserEmail,
                       widget.messageData.reference.path)
                   .then(
                 (data) {
@@ -498,10 +523,9 @@ class MessageDetailsDialogState extends State<MessageDetailsDialog>
                   color: Color.fromRGBO(43, 158, 179, 1),
                 ),
               ),
-              widget.userMap[e].followers
-                      .contains(widget.currentUserModel.email)
+              widget.userMap[e].followers.contains(widget.currentUserEmail)
                   ? widget.userMap[e].following
-                          .contains(widget.currentUserModel.email)
+                          .contains(widget.currentUserEmail)
                       ? Text(
                           'follows you',
                           style: TextStyle(
@@ -511,11 +535,13 @@ class MessageDetailsDialogState extends State<MessageDetailsDialog>
                           ),
                         )
                       : Container()
-                  : GestureDetector(
-                      child: Container(
-                        child: Icon(Icons.add),
-                      ),
-                    ),
+                  : widget.currentUserEmail == e
+                      ? Container()
+                      : GestureDetector(
+                          child: Container(
+                            child: Icon(Icons.add),
+                          ),
+                        ),
             ],
           ),
         ],

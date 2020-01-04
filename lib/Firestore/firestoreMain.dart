@@ -140,6 +140,38 @@ class FirestoreMain {
     );
   }
 
+  void addToReadByList(DocumentSnapshot s, String currentUserEmail) {
+    bool alreadyRead = false;
+    for (String s in s['readBy']) {
+      if (s.contains(currentUserEmail)) {
+        alreadyRead = true;
+      }
+    }
+    if (!alreadyRead) {
+      try {
+        Firestore.instance.document(s.reference.path).updateData(
+          {
+            'readBy': FieldValue.arrayUnion(
+              [currentUserEmail + '@' + DateTime.now().toString()],
+            ),
+          },
+        );
+      } catch (e) {}
+      try {
+        print(s.reference.parent().parent().path);
+        Firestore.instance
+            .document(s.reference.parent().parent().path)
+            .updateData(
+          {
+            'readBy': FieldValue.arrayUnion(
+              [currentUserEmail],
+            ),
+          },
+        );
+      } catch (e) {}
+    }
+  }
+
   void acceptFollowRequest(String loggedInUser, String otherUser) async {
     await Firestore.instance
         .collection('users')

@@ -8,8 +8,9 @@ class DateTimeFormat {
               : sent.minute.toString()) +
           (sent.hour > 11 && sent.hour < 23 ? ' pm' : ' am');
     } else if (now.difference(sent).inDays < 7) {
-      return sent.weekday.toString() +
-          ' ' +
+      // return now.difference(sent).inDays.toString();
+      return _weekdayAbreviation(sent.weekday) +
+          ', ' +
           (sent.hour % 12 == 0 ? '12' : (sent.hour % 12).toString()) +
           ':' +
           (sent.minute < 10
@@ -26,6 +27,27 @@ class DateTimeFormat {
           (sent.minute < 10
               ? '0' + sent.minute.toString()
               : sent.minute.toString());
+    }
+  }
+
+  String _weekdayAbreviation(int day) {
+    switch (day) {
+      case 1:
+        return 'Monday';
+      case 2:
+        return 'Tuesday';
+      case 3:
+        return 'Wednesday';
+      case 4:
+        return 'Thursday';
+      case 5:
+        return 'Friday';
+      case 6:
+        return 'Saturday';
+      case 7:
+        return 'Sunday';
+      default:
+        return 'idk';
     }
   }
 
