@@ -29,7 +29,7 @@ class LoginState extends State<Login> {
       if (user != null) {
         print('logging in');
 
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) {
@@ -238,7 +238,7 @@ class LoginState extends State<Login> {
       FirebaseUser user = result.user;
 
       if (user != null && await user.getIdToken() != null) {
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) {
