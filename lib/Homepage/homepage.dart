@@ -43,7 +43,7 @@ class HomePageState extends State<HomePage> {
             width: 40,
             child: ScopedModelDescendant<UserModel>(
                 builder: (context, child, model) {
-              return g.getUserProfileImage(model.email, 25);
+              return g.currentUserProfileImage(model.profileImage, 25);
             }),
           ),
         ),

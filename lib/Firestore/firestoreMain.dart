@@ -752,4 +752,12 @@ class FirestoreMain {
       backgroundImage: NetworkImage(url),
     );
   }
+
+  Widget currentUserProfileImage(String url, double rad)
+  {
+    return CircleAvatar(
+      radius: rad,
+      backgroundImage: NetworkImage(url),
+    );
+  }
 }
